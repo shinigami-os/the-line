@@ -19,12 +19,23 @@ Singleton {
     readonly property real wrapTotal: wrapToCorner + toastW / 2 - 0.5 + 56
 
     // When the toast content takes over: the dashes have drawn the frame down to its bottom corners.
-    readonly property int tileDelay: Anim.pulse + Math.round(Anim.pulseWrap * wrapToCorner / wrapTotal)
+    readonly property int tileDelay: lead + Anim.pulse + Math.round(Anim.pulseWrap * wrapToCorner / wrapTotal)
 
     // The pulse timeline, shared by the dashes on every screen and by the clock tile that grows under them.
     // pulseMs is the elapsed time (linear). toTile: the dashes turn back and the tile's frame follows them,
     // otherwise they just meet at the centre.
     property bool pulseActive: false
+
+    // Screens whose line is withdrawn (fullscreen). The pulse then starts a little late, so the line has
+    // time to draw itself back before the dashes run on it.
+    property var withdrawn: []
+    readonly property int lead: withdrawn.length > 0 ? Anim.d(160) : 0
+
+    function setWithdrawn(screen, on) {
+        const rest = withdrawn.filter(s => s !== screen);
+        withdrawn = on ? rest.concat(screen) : rest;
+    }
+
     property bool pulseAround: false
     property real pulseMs: 0
 
@@ -37,7 +48,8 @@ Singleton {
     function pulse(toTile) {
         pulseAnim.stop();
         pulseAround = toTile;
-        pulseMs = 0;
+        pulseAnim.from = -lead;
+        pulseMs = -lead;
         pulseAnim.to = Anim.pulse + (toTile ? Anim.pulseWrap : 0);
         pulseActive = true;
         pulseAnim.restart();
@@ -47,8 +59,7 @@ Singleton {
         id: pulseAnim
         target: root
         property: "pulseMs"
-        from: 0
-        duration: Math.max(1, to)
+        duration: Math.max(1, to - from)
         easing.type: Easing.Linear
         onStopped: root.pulseActive = false
     }

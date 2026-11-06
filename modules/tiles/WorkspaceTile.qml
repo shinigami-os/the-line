@@ -13,6 +13,9 @@ Tile {
 
     required property string screenName
     required property int workspace   // active workspace of this screen
+    property bool musicHidden: false  // fullscreen: the music part leaves first
+
+    readonly property bool musicShown: Media.active && !musicHidden
 
     readonly property var toplevel: Hyprland.activeToplevel
 
@@ -55,7 +58,7 @@ Tile {
     readonly property string kind: UiState.isOpen(screenName, "tl") ? "tl" : (UiState.isOpen(screenName, "tm") ? "tm" : "")
 
     anchorSide: "left"
-    restW: Theme.wsBlockW + (Media.active ? Theme.musicW : 0)
+    restW: Theme.wsBlockW + (musicShown ? Theme.musicW : 0)
     openW: 560
     // Launcher: search field, section label, one row per result, footer.
     openH: Theme.tileHeight + (kind === "tm" ? 12 + musicPanel.implicitHeight + 6
@@ -190,15 +193,15 @@ Tile {
         clip: true
 
         // Appears as the reverse of how it leaves: the frame grows first, then the content fades in.
-        opacity: Media.active ? 1 : 0
+        opacity: tile.musicShown ? 1 : 0
         visible: opacity > 0
 
         Behavior on opacity {
             SequentialAnimation {
-                PauseAnimation { duration: Media.active ? Anim.panel : 0 }
+                PauseAnimation { duration: tile.musicShown ? Anim.panel : 0 }
                 NumberAnimation {
-                    duration: Media.active ? Anim.base : Anim.exitFade
-                    easing.type: Media.active ? Anim.easing : Easing.Linear
+                    duration: tile.musicShown ? Anim.base : Anim.exitFade
+                    easing.type: tile.musicShown ? Anim.easing : Easing.Linear
                 }
             }
         }

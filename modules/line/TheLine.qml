@@ -13,12 +13,55 @@ Scope {
 
     readonly property string screenName: modelData.name
     readonly property bool panelHere: UiState.openScreen === screenName && UiState.openPanel !== ""
-    // A fullscreen window on this screen's workspace: the tiles slide away, then the line withdraws into the
-    // screen edges. Leaving fullscreen plays it backwards. The gauge and the pulse still show meanwhile.
+    // A fullscreen window on this screen's workspace. Going fullscreen runs in stages, one after the other:
+    //   1. the music part leaves the workspace tile,  2. the three tiles fold up into the line,
+    //   3. the line withdraws into the screen edges.
+    // Leaving fullscreen runs them backwards. `stage` is where the screen is now (0 = everything shown).
     readonly property bool fullscreen: Hyprland.monitorFor(modelData)?.activeWorkspace?.hasFullscreen ?? false
     readonly property int lineDraw: Math.round(Anim.panel * 1.6)
+    property int stage: 0
 
-    onFullscreenChanged: if (fullscreen && UiState.openScreen === screenName) UiState.close()
+    // While the line is withdrawn, a notification or a level change draws it back for the event (peek).
+    readonly property bool lineEvent: LineState.pulseActive || LineState.gaugeKind !== ""
+    readonly property bool peek: stage >= 3 && (lineEvent || peekLinger.running)
+
+    // How long the current stage's animation needs before the next one starts.
+    function stageDelay() {
+        if (fullscreen)
+            return [0, Media.active ? Anim.closeLead + Anim.panel : 0, Anim.closeLead + Anim.panel][stage];
+        return [0, Anim.panel + Anim.fillLag, root.lineDraw, 0][stage];
+    }
+
+    function scheduleStage() {
+        if ((fullscreen && stage < 3) || (!fullscreen && stage > 0)) {
+            stageTimer.interval = Math.max(1, stageDelay());
+            stageTimer.restart();
+        } else {
+            stageTimer.stop();
+        }
+    }
+
+    onFullscreenChanged: {
+        if (fullscreen && UiState.openScreen === screenName)
+            UiState.close();
+        scheduleStage();
+    }
+    onStageChanged: {
+        scheduleStage();
+        LineState.setWithdrawn(screenName, stage >= 3);
+    }
+    onLineEventChanged: if (!lineEvent && stage >= 3) peekLinger.restart()
+
+    Timer {
+        id: stageTimer
+        onTriggered: root.stage += root.fullscreen ? 1 : -1
+    }
+
+    // Keeps the line out a moment after the event, so the gauge fades before the line withdraws.
+    Timer {
+        id: peekLinger
+        interval: Anim.base
+    }
 
     readonly property int workspace: {
         const ws = Hyprland.monitorFor(modelData)?.activeWorkspace?.id ?? 1;
@@ -54,12 +97,12 @@ Scope {
         color: "transparent"
         WlrLayershell.namespace: "the-line"
         // Hyprland draws fullscreen windows over the top layer, so the line moves to the overlay layer meanwhile.
-        WlrLayershell.layer: root.fullscreen ? WlrLayer.Overlay : WlrLayer.Top
+        WlrLayershell.layer: root.fullscreen || root.stage > 0 ? WlrLayer.Overlay : WlrLayer.Top
         WlrLayershell.keyboardFocus: root.panelHere ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 
         // Input only where something is: the tiles, or the whole surface while a panel is open
         // (so a click outside closes it without reaching the window below).
-        mask: root.panelHere ? fullMask : (root.fullscreen ? noMask : tilesMask)
+        mask: root.panelHere ? fullMask : (root.fullscreen || root.stage > 0 ? noMask : tilesMask)
 
         Region {
             id: fullMask
@@ -90,61 +133,45 @@ Scope {
                 onClicked: UiState.close()
             }
 
-            // The three tiles move as one group in fullscreen: up and out, after (or before) the line.
+            // The three tiles. In fullscreen they fold up into the line (stage 2).
             Item {
                 id: tiles
 
                 anchors.fill: parent
-                enabled: !root.fullscreen
-                opacity: root.fullscreen ? 0 : 1
-
-                transform: Translate {
-                    y: root.fullscreen ? -(Theme.tileHeight + 20) : 0
-
-                    Behavior on y {
-                        SequentialAnimation {
-                            PauseAnimation { duration: root.fullscreen ? 0 : Math.round(root.lineDraw * 0.6) }
-                            NumberAnimation { duration: Anim.panel; easing.type: Anim.easing }
-                        }
-                    }
-                }
-
-                Behavior on opacity {
-                    SequentialAnimation {
-                        PauseAnimation { duration: root.fullscreen ? 0 : Math.round(root.lineDraw * 0.6) }
-                        NumberAnimation { duration: Anim.base }
-                    }
-                }
+                enabled: root.stage === 0
 
                 WorkspaceTile {
                     id: workspaceTile
                     screenName: root.screenName
                     workspace: root.workspace
+                    musicHidden: root.stage >= 1
+                    collapsed: root.stage >= 2
                 }
 
                 ClockTile {
                     id: clockTile
                     screenName: root.screenName
                     fullscreen: root.fullscreen
+                    collapsed: root.stage >= 2
                 }
 
                 StatusTile {
                     id: statusTile
                     screenName: root.screenName
+                    collapsed: root.stage >= 2
                 }
             }
 
             Line {
                 anchors.fill: parent
                 workspace: root.workspace
-                fullscreen: root.fullscreen
-                reach: root.fullscreen ? 0 : 1
+                musicShown: root.stage < 1
+                markerShown: root.stage < 2
+                tileShown: root.stage < 2
+                reach: root.stage >= 3 && !root.peek ? 0 : 1
 
                 Behavior on reach {
-                    SequentialAnimation {
-                        PauseAnimation { duration: root.fullscreen ? Anim.panel : 0 }
-                        NumberAnimation { duration: root.lineDraw; easing.type: Anim.easing }
-                    }
+                    NumberAnimation { duration: root.lineDraw; easing.type: Anim.easing }
                 }
             }
         }

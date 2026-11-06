@@ -187,17 +187,18 @@ Column {
         height: 46
 
         readonly property real secs: Math.max(1, Media.length)
-        readonly property real px: width / secs   // pixels per second
+        readonly property real rulerW: width - 44            // room at the end for the total time
+        readonly property real px: rulerW / secs              // pixels per second
 
         Rectangle {
             y: 6
-            width: parent.width
+            width: rulerItem.rulerW
             height: 1
             color: Theme.borderStrong
         }
         Rectangle {
             y: 6
-            width: Media.progress * parent.width
+            width: Media.progress * rulerItem.rulerW
             height: 1
             color: Theme.accent
 
@@ -226,7 +227,7 @@ Column {
                     color: tick.minute ? Theme.muted : Theme.borderStrong
                 }
                 Text {
-                    visible: tick.minute && tick.x + implicitWidth < rulerItem.width
+                    visible: tick.minute && tick.x + implicitWidth < rulerItem.rulerW - 4
                     y: 10
                     text: (tick.index / 4) + ":00"
                     font.family: Theme.fontMono
@@ -238,7 +239,7 @@ Column {
 
         // Marker: the same 14 x 3 accent bar as the workspace marker.
         Rectangle {
-            x: Math.max(0, Math.min(rulerItem.width - width, Media.progress * rulerItem.width - width / 2))
+            x: Math.max(0, Math.min(rulerItem.rulerW - width, Media.progress * rulerItem.rulerW - width / 2))
             y: 5
             width: 14
             height: 3
@@ -249,8 +250,25 @@ Column {
             }
         }
 
+        // End of the ruler: a closing tick and the total time.
+        Rectangle {
+            x: rulerItem.rulerW
+            y: 6
+            width: 1
+            height: 9
+            color: Theme.muted
+        }
+        Text {
+            x: rulerItem.rulerW + 8
+            y: 0
+            text: Media.format(Media.length)
+            font.family: Theme.fontMono
+            font.pixelSize: 10
+            color: Theme.muted
+        }
+
         MouseArea {
-            width: parent.width
+            width: rulerItem.rulerW
             height: 24
             cursorShape: Qt.PointingHandCursor
             onPressed: mouse => Media.seek(mouse.x / width)

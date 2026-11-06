@@ -28,9 +28,12 @@ Item {
     property real drivenFillW: restW
     property real drivenFillH: restH
 
+    // Folded up into the line (fullscreen): height goes to 0, the top row fades out first.
+    property bool collapsed: false
+
     readonly property bool open: mode === "open"
     readonly property real targetW: mode === "open" ? openW : (mode === "toast" ? toastW : restW)
-    readonly property real targetH: mode === "open" ? openH : (mode === "toast" ? toastH : restH)
+    readonly property real targetH: collapsed ? 0 : (mode === "open" ? openH : (mode === "toast" ? toastH : restH))
 
     default property alias topData: topRow.data
     property alias bodyData: body.data
@@ -120,6 +123,14 @@ Item {
         id: topRow
         width: tile.width
         height: Theme.tileHeight - 1
+        opacity: tile.collapsed ? 0 : 1
+
+        Behavior on opacity {
+            SequentialAnimation {
+                PauseAnimation { duration: tile.collapsed ? 0 : Math.round(Anim.panel * 0.6) }
+                NumberAnimation { duration: tile.collapsed ? Anim.exitFade : Anim.base }
+            }
+        }
     }
 
     Rectangle {

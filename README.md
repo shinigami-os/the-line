@@ -16,7 +16,7 @@ Runs on Hyprland (FHT comes later). Done so far:
 
 - music part of the top-left tile (MPRIS) with its progress on the line; it grows into the music panel (cover, track ruler with seek, controls, player picker)
 
-- fullscreen: the tiles slide away, then the line withdraws into the screen edges (gauge and pulse still play over the app)
+- fullscreen, in stages: the music part leaves, the tiles fold up into the line, the line withdraws into the screen edges. A notification or a level change draws the line back for the event, then it withdraws again
 
 Next: Super hints, Kira's voice.
 

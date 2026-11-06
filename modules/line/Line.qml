@@ -8,7 +8,9 @@ Item {
     id: line
 
     required property int workspace   // 1..10, the active workspace of this screen
-    property bool fullscreen: false
+    property bool musicShown: true     // music progress (gone once the music part leaves in fullscreen)
+    property bool markerShown: true    // workspace marker (gone once the tiles fold up)
+    property bool tileShown: true      // a clock tile the pulse can draw
     property real reach: 1             // 1 = edge to edge, 0 = withdrawn into both screen edges
 
     readonly property real lineWidth: width
@@ -36,7 +38,8 @@ Item {
         height: 3
         width: LineState.gaugeValue * line.lineWidth
         color: Theme.accent
-        opacity: LineState.gaugeKind !== "" ? 1 : 0
+        // On a withdrawn line it waits until the line is mostly drawn back.
+        opacity: LineState.gaugeKind !== "" && line.reach > 0.6 ? 1 : 0
 
         Behavior on width {
             NumberAnimation { duration: Anim.base; easing.type: Anim.easing }
@@ -53,7 +56,7 @@ Item {
         width: Media.progress * Theme.musicW
         height: 1
         color: Theme.accent
-        opacity: Media.active && !line.fullscreen ? 0.85 : 0
+        opacity: Media.active && line.musicShown ? 0.85 : 0
 
         Behavior on width {
             NumberAnimation { duration: 1000 }
@@ -69,7 +72,7 @@ Item {
         width: 14
         height: 3
         color: Theme.accent
-        opacity: line.fullscreen ? 0 : 1
+        opacity: line.markerShown ? 1 : 0
 
         Behavior on opacity {
             NumberAnimation { duration: Anim.base }
@@ -88,13 +91,13 @@ Item {
     PulseDash {
         anchors.fill: parent
         centerX: line.width / 2
-        tileShown: !line.fullscreen
+        tileShown: line.tileShown
         visible: LineState.pulseActive
     }
     PulseDash {
         anchors.fill: parent
         centerX: line.width / 2
-        tileShown: !line.fullscreen
+        tileShown: line.tileShown
         visible: LineState.pulseActive
         transform: Scale {
             origin.x: line.width / 2
