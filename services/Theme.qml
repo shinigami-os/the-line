@@ -27,6 +27,8 @@ Singleton {
     // Tile geometry: every tile hangs from the line at y = 10 and shares this height.
     readonly property int tileHeight: 42
     readonly property int wsCell: 20   // one workspace cell on the ruler
+    readonly property int wsBlockW: 26 + 10 * wsCell   // workspace part of the top-left tile
+    readonly property int musicW: 200                  // music part of the top-left tile, added while a player is active
 
     // Square corners, always.
     readonly property int radius: 0

@@ -16,7 +16,9 @@ Runs on Hyprland (FHT comes later). Done so far:
 
 - top-left tile grows into the launcher: apps (most launched first) and run in terminal; the panel height follows the results
 
-Next: music, fullscreen, Super hints, Kira's voice.
+- music part of the top-left tile (MPRIS) with its progress on the line
+
+Next: fullscreen, Super hints, Kira's voice.
 
 ## Run
 
@@ -40,7 +42,7 @@ qs -p . ipc call line search fire        # open the launcher with a search typed
 
 ```
 shell.qml         entry point and IPC
-services/         singletons: Theme, Anim, Config, UiState, LineState, Notifs, Audio, Brightness, SystemStats, Network, NightLight, Power, Time
+services/         singletons: Theme, Anim, Config, UiState, LineState, Notifs, Audio, Brightness, SystemStats, Network, NightLight, Power, Media, Apps, Session, ClockFace, Time
 modules/common/   Tile (tile that grows into a panel), PanelItem, Reading, Toggle, LineSlider, Icon
 modules/line/     the line and the per-screen surface
 modules/tiles/    the three tiles and their panels
@@ -68,6 +70,6 @@ hl.bind("SUPER+A", hl.dsp.global("the-line:quicksettings"))
 
 ## Needs
 
-Quickshell 0.3 with Hyprland, PipeWire, UPower and Bluetooth support, Hyprland, NetworkManager (nmcli), brightnessctl, procps-ng top, hyprlock, loginctl, and optionally hyprsunset for night light. Fonts: Raleway and IBM Plex Mono (JetBrains Mono is the fallback).
+Quickshell 0.3 with Hyprland, PipeWire, MPRIS, UPower and Bluetooth support, Hyprland, NetworkManager (nmcli), brightnessctl, procps-ng top, hyprlock, loginctl, and optionally hyprsunset for night light. Fonts: Raleway and IBM Plex Mono (JetBrains Mono is the fallback).
 
 Hyprland layer rule to avoid its own fade on the surface: `noanim` for the `the-line` namespace.

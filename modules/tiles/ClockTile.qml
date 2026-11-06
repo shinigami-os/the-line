@@ -59,8 +59,13 @@ Tile {
 
             Text {
                 anchors.verticalCenter: parent.verticalCenter
-                // The computer's own clock (Unix time) while the binary face is on.
-                text: ClockFace.binary ? Math.floor(Time.now.getTime() / 1000) : Qt.formatTime(Time.now, "HH:mm:ss")
+                // The ticking part (seconds, or the last two digits of Unix time with the binary face) is the
+                // tile's accent, like the active workspace on the left and the CPU graph on the right.
+                readonly property string full: ClockFace.binary ? String(Math.floor(Time.now.getTime() / 1000)) : Qt.formatTime(Time.now, "HH:mm:ss")
+                readonly property int split: ClockFace.binary ? full.length - 2 : 5
+
+                textFormat: Text.StyledText
+                text: full.slice(0, split) + "<font color=\"" + Theme.accent + "\">" + full.slice(split) + "</font>"
                 font.family: ClockFace.binary ? Theme.fontMono : Theme.fontUi
                 font.pixelSize: ClockFace.binary ? 15 : 17
                 font.weight: Font.DemiBold

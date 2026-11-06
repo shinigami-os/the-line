@@ -2,7 +2,7 @@ import QtQuick
 import QtQuick.Shapes
 import qs.services
 
-// The line and everything that happens on it: workspace marker, level gauge, notification pulse.
+// The line and everything that happens on it: music progress, workspace marker, level gauge, notification pulse.
 // Lives in the same surface as the tiles but is stacked above them.
 Item {
     id: line
@@ -37,7 +37,24 @@ Item {
         }
     }
 
-    // Workspace marker: slides along the line, in step with the workspace switch.
+    // Music progress: on the line, exactly above the music part of the top-left tile. Creeps forward each second.
+    Rectangle {
+        x: 16 + Theme.wsBlockW
+        y: 10
+        width: Media.progress * Theme.musicW
+        height: 1
+        color: Theme.accent
+        opacity: Media.active ? 0.85 : 0
+
+        Behavior on width {
+            NumberAnimation { duration: 1000 }
+        }
+        Behavior on opacity {
+            NumberAnimation { duration: Anim.base }
+        }
+    }
+
+        // Workspace marker: slides along the line, in step with the workspace switch.
     Rectangle {
         y: 9
         width: 14

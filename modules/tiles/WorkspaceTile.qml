@@ -1,9 +1,11 @@
 import QtQuick
+import QtQuick.Shapes
 import Quickshell.Hyprland
 import qs.modules.common
 import qs.services
 
 // Top-left tile: ten workspace numerals hung under ticks on the line, and the window title under them.
+// While a player is active, a music part is added on the right (its progress runs on the line above it).
 // It grows into the launcher: open an app or run a command. The panel's height follows the number of results.
 Tile {
     id: tile
@@ -49,7 +51,7 @@ Tile {
     }
 
     anchorSide: "left"
-    restW: 26 + 10 * Theme.wsCell
+    restW: Theme.wsBlockW + (Media.active ? Theme.musicW : 0)
     openW: 560
     // Search field, section label, one row per result, footer.
     openH: Theme.tileHeight + 12 + 48 + 24 + Math.max(1, results.length) * 32 + 34 + 12
@@ -117,7 +119,7 @@ Tile {
             id: titleRow
             x: 13
             y: 22
-            width: (tile.open ? tile.width - 26 - who.width - 12 : tile.restW - 26)
+            width: tile.open && !Media.active ? tile.width - 26 - who.width - 12 : Theme.wsBlockW - 26
             spacing: 8
             clip: true
 
@@ -155,10 +157,104 @@ Tile {
             font.family: Theme.fontMono
             font.pixelSize: 10
             color: Theme.muted
-            opacity: tile.open ? 1 : 0
+            opacity: tile.open && !Media.active ? 1 : 0
 
             Behavior on opacity {
                 NumberAnimation { duration: Anim.base }
+            }
+        }
+    }
+
+    // Music: play/pause, track, time. It takes the rest of the top row while the launcher is open.
+    Item {
+        id: music
+
+        x: Theme.wsBlockW
+        width: tile.open ? tile.width - Theme.wsBlockW : Theme.musicW
+        height: Theme.tileHeight - 1
+        visible: Media.active
+        clip: true
+
+        Rectangle {
+            width: 1
+            height: parent.height
+            color: Theme.border
+        }
+
+        Rectangle {
+            id: play
+
+            x: 12
+            anchors.verticalCenter: parent.verticalCenter
+            width: 24
+            height: 24
+            color: "transparent"
+            border.width: 1
+            border.color: playHover.hovered ? Theme.accent : Theme.borderStrong
+
+            Behavior on border.color {
+                ColorAnimation { duration: Anim.hover }
+            }
+
+            // Pause: two bars. Play: a triangle.
+            Row {
+                visible: Media.playing
+                anchors.centerIn: parent
+                spacing: 3
+
+                Rectangle { width: 2.5; height: 9; color: Theme.text }
+                Rectangle { width: 2.5; height: 9; color: Theme.text }
+            }
+            Shape {
+                visible: !Media.playing
+                anchors.centerIn: parent
+                anchors.horizontalCenterOffset: 1
+                width: 8
+                height: 10
+                preferredRendererType: Shape.CurveRenderer
+
+                ShapePath {
+                    strokeWidth: 0
+                    strokeColor: "transparent"
+                    fillColor: Theme.text
+                    startX: 0
+                    startY: 0
+                    PathLine { x: 8; y: 5 }
+                    PathLine { x: 0; y: 10 }
+                    PathLine { x: 0; y: 0 }
+                }
+            }
+
+            HoverHandler {
+                id: playHover
+            }
+            TapHandler {
+                onTapped: Media.toggle()
+            }
+        }
+
+        Column {
+            anchors.left: play.right
+            anchors.leftMargin: 10
+            anchors.right: parent.right
+            anchors.rightMargin: 12
+            anchors.verticalCenter: parent.verticalCenter
+            spacing: 1
+
+            Text {
+                width: parent.width
+                text: tile.open && Media.artist !== "" ? Media.title + "  ·  " + Media.artist : Media.title
+                elide: Text.ElideRight
+                font.family: Theme.fontUi
+                font.pixelSize: 12
+                font.weight: Font.Medium
+                color: Theme.text
+            }
+            Text {
+                text: Media.format(Media.position) + " / " + Media.format(Media.length)
+                font.family: Theme.fontMono
+                font.pixelSize: 10
+                color: Theme.muted
             }
         }
     }
