@@ -3,20 +3,73 @@ import Quickshell.Hyprland
 import qs.modules.common
 import qs.services
 
-// Top-left tile, at rest: ten workspace numerals hung under ticks on the line, and the window title under them.
+// Top-left tile: ten workspace numerals hung under ticks on the line, and the window title under them.
+// It grows into the launcher: open an app, run a command, or add a dev environment.
 Tile {
     id: tile
 
+    required property string screenName
     required property int workspace   // active workspace of this screen
 
-    anchorSide: "left"
-    restW: 26 + 10 * Theme.wsCell
-
     readonly property var toplevel: Hyprland.activeToplevel
+
+    // Launcher state.
+    property string query: ""
+    property int selected: 0
+    readonly property var apps: Apps.search(query, 6)
+    readonly property bool showRun: query.trim() !== "" && apps.length === 0
+    readonly property var kits: DevKits.search(query, 3)
+    // One list for keyboard navigation: apps (or the run row), then dev environments.
+    readonly property var results: (showRun ? [{ kind: "run" }] : apps.map(a => ({ kind: "app", app: a })))
+        .concat(kits.map(k => ({ kind: "kit", kit: k })))
 
     function occupied(n) {
         const ws = Hyprland.workspaces.values.find(w => w.id === n);
         return !!ws && ws.toplevels.values.length > 0;
+    }
+
+    function move(delta) {
+        if (results.length > 0)
+            selected = (selected + delta + results.length) % results.length;
+    }
+
+    function activate(index) {
+        const r = results[index];
+        if (!r)
+            return;
+        if (r.kind === "app")
+            Apps.launch(r.app);
+        else if (r.kind === "run")
+            Apps.runInTerminal(query.trim());
+        else if (!r.kit.installed)
+            DevKits.install(r.kit);
+        else
+            return;
+        UiState.close();
+    }
+
+    function complete() {
+        const r = results[selected];
+        if (r?.kind === "app")
+            query = r.app.name;
+        else if (r?.kind === "kit")
+            query = r.kit.name;
+    }
+
+    anchorSide: "left"
+    restW: 26 + 10 * Theme.wsCell
+    openW: 560
+    openH: Theme.tileHeight + 442
+    mode: UiState.isOpen(screenName, "tl") ? "open" : "rest"
+
+    onQueryChanged: selected = 0
+    onOpenChanged: {
+        if (open) {
+            DevKits.refresh();
+            search.forceActiveFocus();
+        } else {
+            query = "";
+        }
     }
 
     Item {
@@ -68,11 +121,12 @@ Tile {
             }
         }
 
-        // Window title under the numerals.
+        // Window title under the numerals. It opens the launcher, and uses the extra room while open.
         Row {
+            id: titleRow
             x: 13
             y: 22
-            width: tile.restW - 26
+            width: (tile.open ? tile.width - 26 - who.width - 12 : tile.restW - 26)
             spacing: 8
             clip: true
 
@@ -81,17 +135,263 @@ Tile {
                 font.family: Theme.fontUi
                 font.pixelSize: 12
                 font.weight: Font.Medium
-                color: Theme.text
+                color: titleHover.hovered ? Theme.accent : Theme.text
                 elide: Text.ElideRight
-                width: Math.min(implicitWidth, 130)
+                width: Math.min(implicitWidth, tile.open ? titleRow.width * 0.7 : 130)
             }
             Text {
-                anchors.baseline: undefined
                 text: tile.toplevel ? (tile.toplevel.lastIpcObject?.class ?? "") : "no windows"
                 font.family: Theme.fontMono
                 font.pixelSize: 10
                 color: Theme.muted
             }
+
+            HoverHandler {
+                id: titleHover
+            }
+            TapHandler {
+                onTapped: UiState.toggle(tile.screenName, "tl")
+            }
+        }
+
+        // user@host, written on the right while the launcher is open.
+        Text {
+            id: who
+            anchors.right: parent.right
+            anchors.rightMargin: 13
+            y: 22
+            text: Session.user + "@" + Session.host.toLowerCase()
+            font.family: Theme.fontMono
+            font.pixelSize: 10
+            color: Theme.muted
+            opacity: tile.open ? 1 : 0
+
+            Behavior on opacity {
+                NumberAnimation { duration: Anim.base }
+            }
         }
     }
+
+    bodyData: [
+        Column {
+            id: launcher
+
+            x: 13
+            y: 12
+            width: tile.openW - 26
+            spacing: 0
+
+            component Section: Text {
+                width: launcher.width
+                height: 24
+                leftPadding: 4
+                verticalAlignment: Text.AlignVCenter
+                font.family: Theme.fontUi
+                font.pixelSize: 11
+                font.weight: Font.DemiBold
+                font.letterSpacing: 0.9
+                color: Theme.muted
+            }
+
+            // Search field.
+            PanelItem {
+                order: 0
+                shown: tile.open
+                width: launcher.width
+                height: 48
+
+                Rectangle {
+                    width: parent.width
+                    height: 40
+                    color: Theme.bg
+                    border.width: 1
+                    border.color: search.activeFocus ? Theme.accent : Theme.borderStrong
+
+                    Behavior on border.color {
+                        ColorAnimation { duration: Anim.hover }
+                    }
+
+                    Text {
+                        id: prompt
+                        x: 12
+                        anchors.verticalCenter: parent.verticalCenter
+                        text: "›"
+                        font.family: Theme.fontMono
+                        font.pixelSize: 14
+                        color: Theme.accent
+                    }
+
+                    TextInput {
+                        id: search
+
+                        anchors.left: prompt.right
+                        anchors.leftMargin: 10
+                        anchors.right: escCap.left
+                        anchors.rightMargin: 10
+                        anchors.verticalCenter: parent.verticalCenter
+                        text: tile.query
+                        onTextEdited: tile.query = text
+                        font.family: Theme.fontUi
+                        font.pixelSize: 14
+                        font.weight: Font.Medium
+                        color: Theme.text
+                        selectionColor: Theme.accent
+                        selectedTextColor: Theme.accentText
+                        clip: true
+
+                        Keys.onUpPressed: tile.move(-1)
+                        Keys.onDownPressed: tile.move(1)
+                        Keys.onReturnPressed: tile.activate(tile.selected)
+                        Keys.onEnterPressed: tile.activate(tile.selected)
+                        Keys.onEscapePressed: UiState.close()
+                        Keys.onTabPressed: tile.complete()
+
+                        Text {
+                            visible: search.text === ""
+                            anchors.verticalCenter: parent.verticalCenter
+                            text: "Open, run or find"
+                            font: search.font
+                            color: Theme.muted
+                        }
+                    }
+
+                    Rectangle {
+                        id: escCap
+                        anchors.right: parent.right
+                        anchors.rightMargin: 12
+                        anchors.verticalCenter: parent.verticalCenter
+                        width: escText.implicitWidth + 12
+                        height: 18
+                        color: "transparent"
+                        border.width: 1
+                        border.color: Theme.borderStrong
+
+                        Text {
+                            id: escText
+                            anchors.centerIn: parent
+                            text: "Esc"
+                            font.family: Theme.fontMono
+                            font.pixelSize: 11
+                            color: Theme.muted
+                        }
+                    }
+                }
+            }
+
+            PanelItem {
+                order: 1
+                shown: tile.open
+                width: launcher.width
+                height: 24
+
+                Section {
+                    text: "APPS"
+                }
+            }
+
+            // Six app slots (or the run row when nothing matches).
+            Repeater {
+                model: 6
+
+                PanelItem {
+                    id: appSlot
+
+                    required property int index
+                    readonly property var result: index < (tile.showRun ? 1 : tile.apps.length) ? tile.results[index] : null
+
+                    order: 2 + index
+                    shown: tile.open
+                    width: launcher.width
+                    height: 32
+
+                    LauncherRow {
+                        visible: appSlot.result !== null
+                        width: parent.width
+                        selected: tile.selected === appSlot.index
+                        glyph: appSlot.result?.kind === "run" ? "$" : Apps.glyph(appSlot.result?.app?.name ?? "")
+                        name: appSlot.result?.kind === "run" ? tile.query.trim() : (appSlot.result?.app?.name ?? "")
+                        monoName: appSlot.result?.kind === "run"
+                        description: appSlot.result?.kind === "run" ? "run in terminal" : (appSlot.result?.app?.genericName || appSlot.result?.app?.comment || "")
+                        keycap: tile.selected === appSlot.index ? "↵" : ""
+                        onHovered: tile.selected = appSlot.index
+                        onActivated: tile.activate(appSlot.index)
+                    }
+                }
+            }
+
+            PanelItem {
+                order: 8
+                shown: tile.open
+                width: launcher.width
+                height: 24
+
+                Section {
+                    text: "DEV ENVIRONMENTS"
+                }
+            }
+
+            Repeater {
+                model: 3
+
+                PanelItem {
+                    id: kitSlot
+
+                    required property int index
+                    readonly property int resultIndex: (tile.showRun ? 1 : tile.apps.length) + index
+                    readonly property var kit: tile.kits[index] ?? null
+
+                    order: 9 + index
+                    shown: tile.open
+                    width: launcher.width
+                    height: 32
+
+                    LauncherRow {
+                        visible: kitSlot.kit !== null
+                        width: parent.width
+                        selected: tile.selected === kitSlot.resultIndex
+                        glyph: "{}"
+                        name: kitSlot.kit?.name ?? ""
+                        monoName: true
+                        description: kitSlot.kit?.description ?? ""
+                        pill: kitSlot.kit ? (kitSlot.kit.installed ? "on" : "add") : ""
+                        pillOn: kitSlot.kit?.installed ?? false
+                        onHovered: tile.selected = kitSlot.resultIndex
+                        onActivated: tile.activate(kitSlot.resultIndex)
+                    }
+                }
+            }
+
+            PanelItem {
+                order: 12
+                shown: tile.open
+                width: launcher.width
+                height: 34
+
+                Rectangle {
+                    y: 8
+                    width: parent.width
+                    height: 1
+                    color: Theme.border
+                }
+                Row {
+                    x: 4
+                    y: 16
+                    spacing: 16
+
+                    Repeater {
+                        model: ["↵ open", "↑↓ move", "Tab complete", "Esc close"]
+
+                        Text {
+                            required property string modelData
+
+                            text: modelData
+                            font.family: Theme.fontMono
+                            font.pixelSize: 11
+                            color: Theme.muted
+                        }
+                    }
+                }
+            }
+        }
+    ]
 }

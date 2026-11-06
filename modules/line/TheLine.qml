@@ -81,6 +81,7 @@ Scope {
 
             WorkspaceTile {
                 id: workspaceTile
+                screenName: root.screenName
                 workspace: root.workspace
             }
 

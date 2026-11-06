@@ -14,6 +14,7 @@ Singleton {
     readonly property bool reduceMotion: adapter.reduceMotion
     readonly property real motionScale: adapter.motionScale
     readonly property bool superHints: adapter.superHints
+    readonly property string terminal: adapter.terminal
     readonly property var screenFilter: {
         const env = Quickshell.env("THE_LINE_SCREENS");
         return env ? env.split(",") : adapter.screens;
@@ -40,6 +41,7 @@ Singleton {
             property bool reduceMotion: false
             property real motionScale: 1.0
             property bool superHints: true
+            property string terminal: "foot"
             property list<string> screens: []
         }
     }

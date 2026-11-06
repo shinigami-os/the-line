@@ -14,7 +14,9 @@ Runs on Hyprland (FHT comes later). Done so far:
 - top-centre tile: clock, notification toast, notifications panel and calendar
 - top-right tile: performance summary, Wi-Fi, volume, battery. The summary opens the performance dashboard, the icons open quick settings (toggles, sliders, reduce motion, power)
 
-Next: launcher, music, fullscreen, Super hints, Kira's voice.
+- top-left tile grows into the launcher: apps (most launched first), run in terminal, Kira dev environments (flux devkits)
+
+Next: music, fullscreen, Super hints, Kira's voice.
 
 ## Run
 
@@ -45,12 +47,22 @@ assets/           quotes and other static files
 scripts/          helpers
 ```
 
+## Keybindings
+
+The Line registers Hyprland global shortcuts under the `the-line` app id: `launcher`, `notifications`, `quicksettings`, `performance`. For example:
+
+```lua
+hl.bind("SUPER+SPACE", hl.dsp.global("the-line:launcher"))
+hl.bind("SUPER+N", hl.dsp.global("the-line:notifications"))
+hl.bind("SUPER+A", hl.dsp.global("the-line:quicksettings"))
+```
+
 ## Config
 
 `~/.config/the-line/config.json`, every key optional:
 
 ```json
-{ "accent": "#9A5CFF", "reduceMotion": false, "motionScale": 1.0, "screens": [] }
+{ "accent": "#9A5CFF", "reduceMotion": false, "motionScale": 1.0, "screens": [], "terminal": "foot" }
 ```
 
 ## Needs
