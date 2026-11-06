@@ -2,58 +2,28 @@ import QtQuick
 import QtQuick.Shapes
 import qs.services
 
-// The line and everything that happens on it: end caps, workspace marker, level gauge, notification pulse.
+// The line and everything that happens on it: workspace marker, level gauge, notification pulse.
 // Lives in the same surface as the tiles but is stacked above them.
 Item {
     id: line
 
     required property int workspace   // 1..10, the active workspace of this screen
 
-    readonly property real lineWidth: width - 32
+    readonly property real lineWidth: width
 
-    // The line itself.
+    // The line itself: it comes out of both edges of the screen.
     Rectangle {
-        x: 16
+        x: 0
         y: 10
         width: line.lineWidth
         height: 1
         color: Theme.borderStrong
     }
 
-    // End caps: a slanted 1px stroke, the logo's blade angle.
-    Shape {
-        x: 6
-        y: 4
-        width: 8
-        height: 13
-        ShapePath {
-            strokeWidth: 1
-            strokeColor: Theme.borderStrong
-            fillColor: "transparent"
-            startX: 7
-            startY: 0.5
-            PathLine { x: 1; y: 12.5 }
-        }
-    }
-    Shape {
-        x: line.width - 14
-        y: 4
-        width: 8
-        height: 13
-        ShapePath {
-            strokeWidth: 1
-            strokeColor: Theme.borderStrong
-            fillColor: "transparent"
-            startX: 7
-            startY: 0.5
-            PathLine { x: 1; y: 12.5 }
-        }
-    }
-
     // Level gauge: the whole line becomes the bar. No popup.
     Rectangle {
         y: 9
-        x: 16
+        x: 0
         height: 3
         width: LineState.gaugeValue * line.lineWidth
         color: Theme.accent
@@ -86,7 +56,7 @@ Item {
         y: 9
         width: 56
         height: 3
-        x: 16
+        x: 0
         color: Theme.accent
         visible: false
     }
@@ -95,7 +65,7 @@ Item {
         y: 9
         width: 56
         height: 3
-        x: line.width - 72
+        x: line.width - 56
         color: Theme.accent
         visible: false
     }
@@ -115,7 +85,7 @@ Item {
         NumberAnimation {
             target: pulseLeft
             property: "x"
-            from: 16
+            from: 0
             to: line.width / 2 - 56
             duration: Anim.pulse
             easing.type: Anim.easing
@@ -123,7 +93,7 @@ Item {
         NumberAnimation {
             target: pulseRight
             property: "x"
-            from: line.width - 72
+            from: line.width - 56
             to: line.width / 2
             duration: Anim.pulse
             easing.type: Anim.easing

@@ -12,8 +12,8 @@ Tile {
     restW: 176
     toastW: 400
     toastH: 128
-    openW: 400
-    openH: 492
+    openW: 720
+    openH: 432
 
     mode: UiState.isOpen(screenName, "tc") ? "open" : (Notifs.toast ? "toast" : "rest")
 
@@ -42,7 +42,6 @@ Tile {
                 font.family: Theme.fontUi
                 font.pixelSize: 20
                 font.weight: Font.DemiBold
-                font.features: { "lnum": 1, "tnum": 1 }
                 color: Theme.text
             }
             Text {
@@ -76,7 +75,8 @@ Tile {
         // Toast: one block, fades in after the tile starts dropping.
         Item {
             id: toastBlock
-            width: tile.openW
+            x: (tile.openW - tile.toastW) / 2
+            width: tile.toastW
             opacity: tile.mode === "toast" ? 1 : 0
 
             Behavior on opacity {
@@ -134,20 +134,77 @@ Tile {
             }
         },
 
-        // Notifications panel.
-        Column {
-            id: panel
-            width: tile.openW
-            topPadding: 12
-            leftPadding: 12
-            spacing: 4
-
-            readonly property real inner: width - 24
+        // Left half: analog clock, calendar under it.
+        Item {
+            id: leftHalf
+            width: 300
+            height: parent.height
 
             PanelItem {
                 order: 0
                 shown: tile.open
-                width: panel.inner
+                x: (leftHalf.width - width) / 2
+                y: 12
+                width: 140
+                height: 140
+
+                AnalogClock {
+                    size: 140
+                }
+            }
+
+            PanelItem {
+                order: 2
+                shown: tile.open
+                x: 12
+                y: 164
+                width: leftHalf.width - 24
+                height: calendar.implicitHeight + 18
+
+                Rectangle {
+                    y: 0
+                    width: parent.width
+                    height: 1
+                    color: Theme.border
+                }
+                Calendar {
+                    id: calendar
+                    x: 4
+                    y: 10
+                    width: parent.width - 8
+                }
+            }
+        },
+
+        // The cut: a vertical divider between the two halves.
+        PanelItem {
+            order: 1
+            shown: tile.open
+            x: 300
+            width: 1
+            height: parent.height
+
+            Rectangle {
+                anchors.fill: parent
+                color: Theme.border
+            }
+        },
+
+        // Right half: notification centre, controls at the bottom.
+        Item {
+            id: rightHalf
+            x: 301
+            width: tile.openW - 301
+            height: parent.height
+
+            readonly property real inner: width - 24
+
+            PanelItem {
+                order: 1
+                shown: tile.open
+                x: 12
+                y: 12
+                width: rightHalf.inner
                 height: 28
 
                 Text {
@@ -164,22 +221,21 @@ Tile {
                     y: 4
                     anchors.right: parent.right
                     anchors.rightMargin: 4
-                    text: "clear"
+                    text: Notifs.list.length + (Notifs.list.length === 1 ? " item" : " items")
                     font.family: Theme.fontMono
                     font.pixelSize: 11
-                    color: clearHover.hovered ? Theme.accent : Theme.muted
-
-                    HoverHandler { id: clearHover }
-                    TapHandler { onTapped: Notifs.clear() }
+                    color: Theme.muted
                 }
             }
 
             PanelItem {
                 visible: Notifs.list.length === 0
-                order: 1
+                order: 2
                 shown: tile.open
-                width: panel.inner
-                height: visible ? 36 : 0
+                x: 12
+                y: 44
+                width: rightHalf.inner
+                height: 36
 
                 Text {
                     x: 4
@@ -192,91 +248,141 @@ Tile {
                 }
             }
 
-            Repeater {
-                model: Notifs.list.slice(0, 3)
+            Column {
+                x: 12
+                y: 44
+                width: rightHalf.inner
+                spacing: 4
 
-                PanelItem {
-                    id: card
+                Repeater {
+                    model: Notifs.list.slice(0, 4)
 
-                    required property var modelData
-                    required property int index
+                    PanelItem {
+                        id: card
 
-                    order: 1 + index
-                    shown: tile.open
-                    width: panel.inner
-                    height: cardCol.implicitHeight + 18
+                        required property var modelData
+                        required property int index
 
-                    Rectangle {
-                        anchors.fill: parent
-                        color: "transparent"
-                        border.width: 1
-                        border.color: card.modelData.read ? Theme.border : Theme.borderStrong
-                    }
+                        order: 2 + index
+                        shown: tile.open
+                        width: rightHalf.inner
+                        height: cardCol.implicitHeight + 18
 
-                    Column {
-                        id: cardCol
-                        x: 10
-                        y: 9
-                        width: parent.width - 20
-                        spacing: 2
+                        Rectangle {
+                            anchors.fill: parent
+                            color: "transparent"
+                            border.width: 1
+                            border.color: card.modelData.read ? Theme.border : Theme.borderStrong
+                        }
 
-                        Item {
-                            width: parent.width
-                            height: 14
+                        Column {
+                            id: cardCol
+                            x: 10
+                            y: 9
+                            width: parent.width - 20
+                            spacing: 2
 
-                            Text {
-                                text: card.modelData.app
-                                font.family: Theme.fontMono
-                                font.pixelSize: 11
-                                color: Theme.muted
+                            Item {
+                                width: parent.width
+                                height: 14
+
+                                Text {
+                                    text: card.modelData.app
+                                    font.family: Theme.fontMono
+                                    font.pixelSize: 11
+                                    color: Theme.muted
+                                }
+                                Text {
+                                    anchors.right: parent.right
+                                    text: card.modelData.time
+                                    font.family: Theme.fontMono
+                                    font.pixelSize: 11
+                                    color: Theme.muted
+                                }
                             }
                             Text {
-                                anchors.right: parent.right
-                                text: card.modelData.time
-                                font.family: Theme.fontMono
-                                font.pixelSize: 11
-                                color: Theme.muted
+                                width: parent.width
+                                text: card.modelData.title
+                                font.family: Theme.fontUi
+                                font.pixelSize: 13
+                                font.weight: Font.DemiBold
+                                color: Theme.text
+                                elide: Text.ElideRight
                             }
-                        }
-                        Text {
-                            width: parent.width
-                            text: card.modelData.title
-                            font.family: Theme.fontUi
-                            font.pixelSize: 13
-                            font.weight: Font.DemiBold
-                            color: Theme.text
-                            elide: Text.ElideRight
-                        }
-                        Text {
-                            width: parent.width
-                            text: card.modelData.body
-                            font.family: Theme.fontUi
-                            font.pixelSize: 12
-                            font.weight: Font.Medium
-                            color: Theme.muted
-                            elide: Text.ElideRight
+                            Text {
+                                width: parent.width
+                                text: card.modelData.body
+                                font.family: Theme.fontUi
+                                font.pixelSize: 12
+                                font.weight: Font.Medium
+                                color: Theme.muted
+                                elide: Text.ElideRight
+                            }
                         }
                     }
                 }
             }
 
+            // Controls: do not disturb, clear all.
             PanelItem {
-                order: 5
+                order: 6
                 shown: tile.open
-                width: panel.inner
-                height: calendar.implicitHeight + 18
+                x: 12
+                y: rightHalf.height - 12 - 36
+                width: rightHalf.inner
+                height: 36
 
-                Rectangle {
-                    y: 8
-                    width: parent.width
-                    height: 1
-                    color: Theme.border
-                }
-                Calendar {
-                    id: calendar
-                    x: 4
-                    y: 18
-                    width: parent.width - 8
+                Row {
+                    spacing: 8
+
+                    Rectangle {
+                        width: (rightHalf.inner - 8) / 2
+                        height: 36
+                        border.width: 1
+                        border.color: Notifs.dnd ? Theme.accent : (dndHover.hovered ? Theme.borderStrong : Theme.border)
+                        color: Notifs.dnd ? Theme.accentTint : "transparent"
+
+                        Behavior on border.color {
+                            ColorAnimation { duration: Anim.base }
+                        }
+                        Behavior on color {
+                            ColorAnimation { duration: Anim.base }
+                        }
+
+                        Text {
+                            anchors.centerIn: parent
+                            text: Notifs.dnd ? "Do not disturb · on" : "Do not disturb"
+                            font.family: Theme.fontUi
+                            font.pixelSize: 12
+                            font.weight: Font.Medium
+                            color: Theme.text
+                        }
+                        HoverHandler { id: dndHover }
+                        TapHandler { onTapped: Notifs.dnd = !Notifs.dnd }
+                    }
+
+                    Rectangle {
+                        width: (rightHalf.inner - 8) / 2
+                        height: 36
+                        border.width: 1
+                        border.color: clearHover.hovered ? Theme.borderStrong : Theme.border
+                        color: "transparent"
+
+                        Behavior on border.color {
+                            ColorAnimation { duration: Anim.hover }
+                        }
+
+                        Text {
+                            anchors.centerIn: parent
+                            text: "Clear all"
+                            font.family: Theme.fontUi
+                            font.pixelSize: 12
+                            font.weight: Font.Medium
+                            color: clearHover.hovered ? Theme.accent : Theme.text
+                        }
+                        HoverHandler { id: clearHover }
+                        TapHandler { onTapped: Notifs.clear() }
+                    }
                 }
             }
         }
