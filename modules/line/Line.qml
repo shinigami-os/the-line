@@ -43,7 +43,8 @@ Item {
         width: 14
         height: 3
         color: Theme.accent
-        x: 33 + (Math.max(1, Math.min(10, line.workspace)) - 1) * 22
+        // Centred over the active cell of the workspace ruler (tile at 16, ruler 13 px in).
+        x: 16 + 13 + Theme.wsCell / 2 - 7 + (Math.max(1, Math.min(10, line.workspace)) - 1) * Theme.wsCell
 
         Behavior on x {
             NumberAnimation { duration: Anim.workspace; easing.type: Anim.easing }

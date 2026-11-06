@@ -10,7 +10,7 @@ Tile {
     required property int workspace   // active workspace of this screen
 
     anchorSide: "left"
-    restW: 248
+    restW: 26 + 10 * Theme.wsCell
 
     readonly property var toplevel: Hyprland.activeToplevel
 
@@ -22,10 +22,10 @@ Tile {
     Item {
         anchors.fill: parent
 
-        // Workspace ruler: 10 cells of 22px, ticks touching the line.
+        // Workspace ruler: 10 cells, ticks hanging from the line.
         Row {
             x: 13
-            y: 3
+            y: 1
 
             Repeater {
                 model: 10
@@ -38,11 +38,11 @@ Tile {
                     readonly property bool active: n === tile.workspace
                     readonly property bool busy: tile.occupied(n)
 
-                    width: 22
-                    height: 22
+                    width: Theme.wsCell
+                    height: 20
 
                     Rectangle {
-                        x: 10
+                        x: Theme.wsCell / 2 - 1
                         width: 1
                         height: cell.active ? 0 : (cell.busy ? 7 : 4)
                         color: cell.busy ? Theme.muted : Theme.borderStrong
@@ -53,7 +53,7 @@ Tile {
                         anchors.bottom: parent.bottom
                         text: cell.n % 10
                         font.family: Theme.fontUi
-                        font.pixelSize: 13
+                        font.pixelSize: 12
                         font.weight: cell.active ? Font.Bold : Font.Medium
                         color: cell.active ? Theme.accent : (cell.busy ? Theme.text : (cellHover.hovered ? Theme.text : Theme.muted))
                     }
@@ -71,25 +71,25 @@ Tile {
         // Window title under the numerals.
         Row {
             x: 13
-            y: 28
-            width: 222
+            y: 22
+            width: tile.restW - 26
             spacing: 8
             clip: true
 
             Text {
                 text: tile.toplevel ? (tile.toplevel.title || "Untitled") : "Desktop"
                 font.family: Theme.fontUi
-                font.pixelSize: 13
+                font.pixelSize: 12
                 font.weight: Font.Medium
                 color: Theme.text
                 elide: Text.ElideRight
-                width: Math.min(implicitWidth, 150)
+                width: Math.min(implicitWidth, 130)
             }
             Text {
                 anchors.baseline: undefined
                 text: tile.toplevel ? (tile.toplevel.lastIpcObject?.class ?? "") : "no windows"
                 font.family: Theme.fontMono
-                font.pixelSize: 11
+                font.pixelSize: 10
                 color: Theme.muted
             }
         }

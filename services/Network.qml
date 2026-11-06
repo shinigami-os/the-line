@@ -10,6 +10,7 @@ Singleton {
 
     property bool wifiEnabled: true
     property string ssid: ""
+    property int signal: 0   // 0..100
 
     readonly property bool connected: wifiEnabled && ssid !== ""
     readonly property string label: !wifiEnabled ? "off" : (ssid !== "" ? ssid : "not connected")
@@ -37,11 +38,15 @@ Singleton {
 
     Process {
         id: active
-        command: ["nmcli", "-t", "-f", "ACTIVE,SSID", "dev", "wifi"]
+        command: ["nmcli", "-t", "-f", "ACTIVE,SIGNAL,SSID", "dev", "wifi"]
         stdout: StdioCollector {
             onStreamFinished: {
+                // yes:72:MATRIXBOX (colons inside the SSID are escaped as \:)
                 const line = text.split("\n").find(l => l.startsWith("yes:"));
-                root.ssid = line ? line.slice(4) : "";
+                const rest = line ? line.slice(4) : "";
+                const sep = rest.indexOf(":");
+                root.signal = line ? Number(rest.slice(0, sep)) : 0;
+                root.ssid = line ? rest.slice(sep + 1).replace(/\\:/g, ":") : "";
             }
         }
     }

@@ -12,7 +12,7 @@ Singleton {
 
     // Size of the toast the pulse draws around; the clock tile uses the same numbers.
     readonly property int toastW: 400
-    readonly property int toastH: 128
+    readonly property int toastH: Theme.tileHeight + 76
 
     // The pulse's second leg, in px: back out along the line, down the frame's side, inward along its bottom, tail.
     readonly property real wrapToCorner: toastW / 2 - 56.5 + toastH - 1

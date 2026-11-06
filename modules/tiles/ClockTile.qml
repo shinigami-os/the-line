@@ -9,11 +9,11 @@ Tile {
     required property string screenName
 
     anchorSide: "center"
-    restW: 176
+    restW: 152
     toastW: LineState.toastW
     toastH: LineState.toastH
     openW: 720
-    openH: 432
+    openH: Theme.tileHeight + 380
 
     // While the pulse draws this tile, the frame is exactly where the dashes are: the width grows as they run out
     // along the line, the height as they run down the sides. The fill follows fillLag behind.
@@ -58,17 +58,49 @@ Tile {
                 anchors.verticalCenter: parent.verticalCenter
                 text: Qt.formatTime(Time.now, "HH:mm:ss")
                 font.family: Theme.fontUi
-                font.pixelSize: 20
+                font.pixelSize: 17
                 font.weight: Font.DemiBold
                 color: Theme.text
             }
-            Text {
+            // Short date at rest; written out in full while the panel is open.
+            Item {
+                id: dateBox
+
                 anchors.verticalCenter: parent.verticalCenter
-                text: Qt.formatDate(Time.now, "ddd d MMM")
-                font.family: Theme.fontUi
-                font.pixelSize: 12
-                font.weight: Font.Medium
-                color: Theme.muted
+                width: tile.open ? longDate.implicitWidth : shortDate.implicitWidth
+                height: shortDate.implicitHeight
+                clip: true
+
+                Behavior on width {
+                    NumberAnimation { duration: Anim.panel; easing.type: Anim.easing }
+                }
+
+                Text {
+                    id: shortDate
+                    text: Qt.formatDate(Time.now, "ddd d MMM")
+                    font.family: Theme.fontUi
+                    font.pixelSize: 11
+                    font.weight: Font.Medium
+                    color: Theme.muted
+                    opacity: tile.open ? 0 : 1
+
+                    Behavior on opacity {
+                        NumberAnimation { duration: Anim.base }
+                    }
+                }
+                Text {
+                    id: longDate
+                    text: Qt.formatDate(Time.now, "dddd d MMMM yyyy")
+                    font.family: Theme.fontUi
+                    font.pixelSize: 11
+                    font.weight: Font.Medium
+                    color: Theme.muted
+                    opacity: tile.open ? 1 : 0
+
+                    Behavior on opacity {
+                        NumberAnimation { duration: Anim.base }
+                    }
+                }
             }
             Rectangle {
                 anchors.verticalCenter: parent.verticalCenter

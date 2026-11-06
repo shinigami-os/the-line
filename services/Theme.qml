@@ -24,6 +24,10 @@ Singleton {
     readonly property string fontUi: "Raleway"
     readonly property string fontMono: Qt.fontFamilies().indexOf("IBM Plex Mono") >= 0 ? "IBM Plex Mono" : "JetBrains Mono"
 
+    // Tile geometry: every tile hangs from the line at y = 10 and shares this height.
+    readonly property int tileHeight: 42
+    readonly property int wsCell: 20   // one workspace cell on the ruler
+
     // Square corners, always.
     readonly property int radius: 0
 }

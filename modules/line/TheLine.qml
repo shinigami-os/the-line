@@ -18,7 +18,7 @@ Scope {
         return ws;
     }
 
-    // Reserves the top 62px (line at 10 + tile 52) so tiled windows start under the tiles.
+    // Reserves the top of the screen (line at 10 + tile height) so tiled windows start under the tiles.
     PanelWindow {
         screen: root.modelData
         anchors {
@@ -27,7 +27,7 @@ Scope {
             right: true
         }
         implicitHeight: 1
-        exclusiveZone: 62
+        exclusiveZone: 10 + Theme.tileHeight
         color: "transparent"
         mask: Region {}
         WlrLayershell.namespace: "the-line-strut"

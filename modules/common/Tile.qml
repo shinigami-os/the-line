@@ -15,7 +15,7 @@ Item {
     property real margin: 16
 
     property real restW: 176
-    property real restH: 52
+    property real restH: Theme.tileHeight
     property real toastW: restW
     property real toastH: restH
     property real openW: restW
@@ -109,16 +109,16 @@ Item {
         }
     }
 
+    // Spans the whole frame, so its content can use the extra room while the tile is open.
     Item {
         id: topRow
-        width: tile.restW
-        height: 51
-        x: tile._sideX(width)
+        width: tile.width
+        height: Theme.tileHeight - 1
     }
 
     Rectangle {
         id: rule
-        y: 51
+        y: Theme.tileHeight - 1
         width: tile.width
         height: 1
         color: Theme.border
@@ -138,9 +138,9 @@ Item {
 
     Item {
         id: body
-        y: 52
+        y: Theme.tileHeight
         width: tile.openW
-        height: tile.openH - 52
+        height: tile.openH - Theme.tileHeight
         x: tile._sideX(width)
         visible: tile.bodyVisible
         enabled: tile.mode !== "rest"

@@ -5,7 +5,8 @@ import Quickshell.Services.UPower
 import qs.modules.common
 import qs.services
 
-// Top-right tile: a performance summary, then Wi-Fi, volume and battery. Selecting it opens quick settings. Grows into quick settings,
+// Top-right tile: a performance summary and the system status, both as labelled readings.
+// The summary grows into the performance dashboard, the status into quick settings (the only place for power actions). Grows into quick settings,
 // the only place for power actions.
 Tile {
     id: tile
@@ -32,9 +33,11 @@ Tile {
     readonly property string kind: UiState.isOpen(screenName, "tr") ? "tr" : (UiState.isOpen(screenName, "tp") ? "tp" : "")
 
     anchorSide: "right"
-    restW: 340
-    openW: kind === "tp" ? 460 : 360
-    openH: kind === "tp" ? 52 + 12 + performance.implicitHeight + 12 : 400
+    // Rest width from the compact readings, so it doesn't follow the expansion while closing.
+    restW: 12 + 36 + 10 + cpuR.compactWidth + 10 + swapR.compactWidth + 10 + ramR.compactWidth
+        + 12 + 1 + 12 + netR.compactWidth + 10 + volR.compactWidth + 10 + batR.compactWidth + 12
+    openW: kind === "tp" ? 460 : 400
+    openH: Theme.tileHeight + (kind === "tp" ? 12 + performance.implicitHeight + 12 : 348)
     mode: kind !== "" ? "open" : "rest"
 
     Binding {
@@ -43,11 +46,11 @@ Tile {
         value: tile.kind === "tp"
     }
 
-    // Top row. Scrolling over the icons changes the volume.
+    // Top row: two groups of readings. The summary opens the performance dashboard, the status group opens
+    // quick settings. While a panel is open, its group writes its readings out in full.
     Item {
         anchors.fill: parent
 
-        // The summary opens the performance dashboard, the icons open quick settings.
         MouseArea {
             id: perfArea
             anchors.left: parent.left
@@ -84,6 +87,7 @@ Tile {
                 }
             }
 
+            // Scrolling over the status group changes the volume.
             WheelHandler {
                 onWheel: event => Audio.step(event.angleDelta.y > 0 ? 0.02 : -0.02)
             }
@@ -94,9 +98,9 @@ Tile {
             anchors.right: parent.right
             anchors.rightMargin: 12
             anchors.verticalCenter: parent.verticalCenter
-            spacing: 14
+            spacing: 12
 
-            // Performance summary: CPU graph and CPU, swap and RAM load.
+            // Performance: CPU graph, then CPU, swap and RAM.
             Row {
                 anchors.verticalCenter: parent.verticalCenter
                 spacing: 10
@@ -104,13 +108,18 @@ Tile {
                 Shape {
                     id: cpuGraph
 
-                    readonly property var points: SystemStats.cpuHistory.slice(-24).map((v, i) =>
-                        Qt.point(i * width / 23, height - 1 - v * (height - 2)))
+                    readonly property int samples: tile.kind === "tp" ? 48 : 24
+                    readonly property var points: SystemStats.cpuHistory.slice(-samples).map((v, i) =>
+                        Qt.point(i * width / (samples - 1), height - 1 - v * (height - 2)))
 
                     anchors.verticalCenter: parent.verticalCenter
-                    width: 40
-                    height: 16
+                    width: tile.kind === "tp" ? 80 : 36
+                    height: 14
                     preferredRendererType: Shape.CurveRenderer
+
+                    Behavior on width {
+                        NumberAnimation { duration: Anim.panel; easing.type: Anim.easing }
+                    }
 
                     ShapePath {
                         strokeWidth: 1
@@ -123,38 +132,30 @@ Tile {
                     }
                 }
 
-                Repeater {
-                    model: [
-                        { label: "CPU", value: SystemStats.cpu },
-                        { label: "SWAP", value: SystemStats.swap },
-                        { label: "RAM", value: SystemStats.ram }
-                    ]
-
-                    Column {
-                        required property var modelData
-
-                        anchors.verticalCenter: parent.verticalCenter
-                        width: 30
-
-                        Text {
-                            text: parent.modelData.label
-                            font.family: Theme.fontUi
-                            font.pixelSize: 9
-                            font.weight: Font.DemiBold
-                            font.letterSpacing: 0.6
-                            color: Theme.muted
-                        }
-                        Text {
-                            text: Math.round(parent.modelData.value * 100) + "%"
-                            font.family: Theme.fontMono
-                            font.pixelSize: 12
-                            color: Theme.text
-                        }
-                    }
+                Reading {
+                    id: cpuR
+                    anchors.verticalCenter: parent.verticalCenter
+                    label: "CPU"
+                    value: Math.round(SystemStats.cpu * 100) + "%"
+                }
+                Reading {
+                    id: swapR
+                    anchors.verticalCenter: parent.verticalCenter
+                    label: "SWAP"
+                    value: Math.round(SystemStats.swap * 100) + "%"
+                    wide: SystemStats.formatKiB(SystemStats.swapUsedKiB)
+                    expanded: tile.kind === "tp"
+                }
+                Reading {
+                    id: ramR
+                    anchors.verticalCenter: parent.verticalCenter
+                    label: "RAM"
+                    value: Math.round(SystemStats.ram * 100) + "%"
+                    wide: SystemStats.formatKiB(SystemStats.ramUsedKiB) + " / " + SystemStats.formatKiB(SystemStats.ramTotalKiB)
+                    expanded: tile.kind === "tp"
                 }
             }
 
-            // Separator between the summary and the status icons.
             Rectangle {
                 id: sep
                 anchors.verticalCenter: parent.verticalCenter
@@ -163,86 +164,52 @@ Tile {
                 color: Theme.border
             }
 
-            // Wi-Fi
-            Icon {
-                anchors.verticalCenter: parent.verticalCenter
-                width: 16
-                height: 12
-                path: "M1 4.2a10 10 0 0 1 14 0M3.4 6.8a6.6 6.6 0 0 1 9.2 0M5.8 9.3a3.2 3.2 0 0 1 4.4 0"
-                color: Network.connected ? Theme.text : Theme.muted
-
-                Rectangle {
-                    x: 7.3
-                    y: 10.6
-                    width: 1.4
-                    height: 1.4
-                    color: parent.color
-                }
-            }
-
-            // Volume
+            // Status: network (signal drawn as ruler ticks), volume, battery.
             Row {
                 anchors.verticalCenter: parent.verticalCenter
-                spacing: 5
+                spacing: 10
 
-                Icon {
+                Reading {
+                    id: netR
                     anchors.verticalCenter: parent.verticalCenter
-                    width: 14
-                    height: 12
-                    path: Audio.muted ? "M1 4h3l4-3v10L4 8H1z" : "M1 4h3l4-3v10L4 8H1zM10.5 3.5a3.5 3.5 0 0 1 0 5"
-                    color: Audio.muted ? Theme.muted : Theme.text
-                }
-                Text {
-                    anchors.verticalCenter: parent.verticalCenter
-                    text: tile.volumePct
-                    font.family: Theme.fontMono
-                    font.pixelSize: 12
-                    color: tile.volumeHot ? Theme.accent : (Audio.muted ? Theme.muted : Theme.text)
+                    label: "NET"
+                    value: Network.wifiEnabled ? (Network.connected ? "" : "--") : "off"
+                    wide: Network.label
+                    expanded: tile.kind === "tr"
+                    valueColor: Network.connected ? Theme.text : Theme.muted
 
-                    Behavior on color {
-                        ColorAnimation { duration: Anim.base }
+                    Row {
+                        spacing: 2
+
+                        Repeater {
+                            model: 4
+
+                            Rectangle {
+                                required property int index
+
+                                y: 10 - height
+                                width: 1
+                                height: 4 + index * 2
+                                color: Network.connected && Network.signal > index * 25 ? Theme.text : Theme.borderStrong
+                            }
+                        }
                     }
                 }
-            }
-
-            // Battery
-            Row {
-                anchors.verticalCenter: parent.verticalCenter
-                spacing: 5
-
-                Item {
+                Reading {
+                    id: volR
                     anchors.verticalCenter: parent.verticalCenter
-                    width: 20
-                    height: 11
-
-                    Rectangle {
-                        width: 18
-                        height: 11
-                        color: "transparent"
-                        border.width: 1
-                        border.color: tile.charging ? Theme.accent : Theme.text
-                    }
-                    Rectangle {
-                        x: 18
-                        y: 3.5
-                        width: 1.5
-                        height: 4
-                        color: tile.charging ? Theme.accent : Theme.text
-                    }
-                    Rectangle {
-                        x: 2
-                        y: 2
-                        width: 14 * Math.max(0, Math.min(1, tile.batteryPct / 100))
-                        height: 7
-                        color: tile.batteryPct <= 15 && !tile.charging ? Theme.error : (tile.charging ? Theme.accent : Theme.text)
-                    }
+                    label: "VOL"
+                    value: Audio.muted ? "mute" : tile.volumePct + "%"
+                    valueColor: tile.volumeHot ? Theme.accent : (Audio.muted ? Theme.muted : Theme.text)
                 }
-                Text {
+                Reading {
+                    id: batR
                     anchors.verticalCenter: parent.verticalCenter
-                    text: tile.batteryPct
-                    font.family: Theme.fontMono
-                    font.pixelSize: 12
-                    color: Theme.text
+                    label: "BAT"
+                    value: tile.batteryPct + "%"
+                    wide: tile.batteryPct + "%" + (tile.charging ? " · charging" : (tile.timeLeft() !== "" ? " · " + tile.timeLeft() : ""))
+                    expanded: tile.kind === "tr"
+                    valueColor: tile.charging ? Theme.accent : (tile.batteryPct <= 15 ? Theme.error : Theme.text)
                 }
             }
         }
@@ -264,7 +231,7 @@ Tile {
 
             x: 13
             y: 12
-            width: 334
+            width: 374
             enabled: tile.kind === "tr"
             spacing: 8
 
