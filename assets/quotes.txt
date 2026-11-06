@@ -1,0 +1,47 @@
+# Kira's voice: one line per quote, shown on an empty workspace.
+# Lines starting with # are comments. Your own lines go in ~/.config/the-line/quotes.txt (same format), added to these.
+#
+# Placeholders, filled in live (nothing else is ever run):
+#   {user} {host} {uptime} {packages} {kernel} {swappiness} {load} {cpu} {ram}
+
+# The originals
+all quiet. i checked twice.
+uptime {uptime}. impressive. concerning.
+{packages} packages. each one earned its place.
+your cpu is bored. compile something.
+swappiness is {swappiness}, as it should be.
+rolling release. never falling.
+i logged nothing today. you are welcome.
+the terminal misses you.
+
+# Kira
+{user}@{host}. we've met.
+musl inside. no regrets.
+built from source. like trust.
+kernel {kernel}. freshly sharpened.
+load {load}. breathing calmly.
+cpu at {cpu}. someone is slacking.
+ram at {ram}. plenty of room for bad ideas.
+no telemetry. what happens here stays here.
+read the code. it reads back.
+sudo is a privilege, not a lifestyle.
+dark by default. like good coffee.
+ce n'est pas un bug, c'est une fonctionnalité.
+
+# The Line
+one line. that's the whole interface.
+everything happens on the line. even this.
+the line was here before the windows.
+the line holds. it always does.
+nothing to read up there. that's the point.
+every line of this shell can be read. this one too.
+an empty workspace is a quiet room.
+tabs or spaces. the line doesn't judge.
+
+# Linux
+the best distro is the one you understand.
+man pages first. panic later.
+everything is a file. even this sentence.
+it works on my machine. this is your machine.
+there is no cloud. just someone else's computer.
+rm -rf is not a personality.

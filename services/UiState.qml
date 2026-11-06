@@ -10,6 +10,9 @@ Singleton {
     property string openPanel: ""   // "" | "tl" | "tc" | "tr"
     property string openScreen: ""
 
+    // Super is held: key hints hang from the tiles.
+    property bool hints: false
+
     // The launcher's search text (one launcher is open at a time).
     property string launcherQuery: ""
 

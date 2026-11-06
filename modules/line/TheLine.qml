@@ -2,6 +2,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Wayland
 import Quickshell.Hyprland
+import qs.modules.desktop
 import qs.modules.tiles
 import qs.services
 
@@ -62,6 +63,9 @@ Scope {
         id: peekLinger
         interval: Anim.base
     }
+
+    // No window on this screen's workspace: Kira's voice shows.
+    readonly property bool desktopEmpty: (Hyprland.monitorFor(modelData)?.activeWorkspace?.toplevels?.values?.length ?? 1) === 0
 
     readonly property int workspace: {
         const ws = Hyprland.monitorFor(modelData)?.activeWorkspace?.id ?? 1;
@@ -133,6 +137,10 @@ Scope {
                 onClicked: UiState.close()
             }
 
+            KiraVoice {
+                active: root.desktopEmpty && root.stage === 0
+            }
+
             // The three tiles. In fullscreen they fold up into the line (stage 2).
             Item {
                 id: tiles
@@ -173,6 +181,14 @@ Scope {
                 Behavior on reach {
                     NumberAnimation { duration: root.lineDraw; easing.type: Anim.easing }
                 }
+            }
+
+            Hints {
+                anchors.fill: parent
+                leftTile: workspaceTile
+                centerTile: clockTile
+                rightTile: statusTile
+                shown: UiState.hints && Config.superHints && root.stage === 0 && !root.panelHere
             }
         }
     }
