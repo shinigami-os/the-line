@@ -1,0 +1,4 @@
+.qmlls.ini
+.qt/
+.rcc/
+build/
