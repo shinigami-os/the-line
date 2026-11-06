@@ -36,7 +36,7 @@ qs -p . ipc call line close
 
 ```
 shell.qml         entry point and IPC
-services/         singletons: Theme, Anim, Config, UiState, LineState, Notifs, Audio, Brightness, Network, NightLight, Power, Time
+services/         singletons: Theme, Anim, Config, UiState, LineState, Notifs, Audio, Brightness, SystemStats, Network, NightLight, Power, Time
 modules/common/   Tile (tile that grows into a panel), PanelItem, Toggle, LineSlider, Icon
 modules/line/     the line and the per-screen surface
 modules/tiles/    the three tiles and their panels

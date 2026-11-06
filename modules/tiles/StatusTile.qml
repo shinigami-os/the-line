@@ -1,10 +1,11 @@
 import QtQuick
+import QtQuick.Shapes
 import Quickshell.Bluetooth
 import Quickshell.Services.UPower
 import qs.modules.common
 import qs.services
 
-// Top-right tile: Wi-Fi, volume, battery, and the quick settings trigger. Grows into quick settings,
+// Top-right tile: a performance summary, then Wi-Fi, volume and battery. Selecting it opens quick settings. Grows into quick settings,
 // the only place for power actions.
 Tile {
     id: tile
@@ -28,7 +29,7 @@ Tile {
     }
 
     anchorSide: "right"
-    restW: 224
+    restW: 340
     openW: 360
     openH: 400
     mode: UiState.isOpen(screenName, "tr") ? "open" : "rest"
@@ -56,6 +57,72 @@ Tile {
             anchors.rightMargin: 12
             anchors.verticalCenter: parent.verticalCenter
             spacing: 14
+
+            // Performance summary: CPU graph and CPU, swap and RAM load.
+            Row {
+                anchors.verticalCenter: parent.verticalCenter
+                spacing: 10
+
+                Shape {
+                    id: cpuGraph
+
+                    readonly property var points: SystemStats.cpuHistory.map((v, i) =>
+                        Qt.point(i * width / (SystemStats.historyLength - 1), height - 1 - v * (height - 2)))
+
+                    anchors.verticalCenter: parent.verticalCenter
+                    width: 40
+                    height: 16
+                    preferredRendererType: Shape.CurveRenderer
+
+                    ShapePath {
+                        strokeWidth: 1
+                        strokeColor: Theme.accent
+                        fillColor: "transparent"
+
+                        PathPolyline {
+                            path: cpuGraph.points
+                        }
+                    }
+                }
+
+                Repeater {
+                    model: [
+                        { label: "CPU", value: SystemStats.cpu },
+                        { label: "SWAP", value: SystemStats.swap },
+                        { label: "RAM", value: SystemStats.ram }
+                    ]
+
+                    Column {
+                        required property var modelData
+
+                        anchors.verticalCenter: parent.verticalCenter
+                        width: 30
+
+                        Text {
+                            text: parent.modelData.label
+                            font.family: Theme.fontUi
+                            font.pixelSize: 9
+                            font.weight: Font.DemiBold
+                            font.letterSpacing: 0.6
+                            color: Theme.muted
+                        }
+                        Text {
+                            text: Math.round(parent.modelData.value * 100) + "%"
+                            font.family: Theme.fontMono
+                            font.pixelSize: 12
+                            color: Theme.text
+                        }
+                    }
+                }
+            }
+
+            // Separator between the summary and the status icons.
+            Rectangle {
+                anchors.verticalCenter: parent.verticalCenter
+                width: 1
+                height: 22
+                color: Theme.border
+            }
 
             // Wi-Fi
             Icon {
@@ -137,40 +204,6 @@ Tile {
                     font.family: Theme.fontMono
                     font.pixelSize: 12
                     color: Theme.text
-                }
-            }
-
-            // Divider and the quick settings icon.
-            Row {
-                anchors.verticalCenter: parent.verticalCenter
-                spacing: 12
-
-                Rectangle {
-                    anchors.verticalCenter: parent.verticalCenter
-                    width: 1
-                    height: 22
-                    color: Theme.border
-                }
-                Item {
-                    anchors.verticalCenter: parent.verticalCenter
-                    width: 12
-                    height: 12
-
-                    Repeater {
-                        model: 4
-
-                        Rectangle {
-                            required property int index
-
-                            x: (index % 2) * 6.4
-                            y: Math.floor(index / 2) * 6.4
-                            width: 5.2
-                            height: 5.2
-                            color: "transparent"
-                            border.width: 1
-                            border.color: tile.open ? Theme.accent : Theme.muted
-                        }
-                    }
                 }
             }
         }
