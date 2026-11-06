@@ -12,7 +12,7 @@ Runs on Hyprland (FHT comes later). Done so far:
 - the line: end caps, workspace marker, volume/brightness gauge, notification pulse
 - top-left tile at rest: workspace numerals and window title
 - top-centre tile: clock, notification toast, notifications panel and calendar
-- top-right tile: Wi-Fi, volume, battery, and quick settings (toggles, sliders, reduce motion, power)
+- top-right tile: performance summary, Wi-Fi, volume, battery. The summary opens the performance dashboard, the icons open quick settings (toggles, sliders, reduce motion, power)
 
 Next: launcher, music, fullscreen, Super hints, Kira's voice.
 
@@ -28,7 +28,7 @@ Test from another terminal:
 ```sh
 qs -p . ipc call line notify build "cargo build finished" "0 errors"
 qs -p . ipc call line gauge vol 0.64
-qs -p . ipc call line toggle eDP-1 tc    # open the notifications panel
+qs -p . ipc call line toggle eDP-1 tc    # notifications (tr: quick settings, tp: performance)
 qs -p . ipc call line close
 ```
 
@@ -54,6 +54,6 @@ scripts/          helpers
 
 ## Needs
 
-Quickshell 0.3 with Hyprland, PipeWire, UPower and Bluetooth support, Hyprland, NetworkManager (nmcli), brightnessctl, hyprlock, loginctl, and optionally hyprsunset for night light. Fonts: Raleway and IBM Plex Mono (JetBrains Mono is the fallback).
+Quickshell 0.3 with Hyprland, PipeWire, UPower and Bluetooth support, Hyprland, NetworkManager (nmcli), brightnessctl, procps-ng top, hyprlock, loginctl, and optionally hyprsunset for night light. Fonts: Raleway and IBM Plex Mono (JetBrains Mono is the fallback).
 
 Hyprland layer rule to avoid its own fade on the surface: `noanim` for the `the-line` namespace.

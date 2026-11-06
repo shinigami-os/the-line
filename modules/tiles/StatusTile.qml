@@ -28,31 +28,69 @@ Tile {
         return (h > 0 ? h + " h " : "") + m + " min";
     }
 
+    // Which panel is open on this screen: "tr" quick settings, "tp" performance.
+    readonly property string kind: UiState.isOpen(screenName, "tr") ? "tr" : (UiState.isOpen(screenName, "tp") ? "tp" : "")
+
     anchorSide: "right"
     restW: 340
-    openW: 360
-    openH: 400
-    mode: UiState.isOpen(screenName, "tr") ? "open" : "rest"
+    openW: kind === "tp" ? 460 : 360
+    openH: kind === "tp" ? 52 + 12 + performance.implicitHeight + 12 : 400
+    mode: kind !== "" ? "open" : "rest"
 
-    // Top row: the whole row is the trigger. Scrolling on it changes the volume.
-    Rectangle {
+    Binding {
+        target: SystemStats
+        property: "watching"
+        value: tile.kind === "tp"
+    }
+
+    // Top row. Scrolling over the icons changes the volume.
+    Item {
         anchors.fill: parent
-        color: press.pressed ? Theme.surface2 : "transparent"
 
-        Behavior on color {
-            ColorAnimation { duration: Anim.press }
-        }
-
+        // The summary opens the performance dashboard, the icons open quick settings.
         MouseArea {
-            id: press
-            anchors.fill: parent
-            onClicked: UiState.toggle(tile.screenName, "tr")
+            id: perfArea
+            anchors.left: parent.left
+            anchors.top: parent.top
+            anchors.bottom: parent.bottom
+            width: row.x + sep.x + sep.width / 2
+            onClicked: UiState.toggle(tile.screenName, "tp")
+
+            Rectangle {
+                anchors.fill: parent
+                z: -1
+                color: perfArea.pressed ? Theme.surface2 : "transparent"
+
+                Behavior on color {
+                    ColorAnimation { duration: Anim.press }
+                }
+            }
         }
-        WheelHandler {
-            onWheel: event => Audio.step(event.angleDelta.y > 0 ? 0.02 : -0.02)
+        MouseArea {
+            id: statusArea
+            anchors.left: perfArea.right
+            anchors.right: parent.right
+            anchors.top: parent.top
+            anchors.bottom: parent.bottom
+            onClicked: UiState.toggle(tile.screenName, "tr")
+
+            Rectangle {
+                anchors.fill: parent
+                z: -1
+                color: statusArea.pressed ? Theme.surface2 : "transparent"
+
+                Behavior on color {
+                    ColorAnimation { duration: Anim.press }
+                }
+            }
+
+            WheelHandler {
+                onWheel: event => Audio.step(event.angleDelta.y > 0 ? 0.02 : -0.02)
+            }
         }
 
         Row {
+            id: row
             anchors.right: parent.right
             anchors.rightMargin: 12
             anchors.verticalCenter: parent.verticalCenter
@@ -66,8 +104,8 @@ Tile {
                 Shape {
                     id: cpuGraph
 
-                    readonly property var points: SystemStats.cpuHistory.map((v, i) =>
-                        Qt.point(i * width / (SystemStats.historyLength - 1), height - 1 - v * (height - 2)))
+                    readonly property var points: SystemStats.cpuHistory.slice(-24).map((v, i) =>
+                        Qt.point(i * width / 23, height - 1 - v * (height - 2)))
 
                     anchors.verticalCenter: parent.verticalCenter
                     width: 40
@@ -118,6 +156,7 @@ Tile {
 
             // Separator between the summary and the status icons.
             Rectangle {
+                id: sep
                 anchors.verticalCenter: parent.verticalCenter
                 width: 1
                 height: 22
@@ -210,17 +249,28 @@ Tile {
     }
 
     bodyData: [
+        PerformancePanel {
+            id: performance
+
+            x: 13
+            y: 12
+            width: 434
+            enabled: tile.kind === "tp"
+            shown: tile.open && tile.kind === "tp"
+        },
+
         Column {
             id: panel
 
             x: 13
             y: 12
-            width: tile.openW - 26
+            width: 334
+            enabled: tile.kind === "tr"
             spacing: 8
 
             PanelItem {
                 order: 0
-                shown: tile.open
+                shown: tile.open && tile.kind === "tr"
                 width: panel.width
                 height: 104
 
@@ -261,7 +311,7 @@ Tile {
 
             PanelItem {
                 order: 2
-                shown: tile.open
+                shown: tile.open && tile.kind === "tr"
                 width: panel.width
                 height: 36
 
@@ -294,7 +344,7 @@ Tile {
 
             PanelItem {
                 order: 3
-                shown: tile.open
+                shown: tile.open && tile.kind === "tr"
                 width: panel.width
                 height: 36
 
@@ -327,7 +377,7 @@ Tile {
 
             PanelItem {
                 order: 4
-                shown: tile.open
+                shown: tile.open && tile.kind === "tr"
                 width: panel.width
                 height: 44
 
@@ -344,7 +394,7 @@ Tile {
             // Power lives here and nowhere else.
             PanelItem {
                 order: 5
-                shown: tile.open
+                shown: tile.open && tile.kind === "tr"
                 width: panel.width
                 height: 40
 
@@ -407,7 +457,7 @@ Tile {
 
             PanelItem {
                 order: 6
-                shown: tile.open
+                shown: tile.open && tile.kind === "tr"
                 width: panel.width
                 height: 20
 
