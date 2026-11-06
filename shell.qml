@@ -72,6 +72,13 @@ ShellRoot {
             root.toggleFocused(panel);
         }
 
+        // Opens the launcher on the focused screen with this search typed in.
+        function search(text: string): void {
+            if (UiState.openPanel !== "tl")
+                root.toggleFocused("tl");
+            UiState.launcherQuery = text;
+        }
+
         function close(): void {
             UiState.close();
         }

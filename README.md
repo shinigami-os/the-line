@@ -14,7 +14,7 @@ Runs on Hyprland (FHT comes later). Done so far:
 - top-centre tile: clock, notification toast, notifications panel and calendar
 - top-right tile: performance summary, Wi-Fi, volume, battery. The summary opens the performance dashboard, the icons open quick settings (toggles, sliders, reduce motion, power)
 
-- top-left tile grows into the launcher: apps (most launched first), run in terminal, Kira dev environments (flux devkits)
+- top-left tile grows into the launcher: apps (most launched first) and run in terminal; the panel height follows the results
 
 Next: music, fullscreen, Super hints, Kira's voice.
 
@@ -33,6 +33,7 @@ qs -p . ipc call line gauge vol 0.64
 qs -p . ipc call line toggle eDP-1 tc    # notifications (tr: quick settings, tp: performance)
 qs -p . ipc call line close
 qs -p . ipc call line clockFace         # the clock easter egg
+qs -p . ipc call line search fire        # open the launcher with a search typed in
 ```
 
 ## Layout

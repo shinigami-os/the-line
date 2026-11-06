@@ -4,7 +4,7 @@ import qs.modules.common
 import qs.services
 
 // Top-left tile: ten workspace numerals hung under ticks on the line, and the window title under them.
-// It grows into the launcher: open an app, run a command, or add a dev environment.
+// It grows into the launcher: open an app or run a command. The panel's height follows the number of results.
 Tile {
     id: tile
 
@@ -13,15 +13,13 @@ Tile {
 
     readonly property var toplevel: Hyprland.activeToplevel
 
-    // Launcher state.
-    property string query: ""
+    // Launcher state. The query lives in UiState so IPC can open the launcher with a search typed in.
+    readonly property string query: UiState.launcherQuery
     property int selected: 0
-    readonly property var apps: Apps.search(query, 6)
+    readonly property int maxRows: 6
+    readonly property var apps: Apps.search(query, maxRows)
     readonly property bool showRun: query.trim() !== "" && apps.length === 0
-    readonly property var kits: DevKits.search(query, 3)
-    // One list for keyboard navigation: apps (or the run row), then dev environments.
-    readonly property var results: (showRun ? [{ kind: "run" }] : apps.map(a => ({ kind: "app", app: a })))
-        .concat(kits.map(k => ({ kind: "kit", kit: k })))
+    readonly property var results: showRun ? [{ kind: "run" }] : apps.map(a => ({ kind: "app", app: a }))
 
     function occupied(n) {
         const ws = Hyprland.workspaces.values.find(w => w.id === n);
@@ -39,37 +37,30 @@ Tile {
             return;
         if (r.kind === "app")
             Apps.launch(r.app);
-        else if (r.kind === "run")
-            Apps.runInTerminal(query.trim());
-        else if (!r.kit.installed)
-            DevKits.install(r.kit);
         else
-            return;
+            Apps.runInTerminal(query.trim());
         UiState.close();
     }
 
     function complete() {
         const r = results[selected];
         if (r?.kind === "app")
-            query = r.app.name;
-        else if (r?.kind === "kit")
-            query = r.kit.name;
+            UiState.launcherQuery = r.app.name;
     }
 
     anchorSide: "left"
     restW: 26 + 10 * Theme.wsCell
     openW: 560
-    openH: Theme.tileHeight + 442
+    // Search field, section label, one row per result, footer.
+    openH: Theme.tileHeight + 12 + 48 + 24 + Math.max(1, results.length) * 32 + 34 + 12
     mode: UiState.isOpen(screenName, "tl") ? "open" : "rest"
 
     onQueryChanged: selected = 0
     onOpenChanged: {
-        if (open) {
-            DevKits.refresh();
+        if (open)
             search.forceActiveFocus();
-        } else {
-            query = "";
-        }
+        else
+            UiState.launcherQuery = "";
     }
 
     Item {
@@ -230,7 +221,7 @@ Tile {
                         anchors.rightMargin: 10
                         anchors.verticalCenter: parent.verticalCenter
                         text: tile.query
-                        onTextEdited: tile.query = text
+                        onTextEdited: UiState.launcherQuery = text
                         font.family: Theme.fontUi
                         font.pixelSize: 14
                         font.weight: Font.Medium
@@ -285,27 +276,27 @@ Tile {
                 height: 24
 
                 Section {
-                    text: "APPS"
+                    text: tile.showRun ? "RUN" : "APPS"
                 }
             }
 
             // Six app slots (or the run row when nothing matches).
             Repeater {
-                model: 6
+                model: tile.maxRows
 
                 PanelItem {
                     id: appSlot
 
                     required property int index
-                    readonly property var result: index < (tile.showRun ? 1 : tile.apps.length) ? tile.results[index] : null
+                    readonly property var result: tile.results[index] ?? null
 
+                    visible: result !== null
                     order: 2 + index
                     shown: tile.open
                     width: launcher.width
                     height: 32
 
                     LauncherRow {
-                        visible: appSlot.result !== null
                         width: parent.width
                         selected: tile.selected === appSlot.index
                         glyph: appSlot.result?.kind === "run" ? "$" : Apps.glyph(appSlot.result?.app?.name ?? "")
@@ -320,49 +311,7 @@ Tile {
             }
 
             PanelItem {
-                order: 8
-                shown: tile.open
-                width: launcher.width
-                height: 24
-
-                Section {
-                    text: "DEV ENVIRONMENTS"
-                }
-            }
-
-            Repeater {
-                model: 3
-
-                PanelItem {
-                    id: kitSlot
-
-                    required property int index
-                    readonly property int resultIndex: (tile.showRun ? 1 : tile.apps.length) + index
-                    readonly property var kit: tile.kits[index] ?? null
-
-                    order: 9 + index
-                    shown: tile.open
-                    width: launcher.width
-                    height: 32
-
-                    LauncherRow {
-                        visible: kitSlot.kit !== null
-                        width: parent.width
-                        selected: tile.selected === kitSlot.resultIndex
-                        glyph: "{}"
-                        name: kitSlot.kit?.name ?? ""
-                        monoName: true
-                        description: kitSlot.kit?.description ?? ""
-                        pill: kitSlot.kit ? (kitSlot.kit.installed ? "on" : "add") : ""
-                        pillOn: kitSlot.kit?.installed ?? false
-                        onHovered: tile.selected = kitSlot.resultIndex
-                        onActivated: tile.activate(kitSlot.resultIndex)
-                    }
-                }
-            }
-
-            PanelItem {
-                order: 12
+                order: 2 + tile.maxRows
                 shown: tile.open
                 width: launcher.width
                 height: 34

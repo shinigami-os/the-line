@@ -10,6 +10,9 @@ Singleton {
     property string openPanel: ""   // "" | "tl" | "tc" | "tr"
     property string openScreen: ""
 
+    // The launcher's search text (one launcher is open at a time).
+    property string launcherQuery: ""
+
     function isOpen(screenName, panel) {
         return openPanel === panel && openScreen === screenName;
     }
