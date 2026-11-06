@@ -50,28 +50,29 @@ Item {
         }
     }
 
-    // Notification pulse: two dashes travel in and meet at the clock.
-    Rectangle {
+    // Notification pulse: two dashes run along the line to the toast's corners, then draw its outline
+    // (down the sides, inward along the bottom) while the tile grows under them.
+    PulseDash {
         id: pulseLeft
-        y: 9
-        width: 56
-        height: 3
-        x: 0
-        color: Theme.accent
+        anchors.fill: parent
+        centerX: line.width / 2
         visible: false
     }
-    Rectangle {
+    PulseDash {
         id: pulseRight
-        y: 9
-        width: 56
-        height: 3
-        x: line.width - 56
-        color: Theme.accent
+        anchors.fill: parent
+        centerX: line.width / 2
         visible: false
+        transform: Scale {
+            origin.x: line.width / 2
+            xScale: -1
+        }
     }
 
-    ParallelAnimation {
+    SequentialAnimation {
         id: pulseAnim
+
+        property bool around: true
 
         onStarted: {
             pulseLeft.visible = true;
@@ -82,35 +83,33 @@ Item {
             pulseRight.visible = false;
         }
 
-        NumberAnimation {
-            target: pulseLeft
-            property: "x"
-            from: 0
-            to: line.width / 2 - 56
-            duration: Anim.pulse
-            easing.type: Anim.easing
-        }
-        NumberAnimation {
-            target: pulseRight
-            property: "x"
-            from: line.width - 56
-            to: line.width / 2
-            duration: Anim.pulse
-            easing.type: Anim.easing
-        }
+        // Along the line.
         NumberAnimation {
             targets: [pulseLeft, pulseRight]
-            property: "opacity"
+            property: "s"
             from: 0
-            to: 1
-            duration: Anim.pulse * 0.15
+            to: pulseLeft.corner
+            duration: Anim.pulse
+            easing.type: Anim.easing
+        }
+        // Around the tile.
+        NumberAnimation {
+            targets: [pulseLeft, pulseRight]
+            property: "s"
+            to: pulseLeft.end
+            duration: pulseAnim.around ? Anim.pulseWrap : 0
+            easing.type: Anim.easing
         }
     }
 
     Connections {
         target: LineState
 
-        function onPulseRequested() {
+        function onPulseRequested(toTile) {
+            pulseAnim.stop();
+            pulseLeft.around = toTile;
+            pulseRight.around = toTile;
+            pulseAnim.around = toTile;
             pulseAnim.restart();
         }
     }

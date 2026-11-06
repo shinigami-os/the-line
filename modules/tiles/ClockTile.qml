@@ -10,8 +10,8 @@ Tile {
 
     anchorSide: "center"
     restW: 176
-    toastW: 400
-    toastH: 128
+    toastW: LineState.toastW
+    toastH: LineState.toastH
     openW: 720
     openH: 432
 

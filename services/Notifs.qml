@@ -29,7 +29,7 @@ Singleton {
         };
         list = [n].concat(list).slice(0, 20);
         _pending = n;
-        LineState.pulse();
+        LineState.pulse(!dnd && UiState.openPanel !== "tc");
         showDelay.restart();
     }
 
@@ -53,7 +53,7 @@ Singleton {
         }
     }
 
-    // The pulse travels first, then the clock tile drops.
+    // The pulse runs along the line first; when it reaches the tile's corners the tile starts to grow.
     Timer {
         id: showDelay
         interval: Anim.toastDelay
