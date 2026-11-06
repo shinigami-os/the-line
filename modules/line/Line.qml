@@ -51,79 +51,19 @@ Item {
     }
 
     // Notification pulse: two dashes run in along the line and meet at the centre, then turn back, run out to the
-    // toast's top corners and draw its outline (down the sides, inward along the bottom) while the tile grows.
+    // toast's top corners and down its sides while the clock tile's frame grows with them (see ClockTile).
     PulseDash {
-        id: pulseLeft
         anchors.fill: parent
         centerX: line.width / 2
-        visible: false
+        visible: LineState.pulseActive
     }
     PulseDash {
-        id: pulseRight
         anchors.fill: parent
         centerX: line.width / 2
-        visible: false
+        visible: LineState.pulseActive
         transform: Scale {
             origin.x: line.width / 2
             xScale: -1
-        }
-    }
-
-    SequentialAnimation {
-        id: pulseAnim
-
-        property bool around: true
-
-        onStarted: {
-            pulseLeft.visible = true;
-            pulseRight.visible = true;
-        }
-        onStopped: {
-            pulseLeft.visible = false;
-            pulseRight.visible = false;
-        }
-
-        // Meet at the centre.
-        NumberAnimation {
-            targets: [pulseLeft, pulseRight]
-            property: "s"
-            from: 0
-            to: pulseLeft.meetEnd
-            duration: Anim.pulse
-            easing.type: Easing.Linear
-        }
-        // Turn back and follow the tile's edges.
-        ScriptAction {
-            script: {
-                if (pulseAnim.around) {
-                    pulseLeft.r = 0;
-                    pulseRight.r = 0;
-                    pulseLeft.phase = 2;
-                    pulseRight.phase = 2;
-                }
-            }
-        }
-        NumberAnimation {
-            targets: [pulseLeft, pulseRight]
-            property: "r"
-            from: 0
-            to: pulseLeft.wrapEnd
-            duration: pulseAnim.around ? Anim.pulseWrap : 0
-            easing.type: Easing.Linear
-        }
-    }
-
-    Connections {
-        target: LineState
-
-        function onPulseRequested(toTile) {
-            pulseAnim.stop();
-            pulseLeft.phase = 1;
-            pulseRight.phase = 1;
-            pulseLeft.around = toTile;
-            pulseRight.around = toTile;
-            pulseAnim.around = toTile;
-            pulseAnim.restart();
         }
     }
 }

@@ -15,6 +15,24 @@ Tile {
     openW: 720
     openH: 432
 
+    // While the pulse draws this tile, the frame is exactly where the dashes are: the width grows as they run out
+    // along the line, the height as they run down the sides. The fill follows fillLag behind.
+    function frameW(ms) {
+        const r = Math.max(0, ms - Anim.pulse) / Anim.pulseWrap * LineState.wrapTotal;
+        return 2 * Math.min(toastW / 2, Math.max(restW / 2, 56 + r));
+    }
+
+    function frameH(ms) {
+        const r = Math.max(0, ms - Anim.pulse) / Anim.pulseWrap * LineState.wrapTotal;
+        return Math.min(toastH, Math.max(restH, r - (toastW / 2 - 56.5) + 1));
+    }
+
+    driven: LineState.pulseActive && LineState.pulseAround && mode !== "open"
+    drivenW: frameW(LineState.pulseMs)
+    drivenH: frameH(LineState.pulseMs)
+    drivenFillW: frameW(LineState.pulseMs - Anim.fillLag)
+    drivenFillH: frameH(LineState.pulseMs - Anim.fillLag)
+
     mode: UiState.isOpen(screenName, "tc") ? "open" : (Notifs.toast ? "toast" : "rest")
 
     // Top row: the clock is a button.

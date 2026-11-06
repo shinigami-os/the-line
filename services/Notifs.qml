@@ -29,7 +29,7 @@ Singleton {
         };
         list = [n].concat(list).slice(0, 20);
         _pending = n;
-        LineState.pulse(!dnd && UiState.openPanel !== "tc");
+        LineState.pulse(!dnd && UiState.openPanel !== "tc" && toast === null);
         showDelay.restart();
     }
 

@@ -21,6 +21,13 @@ Item {
     property real openW: restW
     property real openH: restH
 
+    // When driven, the frame and the fill take these sizes directly (no animation of their own).
+    property bool driven: false
+    property real drivenW: restW
+    property real drivenH: restH
+    property real drivenFillW: restW
+    property real drivenFillH: restH
+
     readonly property bool open: mode === "open"
     readonly property real targetW: mode === "open" ? openW : (mode === "toast" ? toastW : restW)
     readonly property real targetH: mode === "open" ? openH : (mode === "toast" ? toastH : restH)
@@ -37,18 +44,20 @@ Item {
 
     y: 10
     x: anchorSide === "left" ? margin : (anchorSide === "right" ? parent.width - margin - width : (parent.width - width) / 2)
-    width: targetW
-    height: targetH
+    width: driven ? drivenW : targetW
+    height: driven ? drivenH : targetH
     clip: true
 
     // Frame: no pause when opening, a short lead when closing so the content leaves first.
     Behavior on width {
+        enabled: !tile.driven
         SequentialAnimation {
             PauseAnimation { duration: tile.mode === "rest" ? Anim.closeLead : 0 }
             NumberAnimation { duration: Anim.panel; easing.type: Anim.easing }
         }
     }
     Behavior on height {
+        enabled: !tile.driven
         SequentialAnimation {
             PauseAnimation { duration: tile.mode === "rest" ? Anim.closeLead : 0 }
             NumberAnimation { duration: Anim.panel; easing.type: Anim.easing }
@@ -80,17 +89,19 @@ Item {
     Rectangle {
         id: fill
         color: Theme.surface
-        width: tile.targetW
-        height: tile.targetH
+        width: tile.driven ? tile.drivenFillW : tile.targetW
+        height: tile.driven ? tile.drivenFillH : tile.targetH
         x: tile._sideX(width)
 
         Behavior on width {
+            enabled: !tile.driven
             SequentialAnimation {
                 PauseAnimation { duration: tile.mode === "rest" ? Anim.closeLead : Anim.fillLag }
                 NumberAnimation { duration: Anim.panel; easing.type: Anim.easing }
             }
         }
         Behavior on height {
+            enabled: !tile.driven
             SequentialAnimation {
                 PauseAnimation { duration: tile.mode === "rest" ? Anim.closeLead : Anim.fillLag }
                 NumberAnimation { duration: Anim.panel; easing.type: Anim.easing }

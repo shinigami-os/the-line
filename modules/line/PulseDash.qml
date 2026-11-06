@@ -5,17 +5,18 @@ import qs.services
 //   phase 1: the dash runs along the line from the screen edge to the centre, where the two halves meet (s = head position).
 //   phase 2: it turns back, runs along the line to the top corner of the toast frame, down the frame's side, then
 //            inward along its bottom edge (r = distance its leading end has travelled from the meeting point).
-// With `around` off only phase 1 plays.
+// With `around` off only phase 1 plays. Positions come from LineState.pulseMs (constant speed).
 Item {
     id: dash
 
     property real centerX: width / 2
     property real toastW: LineState.toastW
     property real toastH: LineState.toastH
-    property bool around: true
-    property int phase: 1
-    property real s: 0
-    property real r: 0
+    readonly property bool around: LineState.pulseAround
+    readonly property real ms: LineState.pulseMs
+    readonly property int phase: around && ms >= Anim.pulse ? 2 : 1
+    readonly property real s: Math.min(centerX, ms / Anim.pulse * centerX)
+    readonly property real r: Math.max(0, ms - Anim.pulse) / Anim.pulseWrap * wrapEnd
 
     readonly property real dashLen: 56
 
@@ -28,7 +29,6 @@ Item {
     readonly property real len3: centerX - sideX
     readonly property real total: len1 + len2 + len3
 
-    readonly property real meetEnd: centerX                      // phase 1 target
     readonly property real wrapEnd: total + dashLen              // phase 2 target
 
     opacity: phase === 1 ? Math.min(1, s / Math.max(1, centerX * 0.15)) : 1

@@ -18,11 +18,15 @@ Singleton {
     readonly property real wrapToCorner: toastW / 2 - 56.5 + toastH - 1
     readonly property real wrapTotal: wrapToCorner + toastW / 2 - 0.5 + 56
 
-    // When the tile starts to grow: as the dashes reach its bottom corners, so the outline is drawn before the tile fills in.
+    // When the toast content takes over: the dashes have drawn the frame down to its bottom corners.
     readonly property int tileDelay: Anim.pulse + Math.round(Anim.pulseWrap * wrapToCorner / wrapTotal)
 
-    // toTile: the pulse ends by opening the clock tile (a toast follows), otherwise it just meets at the centre.
-    signal pulseRequested(bool toTile)
+    // The pulse timeline, shared by the dashes on every screen and by the clock tile that grows under them.
+    // pulseMs is the elapsed time (linear). toTile: the dashes turn back and the tile's frame follows them,
+    // otherwise they just meet at the centre.
+    property bool pulseActive: false
+    property bool pulseAround: false
+    property real pulseMs: 0
 
     function showGauge(kind, value) {
         gaugeKind = kind;
@@ -31,7 +35,22 @@ Singleton {
     }
 
     function pulse(toTile) {
-        pulseRequested(toTile);
+        pulseAnim.stop();
+        pulseAround = toTile;
+        pulseMs = 0;
+        pulseAnim.to = Anim.pulse + (toTile ? Anim.pulseWrap : 0);
+        pulseActive = true;
+        pulseAnim.restart();
+    }
+
+    NumberAnimation {
+        id: pulseAnim
+        target: root
+        property: "pulseMs"
+        from: 0
+        duration: Math.max(1, to)
+        easing.type: Easing.Linear
+        onStopped: root.pulseActive = false
     }
 
     Timer {
