@@ -33,6 +33,9 @@ Tile {
     drivenFillW: frameW(LineState.pulseMs - Anim.fillLag)
     drivenFillH: frameH(LineState.pulseMs - Anim.fillLag)
 
+    // The calendar comes back to the current month every time the panel closes.
+    onOpenChanged: if (!open) calendar.monthOffset = 0
+
     mode: UiState.isOpen(screenName, "tc") ? "open" : (Notifs.toast ? "toast" : "rest")
 
     // Top row: the clock is a button.
@@ -198,8 +201,22 @@ Tile {
                 width: 140
                 height: 140
 
+                // Analog by default; today's date in the calendar swaps in the binary clock.
                 AnalogClock {
                     size: 140
+                    opacity: ClockFace.binary ? 0 : 1
+
+                    Behavior on opacity {
+                        NumberAnimation { duration: Anim.base }
+                    }
+                }
+                BinaryClock {
+                    size: 140
+                    opacity: ClockFace.binary ? 1 : 0
+
+                    Behavior on opacity {
+                        NumberAnimation { duration: Anim.base }
+                    }
                 }
             }
 

@@ -1,96 +1,227 @@
 import QtQuick
 import qs.services
 
-// Month grid, weeks start on Monday. Today is an accent cell.
+// Month calendar. Weeks start on Monday, ISO week numbers on the left, six rows so the height never changes.
+// Arrows or the scroll wheel change the month (a short directional slide); the month name returns to today.
+// Clicking today flips the clock face.
 Column {
     id: cal
 
-    property date date: Time.now
+    property date today: Time.now
+    property int monthOffset: 0
 
-    readonly property var cells: {
-        const y = date.getFullYear(), m = date.getMonth();
-        const offset = (new Date(y, m, 1).getDay() + 6) % 7;
-        const days = new Date(y, m + 1, 0).getDate();
+    readonly property date first: new Date(today.getFullYear(), today.getMonth() + monthOffset, 1)
+    readonly property bool showingToday: monthOffset === 0
+
+    // 42 days from the Monday on or before the 1st.
+    readonly property var days: {
+        const lead = (first.getDay() + 6) % 7;
         const out = [];
-        for (let i = 0; i < offset; i++)
-            out.push(0);
-        for (let d = 1; d <= days; d++)
-            out.push(d);
+        for (let i = 0; i < 42; i++)
+            out.push(new Date(first.getFullYear(), first.getMonth(), 1 - lead + i));
         return out;
     }
 
-    // ISO week number.
-    readonly property int week: {
-        const t = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+    readonly property real cellW: width / 8
+
+    function isoWeek(d) {
+        const t = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
         const dn = t.getUTCDay() || 7;
         t.setUTCDate(t.getUTCDate() + 4 - dn);
         const y0 = new Date(Date.UTC(t.getUTCFullYear(), 0, 1));
         return Math.ceil(((t - y0) / 86400000 + 1) / 7);
     }
 
+    function sameDay(a, b) {
+        return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+    }
+
+    function shift(delta) {
+        slide.from = delta > 0 ? 10 : -10;
+        monthOffset += delta;
+        slideAnim.restart();
+    }
+
     spacing: 8
 
+    // Header: month name (back to today), arrows.
     Item {
         width: cal.width
         height: 16
 
         Text {
-            text: Qt.formatDate(cal.date, "MMMM yyyy")
+            id: monthLabel
+            text: Qt.formatDate(cal.first, "MMMM yyyy")
             font.family: Theme.fontUi
             font.pixelSize: 12
             font.weight: Font.Medium
-            color: Theme.text
+            color: !cal.showingToday && monthHover.hovered ? Theme.accent : Theme.text
+
+            HoverHandler {
+                id: monthHover
+                cursorShape: cal.showingToday ? Qt.ArrowCursor : Qt.PointingHandCursor
+            }
+            TapHandler {
+                onTapped: if (!cal.showingToday) cal.shift(-cal.monthOffset)
+            }
         }
         Text {
-            anchors.right: parent.right
-            text: "week " + cal.week
+            visible: !cal.showingToday
+            anchors.left: monthLabel.right
+            anchors.leftMargin: 8
+            anchors.verticalCenter: monthLabel.verticalCenter
+            text: "today"
             font.family: Theme.fontMono
-            font.pixelSize: 11
+            font.pixelSize: 10
             color: Theme.muted
+        }
+
+        Row {
+            anchors.right: parent.right
+            spacing: 4
+
+            Repeater {
+                model: [-1, 1]
+
+                Rectangle {
+                    id: arrow
+
+                    required property int modelData
+
+                    width: 18
+                    height: 16
+                    color: arrowHover.hovered ? Theme.surface2 : "transparent"
+                    border.width: 1
+                    border.color: arrowHover.hovered ? Theme.borderStrong : Theme.border
+
+                    Behavior on color {
+                        ColorAnimation { duration: Anim.hover }
+                    }
+
+                    Text {
+                        anchors.centerIn: parent
+                        text: arrow.modelData < 0 ? "‹" : "›"
+                        font.family: Theme.fontMono
+                        font.pixelSize: 12
+                        color: arrowHover.hovered ? Theme.accent : Theme.muted
+                    }
+                    HoverHandler {
+                        id: arrowHover
+                    }
+                    TapHandler {
+                        onTapped: cal.shift(arrow.modelData)
+                    }
+                }
+            }
         }
     }
 
-    Grid {
-        columns: 7
+    Item {
         width: cal.width
+        height: 16 + 6 * 26
+        clip: true
 
-        Repeater {
-            model: ["M", "T", "W", "T", "F", "S", "S"]
-
-            Text {
-                required property string modelData
-
-                width: cal.width / 7
-                height: 16
-                text: modelData
-                horizontalAlignment: Text.AlignHCenter
-                font.family: Theme.fontUi
-                font.pixelSize: 10
-                font.weight: Font.Medium
-                font.letterSpacing: 0.6
-                color: Theme.muted
-            }
+        WheelHandler {
+            onWheel: event => cal.shift(event.angleDelta.y > 0 ? -1 : 1)
         }
 
-        Repeater {
-            model: cal.cells
+        Item {
+            id: grid
+            width: parent.width
+            height: parent.height
 
-            Rectangle {
-                required property int modelData
-                readonly property bool today: modelData === cal.date.getDate()
+            transform: Translate {
+                id: slide
+                property real from: 0
+            }
 
-                width: cal.width / 7
-                height: 26
-                color: today ? Theme.accent : "transparent"
+            ParallelAnimation {
+                id: slideAnim
+                NumberAnimation { target: slide; property: "x"; from: slide.from; to: 0; duration: Anim.base; easing.type: Anim.easing }
+                NumberAnimation { target: grid; property: "opacity"; from: 0.2; to: 1; duration: Anim.base }
+            }
+
+            // Weekday names, after an empty corner over the week numbers.
+            Row {
+                x: cal.cellW
+
+                Repeater {
+                    model: ["M", "T", "W", "T", "F", "S", "S"]
+
+                    Text {
+                        required property string modelData
+                        required property int index
+
+                        width: cal.cellW
+                        height: 16
+                        text: modelData
+                        horizontalAlignment: Text.AlignHCenter
+                        font.family: Theme.fontUi
+                        font.pixelSize: 10
+                        font.weight: Font.Medium
+                        font.letterSpacing: 0.6
+                        color: index >= 5 ? Theme.borderStrong : Theme.muted
+                    }
+                }
+            }
+
+            Repeater {
+                model: 6
 
                 Text {
-                    anchors.centerIn: parent
-                    text: parent.modelData > 0 ? parent.modelData : ""
-                    font.family: Theme.fontUi
-                    font.pixelSize: 12
-                    font.weight: parent.today ? Font.Bold : Font.Medium
-                    font.features: { "lnum": 1, "tnum": 1 }
-                    color: parent.today ? Theme.accentText : Theme.text
+                    required property int index
+
+                    y: 16 + index * 26
+                    width: cal.cellW
+                    height: 26
+                    verticalAlignment: Text.AlignVCenter
+                    horizontalAlignment: Text.AlignHCenter
+                    text: cal.isoWeek(cal.days[index * 7])
+                    font.family: Theme.fontMono
+                    font.pixelSize: 10
+                    color: Theme.borderStrong
+                }
+            }
+
+            Repeater {
+                model: cal.days
+
+                Rectangle {
+                    id: day
+
+                    required property var modelData
+                    required property int index
+                    readonly property bool inMonth: modelData.getMonth() === cal.first.getMonth()
+                    readonly property bool isToday: cal.sameDay(modelData, cal.today)
+                    readonly property bool weekend: index % 7 >= 5
+
+                    x: cal.cellW * (1 + index % 7)
+                    y: 16 + Math.floor(index / 7) * 26
+                    width: cal.cellW
+                    height: 26
+                    color: isToday ? Theme.accent : (dayHover.hovered && inMonth ? Theme.surface2 : "transparent")
+
+                    Behavior on color {
+                        ColorAnimation { duration: Anim.hover }
+                    }
+
+                    Text {
+                        anchors.centerIn: parent
+                        text: day.modelData.getDate()
+                        font.family: Theme.fontUi
+                        font.pixelSize: 12
+                        font.weight: day.isToday ? Font.Bold : Font.Medium
+                        font.features: { "lnum": 1, "tnum": 1 }
+                        color: day.isToday ? Theme.accentText : (!day.inMonth ? Theme.border : (day.weekend ? Theme.muted : Theme.text))
+                    }
+
+                    HoverHandler {
+                        id: dayHover
+                        cursorShape: day.isToday ? Qt.PointingHandCursor : Qt.ArrowCursor
+                    }
+                    TapHandler {
+                        onTapped: if (day.isToday) ClockFace.toggle()
+                    }
                 }
             }
         }
