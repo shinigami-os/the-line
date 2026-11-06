@@ -13,6 +13,13 @@ Scope {
 
     readonly property string screenName: modelData.name
     readonly property bool panelHere: UiState.openScreen === screenName && UiState.openPanel !== ""
+    // A fullscreen window on this screen's workspace: the tiles slide away, then the line withdraws into the
+    // screen edges. Leaving fullscreen plays it backwards. The gauge and the pulse still show meanwhile.
+    readonly property bool fullscreen: Hyprland.monitorFor(modelData)?.activeWorkspace?.hasFullscreen ?? false
+    readonly property int lineDraw: Math.round(Anim.panel * 1.6)
+
+    onFullscreenChanged: if (fullscreen && UiState.openScreen === screenName) UiState.close()
+
     readonly property int workspace: {
         const ws = Hyprland.monitorFor(modelData)?.activeWorkspace?.id ?? 1;
         return ws;
@@ -46,16 +53,20 @@ Scope {
         exclusionMode: ExclusionMode.Ignore
         color: "transparent"
         WlrLayershell.namespace: "the-line"
-        WlrLayershell.layer: WlrLayer.Top
+        // Hyprland draws fullscreen windows over the top layer, so the line moves to the overlay layer meanwhile.
+        WlrLayershell.layer: root.fullscreen ? WlrLayer.Overlay : WlrLayer.Top
         WlrLayershell.keyboardFocus: root.panelHere ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 
         // Input only where something is: the tiles, or the whole surface while a panel is open
         // (so a click outside closes it without reaching the window below).
-        mask: root.panelHere ? fullMask : tilesMask
+        mask: root.panelHere ? fullMask : (root.fullscreen ? noMask : tilesMask)
 
         Region {
             id: fullMask
             item: content
+        }
+        Region {
+            id: noMask
         }
         Region {
             id: tilesMask
@@ -79,25 +90,62 @@ Scope {
                 onClicked: UiState.close()
             }
 
-            WorkspaceTile {
-                id: workspaceTile
-                screenName: root.screenName
-                workspace: root.workspace
-            }
+            // The three tiles move as one group in fullscreen: up and out, after (or before) the line.
+            Item {
+                id: tiles
 
-            ClockTile {
-                id: clockTile
-                screenName: root.screenName
-            }
+                anchors.fill: parent
+                enabled: !root.fullscreen
+                opacity: root.fullscreen ? 0 : 1
 
-            StatusTile {
-                id: statusTile
-                screenName: root.screenName
+                transform: Translate {
+                    y: root.fullscreen ? -(Theme.tileHeight + 20) : 0
+
+                    Behavior on y {
+                        SequentialAnimation {
+                            PauseAnimation { duration: root.fullscreen ? 0 : Math.round(root.lineDraw * 0.6) }
+                            NumberAnimation { duration: Anim.panel; easing.type: Anim.easing }
+                        }
+                    }
+                }
+
+                Behavior on opacity {
+                    SequentialAnimation {
+                        PauseAnimation { duration: root.fullscreen ? 0 : Math.round(root.lineDraw * 0.6) }
+                        NumberAnimation { duration: Anim.base }
+                    }
+                }
+
+                WorkspaceTile {
+                    id: workspaceTile
+                    screenName: root.screenName
+                    workspace: root.workspace
+                }
+
+                ClockTile {
+                    id: clockTile
+                    screenName: root.screenName
+                    fullscreen: root.fullscreen
+                }
+
+                StatusTile {
+                    id: statusTile
+                    screenName: root.screenName
+                }
             }
 
             Line {
                 anchors.fill: parent
                 workspace: root.workspace
+                fullscreen: root.fullscreen
+                reach: root.fullscreen ? 0 : 1
+
+                Behavior on reach {
+                    SequentialAnimation {
+                        PauseAnimation { duration: root.fullscreen ? Anim.panel : 0 }
+                        NumberAnimation { duration: root.lineDraw; easing.type: Anim.easing }
+                    }
+                }
             }
         }
     }

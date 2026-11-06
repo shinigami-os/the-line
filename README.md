@@ -16,7 +16,9 @@ Runs on Hyprland (FHT comes later). Done so far:
 
 - music part of the top-left tile (MPRIS) with its progress on the line; it grows into the music panel (cover, track ruler with seek, controls, player picker)
 
-Next: fullscreen, Super hints, Kira's voice.
+- fullscreen: the tiles slide away, then the line withdraws into the screen edges (gauge and pulse still play over the app)
+
+Next: Super hints, Kira's voice.
 
 ## Run
 
@@ -70,4 +72,4 @@ hl.bind("SUPER+A", hl.dsp.global("the-line:quicksettings"))
 
 Quickshell 0.3 with Hyprland, PipeWire, MPRIS, UPower and Bluetooth support, Hyprland, NetworkManager (nmcli), brightnessctl, procps-ng top, hyprlock, loginctl, and optionally hyprsunset for night light. Fonts: Raleway and IBM Plex Mono (JetBrains Mono is the fallback).
 
-Hyprland layer rule to avoid its own fade on the surface: `noanim` for the `the-line` namespace.
+Hyprland layer rule to avoid its own fade on the surface: `noanim` for the `the-line` namespace. The surface sits on the top layer, and on the overlay layer while its screen shows a fullscreen window.

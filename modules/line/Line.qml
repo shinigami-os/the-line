@@ -8,14 +8,23 @@ Item {
     id: line
 
     required property int workspace   // 1..10, the active workspace of this screen
+    property bool fullscreen: false
+    property real reach: 1             // 1 = edge to edge, 0 = withdrawn into both screen edges
 
     readonly property real lineWidth: width
 
-    // The line itself: it comes out of both edges of the screen.
+    // The line itself: it comes out of both edges of the screen, one half from each side.
     Rectangle {
         x: 0
         y: 10
-        width: line.lineWidth
+        width: Math.ceil(line.lineWidth / 2 * line.reach)
+        height: 1
+        color: Theme.borderStrong
+    }
+    Rectangle {
+        x: line.lineWidth - width
+        y: 10
+        width: Math.ceil(line.lineWidth / 2 * line.reach)
         height: 1
         color: Theme.borderStrong
     }
@@ -44,7 +53,7 @@ Item {
         width: Media.progress * Theme.musicW
         height: 1
         color: Theme.accent
-        opacity: Media.active ? 0.85 : 0
+        opacity: Media.active && !line.fullscreen ? 0.85 : 0
 
         Behavior on width {
             NumberAnimation { duration: 1000 }
@@ -60,6 +69,12 @@ Item {
         width: 14
         height: 3
         color: Theme.accent
+        opacity: line.fullscreen ? 0 : 1
+
+        Behavior on opacity {
+            NumberAnimation { duration: Anim.base }
+        }
+
         // Centred over the active cell of the workspace ruler (tile at 16, ruler 13 px in).
         x: 16 + 13 + Theme.wsCell / 2 - 7 + (Math.max(1, Math.min(10, line.workspace)) - 1) * Theme.wsCell
 
@@ -73,11 +88,13 @@ Item {
     PulseDash {
         anchors.fill: parent
         centerX: line.width / 2
+        tileShown: !line.fullscreen
         visible: LineState.pulseActive
     }
     PulseDash {
         anchors.fill: parent
         centerX: line.width / 2
+        tileShown: !line.fullscreen
         visible: LineState.pulseActive
         transform: Scale {
             origin.x: line.width / 2

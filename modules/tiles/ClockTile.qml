@@ -7,6 +7,19 @@ Tile {
     id: tile
 
     required property string screenName
+    property bool fullscreen: false
+
+    // A toast shows on this screen only if it started while the tiles were here (not in fullscreen),
+    // so leaving fullscreen never reveals a toast that nothing drew.
+    property bool toastHere: false
+
+    Connections {
+        target: Notifs
+
+        function onToastChanged() {
+            tile.toastHere = Notifs.toast !== null && !tile.fullscreen;
+        }
+    }
 
     anchorSide: "center"
     restW: ClockFace.binary ? 176 : 152
@@ -27,7 +40,7 @@ Tile {
         return Math.min(toastH, Math.max(restH, r - (toastW / 2 - 56.5) + 1));
     }
 
-    driven: LineState.pulseActive && LineState.pulseAround && mode !== "open"
+    driven: LineState.pulseActive && LineState.pulseAround && mode !== "open" && !fullscreen
     drivenW: frameW(LineState.pulseMs)
     drivenH: frameH(LineState.pulseMs)
     drivenFillW: frameW(LineState.pulseMs - Anim.fillLag)
@@ -36,7 +49,7 @@ Tile {
     // The calendar comes back to the current month every time the panel closes.
     onOpenChanged: if (!open) calendar.monthOffset = 0
 
-    mode: UiState.isOpen(screenName, "tc") ? "open" : (Notifs.toast ? "toast" : "rest")
+    mode: UiState.isOpen(screenName, "tc") ? "open" : (toastHere ? "toast" : "rest")
 
     // Top row: the clock is a button.
     Rectangle {

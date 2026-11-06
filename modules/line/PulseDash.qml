@@ -12,7 +12,8 @@ Item {
     property real centerX: width / 2
     property real toastW: LineState.toastW
     property real toastH: LineState.toastH
-    readonly property bool around: LineState.pulseAround
+    property bool tileShown: true   // false in fullscreen: no tile to draw, the dashes just meet
+    readonly property bool around: LineState.pulseAround && tileShown
     readonly property real ms: LineState.pulseMs
     readonly property int phase: around && ms >= Anim.pulse ? 2 : 1
     readonly property real s: Math.min(centerX, ms / Anim.pulse * centerX)
@@ -31,7 +32,8 @@ Item {
 
     readonly property real wrapEnd: total + dashLen              // phase 2 target
 
-    opacity: phase === 1 ? Math.min(1, s / Math.max(1, centerX * 0.15)) : 1
+    // Fades in over the first stretch; gone once they meet if there is no tile to draw on this screen.
+    opacity: !around && ms >= Anim.pulse ? 0 : (phase === 1 ? Math.min(1, s / Math.max(1, centerX * 0.15)) : 1)
 
     function lo(a) { return Math.max(a, r - dashLen); }
     function hi(b) { return Math.min(b, r); }
