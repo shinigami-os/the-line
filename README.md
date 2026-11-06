@@ -30,6 +30,7 @@ qs -p . ipc call line notify build "cargo build finished" "0 errors"
 qs -p . ipc call line gauge vol 0.64
 qs -p . ipc call line toggle eDP-1 tc    # notifications (tr: quick settings, tp: performance)
 qs -p . ipc call line close
+qs -p . ipc call line clockFace         # the clock easter egg
 ```
 
 ## Layout

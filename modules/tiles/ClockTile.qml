@@ -9,7 +9,7 @@ Tile {
     required property string screenName
 
     anchorSide: "center"
-    restW: 152
+    restW: ClockFace.binary ? 176 : 152
     toastW: LineState.toastW
     toastH: LineState.toastH
     openW: 720
@@ -59,9 +59,10 @@ Tile {
 
             Text {
                 anchors.verticalCenter: parent.verticalCenter
-                text: Qt.formatTime(Time.now, "HH:mm:ss")
-                font.family: Theme.fontUi
-                font.pixelSize: 17
+                // The computer's own clock (Unix time) while the binary face is on.
+                text: ClockFace.binary ? Math.floor(Time.now.getTime() / 1000) : Qt.formatTime(Time.now, "HH:mm:ss")
+                font.family: ClockFace.binary ? Theme.fontMono : Theme.fontUi
+                font.pixelSize: ClockFace.binary ? 15 : 17
                 font.weight: Font.DemiBold
                 color: Theme.text
             }

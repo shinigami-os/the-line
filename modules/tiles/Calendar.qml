@@ -73,7 +73,15 @@ Column {
             text: "today"
             font.family: Theme.fontMono
             font.pixelSize: 10
-            color: Theme.muted
+            color: todayHover.hovered ? Theme.accent : Theme.muted
+
+            HoverHandler {
+                id: todayHover
+                cursorShape: Qt.PointingHandCursor
+            }
+            TapHandler {
+                onTapped: cal.shift(-cal.monthOffset)
+            }
         }
 
         Row {

@@ -86,6 +86,12 @@ Item {
         id: hover
     }
 
+    // Swallows clicks on empty parts of the tile, so they don't reach the scrim that closes panels.
+    MouseArea {
+        anchors.fill: parent
+        acceptedButtons: Qt.AllButtons
+    }
+
     Rectangle {
         id: fill
         color: Theme.surface

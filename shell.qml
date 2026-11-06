@@ -32,5 +32,9 @@ ShellRoot {
         function close(): void {
             UiState.close();
         }
+
+        function clockFace(): void {
+            ClockFace.toggle();
+        }
     }
 }
