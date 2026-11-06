@@ -1,8 +1,6 @@
 # The Line
 
-A Quickshell shell for Kira Linux, built on one line. The line crosses the top of the screen and tiles hang beneath it. Notifications, volume, workspaces and music all play out on the line, and the tiles grow into panels instead of opening popups.
-
-Working name; the final name is not chosen yet.
+The desktop shell of Kira Linux, built with Quickshell on one line. The line crosses the top of the screen and tiles hang beneath it. Notifications, volume, workspaces and music all play out on the line, and the tiles grow into panels instead of opening popups.
 
 ## Status
 

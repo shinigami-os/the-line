@@ -184,12 +184,13 @@ Tile {
                         Repeater {
                             model: 4
 
+                            // Bars the signal doesn't reach stay drawn, in the empty tone.
                             Rectangle {
                                 required property int index
 
                                 y: 10 - height
-                                width: 1
-                                height: 4 + index * 2
+                                width: 2
+                                height: 3 + index * 2
                                 color: Network.connected && Network.signal > index * 25 ? Theme.text : Theme.borderStrong
                             }
                         }

@@ -59,6 +59,40 @@ Column {
         }
     }
 
+    // Skip glyph: a triangle against a bar, pointing forward or back.
+    component SkipGlyph: Item {
+        id: skip
+
+        property bool forward: true
+
+        width: 11
+        height: 10
+
+        Rectangle {
+            x: skip.forward ? 9 : 0
+            width: 2
+            height: 10
+            color: Theme.text
+        }
+        Shape {
+            x: skip.forward ? 0 : 3
+            width: 8
+            height: 10
+            preferredRendererType: Shape.CurveRenderer
+
+            ShapePath {
+                strokeWidth: 0
+                strokeColor: "transparent"
+                fillColor: Theme.text
+                startX: skip.forward ? 0 : 8
+                startY: 0
+                PathLine { x: skip.forward ? 8 : 0; y: 5 }
+                PathLine { x: skip.forward ? 0 : 8; y: 10 }
+                PathLine { x: skip.forward ? 0 : 8; y: 0 }
+            }
+        }
+    }
+
     // Cover and track.
     PanelItem {
         order: 0
@@ -130,14 +164,16 @@ Column {
             }
         }
 
+        // Elapsed / total, at the foot of the track info.
         Text {
             anchors.left: cover.right
             anchors.leftMargin: 14
             y: 88 - height
-            text: Media.source.toLowerCase()
+            textFormat: Text.StyledText
+            text: "<font color=\"" + Theme.accent + "\">" + Media.format(Media.position) + "</font> / " + Media.format(Media.length)
             font.family: Theme.fontMono
-            font.pixelSize: 10
-            color: Theme.muted
+            font.pixelSize: 11
+            color: Theme.text
         }
     }
 
@@ -190,7 +226,7 @@ Column {
                     color: tick.minute ? Theme.muted : Theme.borderStrong
                 }
                 Text {
-                    visible: tick.minute && tick.x + implicitWidth < rulerItem.width - 40
+                    visible: tick.minute && tick.x + implicitWidth < rulerItem.width
                     y: 10
                     text: (tick.index / 4) + ":00"
                     font.family: Theme.fontMono
@@ -211,15 +247,6 @@ Column {
             Behavior on x {
                 NumberAnimation { duration: 1000 }
             }
-        }
-
-        Text {
-            anchors.right: parent.right
-            y: 17
-            text: Media.format(Media.position) + " / " + Media.format(Media.length)
-            font.family: Theme.fontMono
-            font.pixelSize: 10
-            color: Theme.text
         }
 
         MouseArea {
@@ -248,10 +275,8 @@ Column {
                 enabledState: Media.player?.canGoPrevious ?? false
                 onClicked: Media.previous()
 
-                Row {
-                    spacing: 1
-                    Rectangle { width: 1.5; height: 10; color: Theme.text }
-                    Text { text: "‹"; font.family: Theme.fontMono; font.pixelSize: 14; color: Theme.text; y: -4 }
+                SkipGlyph {
+                    forward: false
                 }
             }
             Button {
@@ -286,10 +311,8 @@ Column {
                 enabledState: Media.player?.canGoNext ?? false
                 onClicked: Media.next()
 
-                Row {
-                    spacing: 1
-                    Text { text: "›"; font.family: Theme.fontMono; font.pixelSize: 14; color: Theme.text; y: -4 }
-                    Rectangle { width: 1.5; height: 10; color: Theme.text }
+                SkipGlyph {
+                    forward: true
                 }
             }
         }
@@ -338,7 +361,9 @@ Column {
 
                     required property var modelData
 
-                    text: (modelData.identity ?? "player").toLowerCase() + (modelData.isPlaying ? " ·" : "")
+                    textFormat: Text.StyledText
+                    text: (modelData.identity ?? "player").toLowerCase()
+                        + "<font color=\"" + Theme.muted + "\"> · " + (modelData.isPlaying ? "playing" : "paused") + "</font>"
                     font.family: Theme.fontMono
                     font.pixelSize: 11
                     color: modelData === Media.player ? Theme.accent : (tabHover.hovered ? Theme.text : Theme.muted)
