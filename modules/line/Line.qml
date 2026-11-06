@@ -90,7 +90,7 @@ Item {
             from: 0
             to: pulseLeft.meetEnd
             duration: Anim.pulse
-            easing.type: Anim.easing
+            easing.type: Easing.Linear
         }
         // Turn back and follow the tile's edges.
         ScriptAction {
@@ -109,7 +109,7 @@ Item {
             from: 0
             to: pulseLeft.wrapEnd
             duration: pulseAnim.around ? Anim.pulseWrap : 0
-            easing.type: Anim.easing
+            easing.type: Easing.Linear
         }
     }
 

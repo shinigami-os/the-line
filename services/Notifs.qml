@@ -53,10 +53,10 @@ Singleton {
         }
     }
 
-    // The pulse runs along the line first; when it reaches the tile's corners the tile starts to grow.
+    // The pulse draws the tile's outline first; the tile grows into it once the dashes reach the bottom corners.
     Timer {
         id: showDelay
-        interval: Anim.toastDelay
+        interval: LineState.tileDelay
         onTriggered: {
             if (root.dnd || UiState.openPanel === "tc" || !root._pending)
                 return;
