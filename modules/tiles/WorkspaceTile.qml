@@ -6,6 +6,7 @@ import qs.services
 
 // Top-left tile: ten workspace numerals hung under ticks on the line, and the window title under them.
 // While a player is active, a music part is added on the right (its progress runs on the line above it).
+// The workspace part grows into the launcher, the music part into the music panel.
 // It grows into the launcher: open an app or run a command. The panel's height follows the number of results.
 Tile {
     id: tile
@@ -50,19 +51,33 @@ Tile {
             UiState.launcherQuery = r.app.name;
     }
 
+    // Which panel is open on this screen: "tl" launcher, "tm" music.
+    readonly property string kind: UiState.isOpen(screenName, "tl") ? "tl" : (UiState.isOpen(screenName, "tm") ? "tm" : "")
+
     anchorSide: "left"
     restW: Theme.wsBlockW + (Media.active ? Theme.musicW : 0)
     openW: 560
-    // Search field, section label, one row per result, footer.
-    openH: Theme.tileHeight + 12 + 48 + 24 + Math.max(1, results.length) * 32 + 34 + 12
-    mode: UiState.isOpen(screenName, "tl") ? "open" : "rest"
+    // Launcher: search field, section label, one row per result, footer.
+    openH: Theme.tileHeight + (kind === "tm" ? 12 + musicPanel.implicitHeight + 6
+        : 12 + 48 + 24 + Math.max(1, results.length) * 32 + 34 + 12)
+    mode: kind !== "" ? "open" : "rest"
 
     onQueryChanged: selected = 0
-    onOpenChanged: {
-        if (open)
+    onKindChanged: {
+        if (kind === "tl")
             search.forceActiveFocus();
         else
             UiState.launcherQuery = "";
+    }
+
+    // The music panel can't stay open without a player.
+    Connections {
+        target: Media
+
+        function onActiveChanged() {
+            if (!Media.active && tile.kind === "tm")
+                UiState.close();
+        }
     }
 
     Item {
@@ -172,8 +187,26 @@ Tile {
         x: Theme.wsBlockW
         width: tile.open ? tile.width - Theme.wsBlockW : Theme.musicW
         height: Theme.tileHeight - 1
-        visible: Media.active
         clip: true
+
+        // Appears as the reverse of how it leaves: the frame grows first, then the content fades in.
+        opacity: Media.active ? 1 : 0
+        visible: opacity > 0
+
+        Behavior on opacity {
+            SequentialAnimation {
+                PauseAnimation { duration: Media.active ? Anim.panel : 0 }
+                NumberAnimation {
+                    duration: Media.active ? Anim.base : Anim.exitFade
+                    easing.type: Media.active ? Anim.easing : Easing.Linear
+                }
+            }
+        }
+
+        MouseArea {
+            anchors.fill: parent
+            onClicked: UiState.toggle(tile.screenName, "tm")
+        }
 
         Rectangle {
             width: 1
@@ -228,8 +261,9 @@ Tile {
             HoverHandler {
                 id: playHover
             }
-            TapHandler {
-                onTapped: Media.toggle()
+            MouseArea {
+                anchors.fill: parent
+                onClicked: Media.toggle()
             }
         }
 
@@ -260,12 +294,23 @@ Tile {
     }
 
     bodyData: [
+        MusicPanel {
+            id: musicPanel
+
+            x: 13
+            y: 12
+            width: tile.openW - 26
+            enabled: tile.kind === "tm"
+            shown: tile.kind === "tm"
+        },
+
         Column {
             id: launcher
 
             x: 13
             y: 12
             width: tile.openW - 26
+            enabled: tile.kind === "tl"
             spacing: 0
 
             component Section: Text {
@@ -283,7 +328,7 @@ Tile {
             // Search field.
             PanelItem {
                 order: 0
-                shown: tile.open
+                shown: tile.kind === "tl"
                 width: launcher.width
                 height: 48
 
@@ -367,7 +412,7 @@ Tile {
 
             PanelItem {
                 order: 1
-                shown: tile.open
+                shown: tile.kind === "tl"
                 width: launcher.width
                 height: 24
 
@@ -388,7 +433,7 @@ Tile {
 
                     visible: result !== null
                     order: 2 + index
-                    shown: tile.open
+                    shown: tile.kind === "tl"
                     width: launcher.width
                     height: 32
 
@@ -408,7 +453,7 @@ Tile {
 
             PanelItem {
                 order: 2 + tile.maxRows
-                shown: tile.open
+                shown: tile.kind === "tl"
                 width: launcher.width
                 height: 34
 

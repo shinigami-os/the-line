@@ -48,18 +48,18 @@ Item {
     height: driven ? drivenH : targetH
     clip: true
 
-    // Frame: no pause when opening, a short lead when closing so the content leaves first.
+    // Frame: no pause when growing, a short lead when shrinking so the content leaves first.
     Behavior on width {
         enabled: !tile.driven
         SequentialAnimation {
-            PauseAnimation { duration: tile.mode === "rest" ? Anim.closeLead : 0 }
+            PauseAnimation { duration: tile.targetW < tile.width ? Anim.closeLead : 0 }
             NumberAnimation { duration: Anim.panel; easing.type: Anim.easing }
         }
     }
     Behavior on height {
         enabled: !tile.driven
         SequentialAnimation {
-            PauseAnimation { duration: tile.mode === "rest" ? Anim.closeLead : 0 }
+            PauseAnimation { duration: tile.targetH < tile.height ? Anim.closeLead : 0 }
             NumberAnimation { duration: Anim.panel; easing.type: Anim.easing }
         }
     }
@@ -102,14 +102,14 @@ Item {
         Behavior on width {
             enabled: !tile.driven
             SequentialAnimation {
-                PauseAnimation { duration: tile.mode === "rest" ? Anim.closeLead : Anim.fillLag }
+                PauseAnimation { duration: tile.targetW < fill.width ? Anim.closeLead : Anim.fillLag }
                 NumberAnimation { duration: Anim.panel; easing.type: Anim.easing }
             }
         }
         Behavior on height {
             enabled: !tile.driven
             SequentialAnimation {
-                PauseAnimation { duration: tile.mode === "rest" ? Anim.closeLead : Anim.fillLag }
+                PauseAnimation { duration: tile.targetH < fill.height ? Anim.closeLead : Anim.fillLag }
                 NumberAnimation { duration: Anim.panel; easing.type: Anim.easing }
             }
         }

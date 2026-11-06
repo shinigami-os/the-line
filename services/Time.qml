@@ -4,7 +4,7 @@ import QtQuick
 import Quickshell
 
 Singleton {
-    readonly property date now: clock.date
+    readonly property var now: clock.date ?? new Date()
 
     SystemClock {
         id: clock

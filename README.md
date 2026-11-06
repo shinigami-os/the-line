@@ -16,7 +16,7 @@ Runs on Hyprland (FHT comes later). Done so far:
 
 - top-left tile grows into the launcher: apps (most launched first) and run in terminal; the panel height follows the results
 
-- music part of the top-left tile (MPRIS) with its progress on the line
+- music part of the top-left tile (MPRIS) with its progress on the line; it grows into the music panel (cover, track ruler with seek, controls, player picker)
 
 Next: fullscreen, Super hints, Kira's voice.
 
@@ -32,7 +32,7 @@ Test from another terminal:
 ```sh
 qs -p . ipc call line notify build "cargo build finished" "0 errors"
 qs -p . ipc call line gauge vol 0.64
-qs -p . ipc call line toggle eDP-1 tc    # notifications (tr: quick settings, tp: performance)
+qs -p . ipc call line toggle eDP-1 tc    # notifications (tl: launcher, tm: music, tr: quick settings, tp: performance)
 qs -p . ipc call line close
 qs -p . ipc call line clockFace         # the clock easter egg
 qs -p . ipc call line search fire        # open the launcher with a search typed in
