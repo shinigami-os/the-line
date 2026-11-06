@@ -1,10 +1,11 @@
 import QtQuick
 import qs.services
 
-// One half of the notification pulse. A 56px dash is pushed along a path by `s`, the distance travelled by its head:
-//   along the line to the top corner of the toast frame, down the frame's side, then inward along its bottom edge.
-// Drawn for the left half; the right half is the same item mirrored about the screen centre.
-// With `around` off the dash just runs along the line to the centre (no tile to draw).
+// One half of the notification pulse, a 56px dash drawn for the left half (the right half is the same item mirrored).
+//   phase 1: the dash runs along the line from the screen edge to the centre, where the two halves meet (s = head position).
+//   phase 2: it turns back, runs along the line to the top corner of the toast frame, down the frame's side, then
+//            inward along its bottom edge (r = distance its leading end has travelled from the meeting point).
+// With `around` off only phase 1 plays.
 Item {
     id: dash
 
@@ -12,38 +13,52 @@ Item {
     property real toastW: LineState.toastW
     property real toastH: LineState.toastH
     property bool around: true
+    property int phase: 1
     property real s: 0
+    property real r: 0
 
     readonly property real dashLen: 56
-    readonly property real sideX: centerX - toastW / 2 + 0.5   // centre of the frame's side border
-    readonly property real bottomY: 10 + toastH - 0.5          // centre of the frame's bottom border
-    readonly property real len1: around ? sideX : centerX
-    readonly property real len2: around ? bottomY - 10.5 : 0
-    readonly property real len3: around ? centerX - sideX : 0
+
+    // Phase 2 path, as a distance d along it (d < 0 is the tail still behind the start, on the line near the centre).
+    readonly property real x0: centerX - dashLen                // leading end when the dash turns back
+    readonly property real sideX: centerX - toastW / 2 + 0.5     // centre of the frame's side border
+    readonly property real bottomY: 10 + toastH - 0.5            // centre of the frame's bottom border
+    readonly property real len1: x0 - sideX
+    readonly property real len2: bottomY - 10.5
+    readonly property real len3: centerX - sideX
     readonly property real total: len1 + len2 + len3
 
-    // The head stops here after the first stretch; the rest is the wrap around the tile.
-    readonly property real corner: len1
-    readonly property real end: around ? total + dashLen : total
+    readonly property real meetEnd: centerX                      // phase 1 target
+    readonly property real wrapEnd: total + dashLen              // phase 2 target
 
-    opacity: Math.min(1, s / Math.max(1, len1 * 0.15))
+    opacity: phase === 1 ? Math.min(1, s / Math.max(1, centerX * 0.15)) : 1
 
-    function lo(a) { return Math.max(a, s - dashLen); }
-    function hi(b) { return Math.min(b, s); }
+    function lo(a) { return Math.max(a, r - dashLen); }
+    function hi(b) { return Math.min(b, r); }
 
-    // Along the line.
+    // Phase 1: along the line towards the centre.
     Rectangle {
-        visible: dash.hi(dash.len1) > dash.lo(0)
-        x: dash.lo(0)
+        visible: dash.phase === 1
+        x: Math.max(0, dash.s - dash.dashLen)
         y: 9
-        width: dash.hi(dash.len1) - dash.lo(0)
+        width: dash.s - x
+        height: 3
+        color: Theme.accent
+    }
+
+    // Phase 2, along the line, going back out.
+    Rectangle {
+        visible: dash.phase === 2 && dash.hi(dash.len1) > dash.lo(-dash.dashLen)
+        x: dash.x0 - dash.hi(dash.len1)
+        y: 9
+        width: dash.hi(dash.len1) - dash.lo(-dash.dashLen)
         height: 3
         color: Theme.accent
     }
 
     // Down the side.
     Rectangle {
-        visible: dash.around && dash.hi(dash.len1 + dash.len2) > dash.lo(dash.len1)
+        visible: dash.phase === 2 && dash.hi(dash.len1 + dash.len2) > dash.lo(dash.len1)
         x: dash.sideX - 1.5
         y: 10.5 + (dash.lo(dash.len1) - dash.len1)
         width: 3
@@ -53,7 +68,7 @@ Item {
 
     // Inward along the bottom.
     Rectangle {
-        visible: dash.around && dash.hi(dash.total) > dash.lo(dash.len1 + dash.len2)
+        visible: dash.phase === 2 && dash.hi(dash.total) > dash.lo(dash.len1 + dash.len2)
         x: dash.sideX + (dash.lo(dash.len1 + dash.len2) - dash.len1 - dash.len2)
         y: dash.bottomY - 1.5
         width: dash.hi(dash.total) - dash.lo(dash.len1 + dash.len2)

@@ -50,8 +50,8 @@ Item {
         }
     }
 
-    // Notification pulse: two dashes run along the line to the toast's corners, then draw its outline
-    // (down the sides, inward along the bottom) while the tile grows under them.
+    // Notification pulse: two dashes run in along the line and meet at the centre, then turn back, run out to the
+    // toast's top corners and draw its outline (down the sides, inward along the bottom) while the tile grows.
     PulseDash {
         id: pulseLeft
         anchors.fill: parent
@@ -83,20 +83,31 @@ Item {
             pulseRight.visible = false;
         }
 
-        // Along the line.
+        // Meet at the centre.
         NumberAnimation {
             targets: [pulseLeft, pulseRight]
             property: "s"
             from: 0
-            to: pulseLeft.corner
+            to: pulseLeft.meetEnd
             duration: Anim.pulse
             easing.type: Anim.easing
         }
-        // Around the tile.
+        // Turn back and follow the tile's edges.
+        ScriptAction {
+            script: {
+                if (pulseAnim.around) {
+                    pulseLeft.r = 0;
+                    pulseRight.r = 0;
+                    pulseLeft.phase = 2;
+                    pulseRight.phase = 2;
+                }
+            }
+        }
         NumberAnimation {
             targets: [pulseLeft, pulseRight]
-            property: "s"
-            to: pulseLeft.end
+            property: "r"
+            from: 0
+            to: pulseLeft.wrapEnd
             duration: pulseAnim.around ? Anim.pulseWrap : 0
             easing.type: Anim.easing
         }
@@ -107,6 +118,8 @@ Item {
 
         function onPulseRequested(toTile) {
             pulseAnim.stop();
+            pulseLeft.phase = 1;
+            pulseRight.phase = 1;
             pulseLeft.around = toTile;
             pulseRight.around = toTile;
             pulseAnim.around = toTile;
