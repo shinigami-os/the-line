@@ -12,8 +12,9 @@ Runs on Hyprland (FHT comes later). Done so far:
 - the line: end caps, workspace marker, volume/brightness gauge, notification pulse
 - top-left tile at rest: workspace numerals and window title
 - top-centre tile: clock, notification toast, notifications panel and calendar
+- top-right tile: Wi-Fi, volume, battery, and quick settings (toggles, sliders, reduce motion, power)
 
-Next: top-right tile, launcher, music, fullscreen, Super hints, Kira's voice.
+Next: launcher, music, fullscreen, Super hints, Kira's voice.
 
 ## Run
 
@@ -35,8 +36,8 @@ qs -p . ipc call line close
 
 ```
 shell.qml         entry point and IPC
-services/         singletons: Theme, Anim, Config, UiState, LineState, Notifs, Audio, Time
-modules/common/   Tile (tile that grows into a panel), PanelItem (staggered panel item)
+services/         singletons: Theme, Anim, Config, UiState, LineState, Notifs, Audio, Brightness, Network, NightLight, Power, Time
+modules/common/   Tile (tile that grows into a panel), PanelItem, Toggle, LineSlider, Icon
 modules/line/     the line and the per-screen surface
 modules/tiles/    the three tiles and their panels
 assets/           quotes and other static files
@@ -53,6 +54,6 @@ scripts/          helpers
 
 ## Needs
 
-Quickshell 0.3 with Hyprland, PipeWire and Notifications support, Raleway and IBM Plex Mono (JetBrains Mono is the fallback), and Hyprland.
+Quickshell 0.3 with Hyprland, PipeWire, UPower and Bluetooth support, Hyprland, NetworkManager (nmcli), brightnessctl, hyprlock, loginctl, and optionally hyprsunset for night light. Fonts: Raleway and IBM Plex Mono (JetBrains Mono is the fallback).
 
 Hyprland layer rule to avoid its own fade on the surface: `noanim` for the `the-line` namespace.

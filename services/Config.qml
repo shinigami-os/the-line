@@ -19,7 +19,16 @@ Singleton {
         return env ? env.split(",") : adapter.screens;
     }
 
+    function setReduceMotion(value) {
+        adapter.reduceMotion = value;
+        file.writeAdapter();
+    }
+
+    // FileView does not create the directory.
+    Component.onCompleted: Quickshell.execDetached(["mkdir", "-p", Quickshell.env("HOME") + "/.config/the-line"])
+
     FileView {
+        id: file
         path: Quickshell.env("HOME") + "/.config/the-line/config.json"
         watchChanges: true
         printErrors: false

@@ -61,7 +61,8 @@ Scope {
             id: tilesMask
             regions: [
                 Region { item: workspaceTile },
-                Region { item: clockTile }
+                Region { item: clockTile },
+                Region { item: statusTile }
             ]
         }
 
@@ -85,6 +86,11 @@ Scope {
 
             ClockTile {
                 id: clockTile
+                screenName: root.screenName
+            }
+
+            StatusTile {
+                id: statusTile
                 screenName: root.screenName
             }
 

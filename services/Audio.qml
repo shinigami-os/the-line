@@ -14,6 +14,17 @@ Singleton {
 
     property bool armed: false
 
+    function setVolume(value) {
+        if (sink?.audio) {
+            sink.audio.muted = false;
+            sink.audio.volume = Math.max(0, Math.min(1, value));
+        }
+    }
+
+    function step(delta) {
+        setVolume(volume + delta);
+    }
+
     PwObjectTracker {
         objects: [root.sink]
     }
