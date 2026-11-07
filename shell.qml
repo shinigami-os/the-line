@@ -174,6 +174,11 @@ ShellRoot {
             UiState.sheetScreen = root.focusedScreen();
         }
 
+        // The frozen screens of an area screenshot (session/the-line-shot).
+        function freeze(on: bool): void {
+            UiState.frozen = on;
+        }
+
         function overview(): void {
             UiState.openPanel = "tw";
             UiState.openScreen = root.focusedScreen();

@@ -10,6 +10,9 @@ Singleton {
     property string openPanel: ""   // "" | "tl" | "tc" | "tr"
     property string openScreen: ""
 
+    // An area screenshot is being selected: the screens show their frozen capture.
+    property bool frozen: false
+
     // The screen the cheat sheet is open on ("" for closed).
     property string sheetScreen: ""
     property int sheetTab: 0   // the tab it opens on

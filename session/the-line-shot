@@ -1,14 +1,22 @@
 #!/bin/sh
-# Area screenshot to the clipboard. Any screen (or several) can be selected; the screens are frozen while
-# selecting when hyprpicker is installed. SUPER+SHIFT+S in session/hyprland.lua.
+# Area screenshot to the clipboard, SUPER+SHIFT+S. Any screen, or several, can be selected.
+# The screens are frozen while you select: each one is captured first (without the cursor), The Line shows the
+# captures over the screens, slurp selects on top of them, and the area is cut out of that frozen picture.
 
-if command -v hyprpicker >/dev/null 2>&1; then
-    hyprpicker -r -z >/dev/null 2>&1 &
-    freeze=$!
-    sleep 0.15
-fi
+shell="${THE_LINE_DIR:-$(dirname "$(readlink -f "$0")")/..}"
+dir="${XDG_RUNTIME_DIR:-/tmp}/the-line-freeze"
+mkdir -p "$dir" && rm -f "$dir"/*.png
+
+for output in $(hyprctl -j monitors | jq -r '.[].name'); do
+    grim -o "$output" "$dir/$output.png" &
+done
+wait
+
+qs -p "$shell" ipc call line freeze true
+sleep 0.2
 
 area=$(slurp -d)
-
-[ -n "$freeze" ] && kill "$freeze" 2>/dev/null
 [ -n "$area" ] && grim -g "$area" - | wl-copy
+
+qs -p "$shell" ipc call line freeze false
+rm -f "$dir"/*.png

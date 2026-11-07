@@ -92,6 +92,10 @@ Scope {
         }
     }
 
+    Freeze {
+        screen: root.modelData
+    }
+
     // Kira's voice on an empty workspace, behind the windows. It steps aside while a one-off line plays here.
     DesktopVoice {
         screen: root.modelData
