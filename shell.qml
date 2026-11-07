@@ -41,6 +41,30 @@ ShellRoot {
         }
     }
 
+    // Quickshell doesn't always update a workspace's fullscreen state when an app leaves fullscreen by itself (F11):
+    // re-read the workspaces on every fullscreen or window event, and once more just after.
+    Connections {
+        target: Hyprland
+
+        function onRawEvent(event) {
+            if (["fullscreen", "openwindow", "closewindow", "movewindowv2", "workspacev2"].includes(event.name)) {
+                Hyprland.refreshWorkspaces();
+                refreshAgain.restart();
+            }
+            // Window classes and titles (the workspace tile names the app, and counts its windows).
+            if (["openwindow", "closewindow", "windowtitlev2", "movewindowv2"].includes(event.name))
+                Hyprland.refreshToplevels();
+        }
+    }
+    Timer {
+        id: refreshAgain
+        interval: 150
+        onTriggered: {
+            Hyprland.refreshWorkspaces();
+            Hyprland.refreshToplevels();
+        }
+    }
+
     Variants {
         model: root.screens
 

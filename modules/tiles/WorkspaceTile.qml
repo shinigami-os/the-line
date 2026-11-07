@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Shapes
+import Quickshell
 import Quickshell.Hyprland
 import qs.modules.common
 import qs.services
@@ -17,7 +18,49 @@ Tile {
 
     readonly property bool musicShown: Media.active && !musicHidden
 
-    readonly property var toplevel: Hyprland.activeToplevel
+    // The window this screen is on: the focused one if it is here, else the last one focused on this
+    // screen's workspace, else any window of it (none: the desktop).
+    readonly property var activeWs: Hyprland.workspaces.values.find(w => w.id === workspace) ?? null
+    readonly property var wsWindows: activeWs?.toplevels?.values ?? []
+    property var lastFocused: ({})   // workspace id -> toplevel
+
+    readonly property var toplevel: {
+        const focused = Hyprland.activeToplevel;
+        if (focused && wsWindows.includes(focused))
+            return focused;
+        const last = lastFocused[workspace];
+        if (last && wsWindows.includes(last))
+            return last;
+        return wsWindows[0] ?? null;
+    }
+
+    Connections {
+        target: Hyprland
+
+        function onActiveToplevelChanged() {
+            const t = Hyprland.activeToplevel;
+            const ws = t?.workspace?.id;
+            if (ws !== undefined) {
+                const m = Object.assign({}, tile.lastFocused);
+                m[ws] = t;
+                tile.lastFocused = m;
+            }
+        }
+    }
+
+    // The app's name; its window title only when several windows of that app are open (to tell them apart).
+    readonly property string appClass: toplevel?.lastIpcObject?.class ?? ""
+    readonly property string appName: {
+        if (!toplevel)
+            return "Desktop";
+        const entry = appClass !== "" ? DesktopEntries.heuristicLookup(appClass) : null;
+        if (entry?.name)
+            return entry.name;
+        const c = appClass.split(".").pop();
+        return c !== "" ? c.charAt(0).toUpperCase() + c.slice(1) : (toplevel.title || "Untitled");
+    }
+    readonly property int instances: appClass === "" ? 0 : Hyprland.toplevels.values.filter(t => (t.lastIpcObject?.class ?? "") === appClass).length
+    readonly property string detail: instances > 1 ? (toplevel?.title ?? "") : ""
 
     // Launcher state. The query lives in UiState so IPC can open the launcher with a search typed in.
     readonly property string query: UiState.launcherQuery
@@ -143,19 +186,24 @@ Tile {
             clip: true
 
             Text {
-                text: tile.toplevel ? (tile.toplevel.title || "Untitled") : "Desktop"
+                id: appText
+                text: tile.appName
                 font.family: Theme.fontUi
                 font.pixelSize: 12
                 font.weight: Font.Medium
                 color: titleHover.hovered ? Theme.accent : Theme.text
                 elide: Text.ElideRight
-                width: Math.min(implicitWidth, tile.open ? titleRow.width * 0.7 : 130)
+                width: Math.min(implicitWidth, titleRow.width)
             }
             Text {
-                text: tile.toplevel ? (tile.toplevel.lastIpcObject?.class ?? "") : "no windows"
+                visible: text !== ""
+                text: tile.detail
                 font.family: Theme.fontMono
                 font.pixelSize: 10
                 color: Theme.muted
+                elide: Text.ElideRight
+                width: Math.max(0, Math.min(implicitWidth, titleRow.width - appText.width - titleRow.spacing))
+                anchors.baseline: appText.baseline
             }
 
             HoverHandler {

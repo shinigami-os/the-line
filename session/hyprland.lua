@@ -46,7 +46,7 @@ hl.env("XCURSOR_SIZE", "24")
 hl.config({
     general = {
         gaps_in = 2,
-        gaps_out = 4,
+        gaps_out = 12,   -- around a group of windows; gaps_in is between windows of the same group
         border_size = 1,
         col = {
             active_border = "rgba(9a5cffff)",   -- the accent
@@ -97,14 +97,11 @@ hl.config({
         repeat_rate = 35,
         follow_mouse = 1,
         touchpad = {
-            natural_scroll = true,
+            natural_scroll = false,
             disable_while_typing = true,
             clickfinger_behavior = true,
             scroll_factor = 0.5,
         },
-    },
-    binds = {
-        scroll_event_delay = 0,
     },
     xwayland = {
         force_zero_scaling = true,
@@ -114,8 +111,6 @@ hl.config({
         no_donation_nag = true,
     },
 })
-
-hl.gesture({ fingers = 4, direction = "horizontal", action = "workspace" })
 
 ------------- Motion -------------
 -- One curve everywhere, the shell's quartic ease-out. Speeds are in tenths of a second and match the shell's
@@ -177,55 +172,106 @@ hl.on("hyprland.start", function()
 end)
 
 ------------- Keys -------------
+-- The list these come from, with what each one does: Kira-Linux/THE_LINE_SHORTCUTS.md (the owner's choices).
+-- U / H / J / K mirror the arrows (up / left / down / right) wherever arrows are used.
+
+local dirs = {
+    { "Up", "U", "up", 0, -40 },
+    { "Left", "H", "left", -40, 0 },
+    { "Down", "J", "down", 0, 40 },
+    { "Right", "K", "right", 40, 0 },
+}
 
 -- The Line
-hl.bind("SUPER+Space", hl.dsp.global("the-line:launcher"), { desc = "The Line: launcher" })
+hl.bind("SUPER+Super_L", hl.dsp.global("the-line:launcher"), { release = true, desc = "The Line: launcher (tap Super)" })
 hl.bind("SUPER+N", hl.dsp.global("the-line:notifications"), { desc = "The Line: notifications and calendar" })
 hl.bind("SUPER+A", hl.dsp.global("the-line:quicksettings"), { desc = "The Line: quick settings" })
 hl.bind("SUPER+P", hl.dsp.global("the-line:performance"), { desc = "The Line: performance" })
 hl.bind("SUPER+End", hl.dsp.exec_cmd("pkill -f '^qs -p " .. SHELL .. "$'; " .. QS), { desc = "The Line: restart the shell" })
+-- Coming with their features (the keys are reserved already):
+hl.bind("SUPER+F1", hl.dsp.global("the-line:cheatsheet"), { desc = "The Line: every shortcut, in one sheet" })
+hl.bind("SUPER+V", hl.dsp.global("the-line:clipboard"), { desc = "The Line: clipboard history" })
+hl.bind("SUPER+T", hl.dsp.global("the-line:wallpapers"), { desc = "The Line: wallpaper picker" })
+hl.bind("SUPER+semicolon", hl.dsp.global("the-line:emoji"), { desc = "The Line: emoji picker" })
+hl.bind("SUPER+I", hl.dsp.global("the-line:settings"), { desc = "The Line: settings" })
+hl.bind("CTRL+ALT+Delete", hl.dsp.global("the-line:power"), { desc = "The Line: power menu" })
+hl.bind("XF86PowerOff", hl.dsp.global("the-line:power"), { locked = true, desc = "The Line: power menu (asks first)" })
 
 -- Session
-hl.bind("SUPER+L", hl.dsp.exec_cmd("hyprlock"), { desc = "Session: lock" })
+hl.bind("SUPER+L", hl.dsp.exec_cmd("hyprlock"), { desc = "Lock" })
 
 -- Volume and brightness: the line itself shows the level, no popup.
-hl.bind("XF86AudioMute", hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"), { locked = true })
-hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd("wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+"), { locked = true, repeating = true })
-hl.bind("XF86AudioLowerVolume", hl.dsp.exec_cmd("wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"), { locked = true, repeating = true })
-hl.bind("XF86MonBrightnessUp", hl.dsp.exec_cmd("brightnessctl -q set 5%+"), { locked = true, repeating = true })
-hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd("brightnessctl -q set 5%-"), { locked = true, repeating = true })
+hl.bind("XF86AudioMute", hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"), { locked = true, desc = "Mute" })
+hl.bind("SUPER+XF86AudioMute", hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"), { locked = true, desc = "Mute the microphone" })
+hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd("wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+"), { locked = true, repeating = true, desc = "Volume up" })
+hl.bind("XF86AudioLowerVolume", hl.dsp.exec_cmd("wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"), { locked = true, repeating = true, desc = "Volume down" })
+hl.bind("XF86MonBrightnessUp", hl.dsp.exec_cmd("brightnessctl -q set 5%+"), { locked = true, repeating = true, desc = "Brightness up" })
+hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd("brightnessctl -q set 5%-"), { locked = true, repeating = true, desc = "Brightness down" })
 
 -- Media
-hl.bind("XF86AudioPlay", hl.dsp.exec_cmd("playerctl play-pause"), { locked = true })
-hl.bind("XF86AudioPause", hl.dsp.exec_cmd("playerctl play-pause"), { locked = true })
-hl.bind("XF86AudioNext", hl.dsp.exec_cmd("playerctl next"), { locked = true })
-hl.bind("XF86AudioPrev", hl.dsp.exec_cmd("playerctl previous"), { locked = true })
+hl.bind("XF86AudioPlay", hl.dsp.exec_cmd("playerctl play-pause"), { locked = true, desc = "Play / pause" })
+hl.bind("XF86AudioPause", hl.dsp.exec_cmd("playerctl play-pause"), { locked = true, desc = "Play / pause" })
+hl.bind("XF86AudioNext", hl.dsp.exec_cmd("playerctl next"), { locked = true, desc = "Next track" })
+hl.bind("XF86AudioPrev", hl.dsp.exec_cmd("playerctl previous"), { locked = true, desc = "Previous track" })
 
--- Screenshots
+-- Screenshots and tools
 hl.bind("Print", hl.dsp.exec_cmd("grim - | wl-copy"), { locked = true, desc = "Screenshot to the clipboard" })
-hl.bind("SUPER+SHIFT+S", hl.dsp.exec_cmd("grim -g \"$(slurp)\" - | wl-copy"), { desc = "Screenshot an area to the clipboard" })
-hl.bind("CTRL+Print", hl.dsp.exec_cmd("mkdir -p ~/Pictures/Screenshots && grim ~/Pictures/Screenshots/$(date +%Y-%m-%d_%H.%M.%S).png"), { locked = true, desc = "Screenshot to ~/Pictures/Screenshots" })
+hl.bind("SUPER+SHIFT+S", hl.dsp.exec_cmd("flameshot gui"), { desc = "Screenshot an area (frozen screen)" })
+hl.bind("CTRL+Print", hl.dsp.exec_cmd("grim -g \"$(slurp)\" - | tesseract - - | wl-copy"), { desc = "Text from an area (OCR) to the clipboard" })
+hl.bind("ALT+Print", hl.dsp.exec_cmd("hyprpicker -a"), { desc = "Colour picker to the clipboard" })
+hl.bind("SUPER+ALT+R", hl.dsp.exec_cmd("pkill -INT -x wf-recorder || { mkdir -p ~/Videos/Recordings && wf-recorder -g \"$(slurp)\" -f ~/Videos/Recordings/$(date +%Y-%m-%d_%H.%M.%S).mp4; }"), { desc = "Record an area (again to stop)" })
 
 -- Windows
 hl.bind("SUPER+Q", hl.dsp.window.close(), { desc = "Close the window" })
+hl.bind("SUPER+SHIFT+Q", hl.dsp.exec_cmd("hyprctl kill"), { desc = "Kill a window (pick it)" })
 hl.bind("SUPER+F", hl.dsp.window.fullscreen(), { desc = "Fullscreen" })
-hl.bind("SUPER+ALT+Space", hl.dsp.window.float(), { desc = "Float" })
-hl.bind("SUPER+J", hl.dsp.layout("togglesplit"), { desc = "Toggle split" })
-hl.bind("SUPER+Left", hl.dsp.window.move({ direction = "left" }))
-hl.bind("SUPER+Right", hl.dsp.window.move({ direction = "right" }))
-hl.bind("SUPER+Up", hl.dsp.window.move({ direction = "up" }))
-hl.bind("SUPER+Down", hl.dsp.window.move({ direction = "down" }))
-hl.bind("SUPER+mouse:272", hl.dsp.window.drag(), { mouse = true })
-hl.bind("SUPER+mouse:273", hl.dsp.window.resize(), { mouse = true })
+hl.bind("SUPER+ALT+Space", hl.dsp.window.float(), { desc = "Float / tile" })
+hl.bind("SUPER+SHIFT+Space", hl.dsp.window.center(), { desc = "Centre a floating window" })
+hl.bind("SUPER+Y", hl.dsp.layout("togglesplit"), { desc = "Toggle split" })
+for _, d in ipairs(dirs) do
+    local arrow, letter, dir = d[1], d[2], d[3]
+    for _, key in ipairs({ arrow, letter }) do
+        hl.bind("SUPER+" .. key, hl.dsp.focus({ direction = dir }), { desc = "Focus " .. dir })
+        -- Moving past the edge of a screen sends the window to the next screen.
+        hl.bind("SUPER+SHIFT+" .. key, hl.dsp.window.move({ direction = dir }), { desc = "Move the window " .. dir })
+    end
+end
+hl.bind("SUPER+mouse:272", hl.dsp.window.drag(), { mouse = true, desc = "Move with the mouse" })
+hl.bind("SUPER+mouse:273", hl.dsp.window.resize(), { mouse = true, desc = "Resize with the mouse" })
 
--- Workspaces 1-10 (keys 1 to 0): Super to go, Super+Ctrl to send the window.
+-- Resize mode: SUPER+R, then arrows (or U/H/J/K) resize, Esc / Enter / SUPER+R leave.
+hl.bind("SUPER+R", hl.dsp.submap("resize"), { desc = "Resize mode" })
+hl.define_submap("resize", function()
+    for _, d in ipairs(dirs) do
+        for _, key in ipairs({ d[1], d[2] }) do
+            hl.bind(key, hl.dsp.window.resize({ x = d[4], y = d[5], relative = true }), { repeating = true })
+        end
+    end
+    hl.bind("Escape", hl.dsp.submap("reset"))
+    hl.bind("Return", hl.dsp.submap("reset"))
+    hl.bind("SUPER+R", hl.dsp.submap("reset"))
+end)
+
+-- Workspaces 1-10 (keys 1 to 0): Super to go, Super+Ctrl to send the window there, Super+Shift to send and follow.
 for i = 1, 10 do
     local code = (i % 10) + 9
     hl.bind("SUPER+code:" .. code, hl.dsp.focus({ workspace = i }), { desc = "Workspace " .. i })
     hl.bind("SUPER+CTRL+code:" .. code, hl.dsp.window.move({ workspace = i, follow = false }), { desc = "Send to workspace " .. i })
+    hl.bind("SUPER+SHIFT+code:" .. code, hl.dsp.window.move({ workspace = i, follow = true }), { desc = "Send to workspace " .. i .. " and follow" })
 end
-hl.bind("SUPER+mouse_up", hl.dsp.focus({ direction = "right" }))
-hl.bind("SUPER+mouse_down", hl.dsp.focus({ direction = "left" }))
+-- Next / previous workspace: one step per scroll notch or key press.
+hl.bind("SUPER+mouse_down", hl.dsp.focus({ workspace = "r+1" }), { desc = "Next workspace" })
+hl.bind("SUPER+mouse_up", hl.dsp.focus({ workspace = "r-1" }), { desc = "Previous workspace" })
+for _, key in ipairs({ "Right", "K" }) do
+    hl.bind("SUPER+ALT+" .. key, hl.dsp.focus({ workspace = "r+1" }), { desc = "Next workspace" })
+end
+for _, key in ipairs({ "Left", "H" }) do
+    hl.bind("SUPER+ALT+" .. key, hl.dsp.focus({ workspace = "r-1" }), { desc = "Previous workspace" })
+end
+
+-- Touchpad: 4 fingers sideways for workspaces, up or down for fullscreen.
+hl.gesture({ fingers = 4, direction = "horizontal", action = "workspace" })
+hl.gesture({ fingers = 4, direction = "vertical", action = "fullscreen" })
 
 ------------- Yours -------------
 
