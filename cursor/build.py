@@ -12,10 +12,12 @@ once along the outline, like the notification pulse on the line, then everything
 Everything is drawn on a 32-unit grid and rendered at each size with 4x supersampling.
 """
 
+import io
 import math
 import os
 import struct
 import sys
+import zipfile
 
 from PIL import Image, ImageDraw
 
@@ -348,6 +350,30 @@ def render(name):
     return images
 
 
+# ---------------------------------------------------------------- hyprcursor writer
+# Hyprland draws its pointer through hyprcursor, which animates its own format: one zip (.hlc) per cursor, holding
+# a meta.hl and the frames. Several define_size lines for one size make an animation (last value: delay in ms).
+
+def hyprcursor(name, images, aliases):
+    _, (hx, hy), _ = CURSORS[name]
+    meta = ["resize_algorithm = bilinear", f"hotspot_x = {hx / 32:.4f}", f"hotspot_y = {hy / 32:.4f}"]
+    if aliases:
+        meta.append("define_override = " + ";".join(aliases))
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, "w", zipfile.ZIP_STORED) as z:
+        counts = {}
+        for size, img, _, _, delay in images:
+            i = counts.get(size, 0)
+            counts[size] = i + 1
+            png = io.BytesIO()
+            img.save(png, "PNG")
+            fname = f"{name}_{size}_{i}.png"
+            z.writestr(fname, png.getvalue())
+            meta.append(f"define_size = {size}, {fname}" + (f", {delay}" if delay else ""))
+        z.writestr("meta.hl", "\n".join(meta) + "\n")
+    return buf.getvalue()
+
+
 def main():
     here = os.path.dirname(os.path.abspath(__file__))
     out = sys.argv[1] if len(sys.argv) > 1 else os.path.join(here, "build", "TheLine")
@@ -357,9 +383,17 @@ def main():
     with open(os.path.join(out, "index.theme"), "w") as f:
         f.write("[Icon Theme]\nName=The Line\nComment=The Line's cursors: flat, square, one accent\n")
 
+    hypr = os.path.join(out, "hyprcursors")
+    os.makedirs(hypr, exist_ok=True)
+    with open(os.path.join(out, "manifest.hl"), "w") as f:
+        f.write("name = TheLine\ndescription = The Line's cursors: flat, square, one accent\nversion = 1\ncursors_directory = hyprcursors\n")
+
     for name in CURSORS:
+        images = render(name)
         with open(os.path.join(cursors, name), "wb") as f:
-            f.write(xcursor(render(name)))
+            f.write(xcursor(images))
+        with open(os.path.join(hypr, name + ".hlc"), "wb") as f:
+            f.write(hyprcursor(name, images, ALIASES.get(name, [])))
         for alias in ALIASES.get(name, []):
             link = os.path.join(cursors, alias)
             if os.path.lexists(link):

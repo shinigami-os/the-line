@@ -10,6 +10,9 @@ Singleton {
     property string openPanel: ""   // "" | "tl" | "tc" | "tr"
     property string openScreen: ""
 
+    // Hyprland's resize mode (SUPER+R) is on.
+    property bool resizing: false
+
     // The launcher's search text (one launcher is open at a time).
     property string launcherQuery: ""
 

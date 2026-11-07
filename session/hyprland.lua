@@ -40,6 +40,8 @@ hl.env("CLUTTER_BACKEND", "wayland")
 hl.env("MOZ_ENABLE_WAYLAND", "1")
 hl.env("XCURSOR_THEME", "TheLine")   -- The Line's cursors (cursor/build.py)
 hl.env("XCURSOR_SIZE", "24")
+hl.env("HYPRCURSOR_THEME", "TheLine")   -- the same theme in hyprcursor form: Hyprland animates that one
+hl.env("HYPRCURSOR_SIZE", "24")
 
 ------------- Look -------------
 
@@ -183,7 +185,7 @@ local dirs = {
 }
 
 -- The Line
-hl.bind("SUPER+Super_L", hl.dsp.global("the-line:launcher"), { release = true, desc = "The Line: launcher (tap Super)" })
+hl.bind("SUPER+Super_L", hl.dsp.global("the-line:launcherTap"), { release = true, desc = "The Line: launcher (tap Super)" })
 hl.bind("SUPER+N", hl.dsp.global("the-line:notifications"), { desc = "The Line: notifications and calendar" })
 hl.bind("SUPER+A", hl.dsp.global("the-line:quicksettings"), { desc = "The Line: quick settings" })
 hl.bind("SUPER+P", hl.dsp.global("the-line:performance"), { desc = "The Line: performance" })
@@ -240,6 +242,7 @@ hl.bind("SUPER+mouse:272", hl.dsp.window.drag(), { mouse = true, desc = "Move wi
 hl.bind("SUPER+mouse:273", hl.dsp.window.resize(), { mouse = true, desc = "Resize with the mouse" })
 
 -- Resize mode: SUPER+R, then arrows (or U/H/J/K) resize, Esc / Enter / SUPER+R leave.
+-- While it is on, The Line draws a loading ring around the focused window (modules/desktop/ResizeRing.qml).
 hl.bind("SUPER+R", hl.dsp.submap("resize"), { desc = "Resize mode" })
 hl.define_submap("resize", function()
     for _, d in ipairs(dirs) do

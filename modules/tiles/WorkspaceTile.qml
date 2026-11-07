@@ -18,35 +18,9 @@ Tile {
 
     readonly property bool musicShown: Media.active && !musicHidden
 
-    // The window this screen is on: the focused one if it is here, else the last one focused on this
-    // screen's workspace, else any window of it (none: the desktop).
-    readonly property var activeWs: Hyprland.workspaces.values.find(w => w.id === workspace) ?? null
-    readonly property var wsWindows: activeWs?.toplevels?.values ?? []
-    property var lastFocused: ({})   // workspace id -> toplevel
-
-    readonly property var toplevel: {
-        const focused = Hyprland.activeToplevel;
-        if (focused && wsWindows.includes(focused))
-            return focused;
-        const last = lastFocused[workspace];
-        if (last && wsWindows.includes(last))
-            return last;
-        return wsWindows[0] ?? null;
-    }
-
-    Connections {
-        target: Hyprland
-
-        function onActiveToplevelChanged() {
-            const t = Hyprland.activeToplevel;
-            const ws = t?.workspace?.id;
-            if (ws !== undefined) {
-                const m = Object.assign({}, tile.lastFocused);
-                m[ws] = t;
-                tile.lastFocused = m;
-            }
-        }
-    }
+    // The focused window, the same on every screen.
+    // (activeToplevel is empty after a shell restart until focus moves: fall back to the activated window.)
+    readonly property var toplevel: Hyprland.activeToplevel ?? Hyprland.toplevels.values.find(t => t.activated) ?? null
 
     // The app's name; its window title only when several windows of that app are open (to tell them apart).
     readonly property string appClass: toplevel?.lastIpcObject?.class ?? ""

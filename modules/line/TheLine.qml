@@ -198,6 +198,11 @@ Scope {
                 }
             }
 
+            ResizeRing {
+                anchors.fill: parent
+                screen: root.modelData
+            }
+
             Line {
                 anchors.fill: parent
                 workspace: root.workspace

@@ -51,6 +51,8 @@ ShellRoot {
                 Hyprland.refreshWorkspaces();
                 refreshAgain.restart();
             }
+            if (event.name === "submap")
+                UiState.resizing = event.data === "resize";
             // Window classes and titles (the workspace tile names the app, and counts its windows).
             if (["openwindow", "closewindow", "windowtitlev2", "movewindowv2"].includes(event.name))
                 Hyprland.refreshToplevels();
@@ -80,6 +82,12 @@ ShellRoot {
         name: "launcher"
         description: "Open the launcher"
         onPressed: root.toggleFocused("tl")
+    }
+    // Tapping Super alone: bound on the key's release, which reaches the shell as a release.
+    Shortcut {
+        name: "launcherTap"
+        description: "Open the launcher (tap Super)"
+        onReleased: root.toggleFocused("tl")
     }
     Shortcut {
         name: "notifications"
