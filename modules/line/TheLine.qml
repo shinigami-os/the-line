@@ -14,6 +14,8 @@ Scope {
 
     readonly property string screenName: modelData.name
     readonly property bool panelHere: UiState.openScreen === screenName && UiState.openPanel !== ""
+    // A dialog from the line (polkit) is open on this screen: it takes the keyboard and every click.
+    readonly property bool dialogHere: Polkit.active && Polkit.screen === screenName
     // A fullscreen window on this screen's workspace. Going fullscreen runs in stages, one after the other:
     //   1. the music part leaves the workspace tile,  2. the three tiles fold up into the line,
     //   3. the line withdraws into the screen edges.
@@ -126,11 +128,11 @@ Scope {
         WlrLayershell.namespace: "the-line"
         // Hyprland draws fullscreen windows over the top layer, so the line moves to the overlay layer meanwhile.
         WlrLayershell.layer: root.fullscreen || root.stage > 0 ? WlrLayer.Overlay : WlrLayer.Top
-        WlrLayershell.keyboardFocus: root.panelHere ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
+        WlrLayershell.keyboardFocus: root.panelHere || root.dialogHere ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 
         // Input only where something is: the tiles, or the whole surface while a panel is open
         // (so a click outside closes it without reaching the window below).
-        mask: root.panelHere ? fullMask : (root.fullscreen || root.stage > 0 ? noMask : tilesMask)
+        mask: root.panelHere || root.dialogHere ? fullMask : (root.fullscreen || root.stage > 0 ? noMask : tilesMask)
 
         Region {
             id: fullMask
@@ -216,6 +218,11 @@ Scope {
                 }
             }
 
+
+            PolkitDialog {
+                anchors.fill: parent
+                screenName: root.screenName
+            }
         }
     }
 }

@@ -25,7 +25,9 @@ Runs on Hyprland (FHT comes later). Done so far:
 - optional app icons on the workspace ruler (`workspaceIcons` in the config)
 - intro: each screen starts hidden and draws itself in once its wallpaper is shown
 
-Next: polkit agent, Super+F1 cheat sheet, first-run welcome, launcher shortcuts section, easter eggs from the backlog.
+- polkit agent: an app asking for an admin password gets The Line's dialog (the line drawn across the screen, the box opening on it)
+
+Next: Super+F1 cheat sheet, first-run welcome, launcher shortcuts section, easter eggs from the backlog.
 
 ## Session
 
@@ -72,7 +74,7 @@ qs -p . ipc call line overview           # the workspace overview
 ```
 shell.qml         entry point and IPC
 services/         singletons: Theme, Anim, Config, UiState, LineState, Notifs, Audio, Brightness, SystemStats, Network, NightLight, Power, Media, Apps, Session, ClockFace, Time
-modules/common/   Tile (tile that grows into a panel), PanelItem, Reading, Toggle, LineSlider, Icon
+modules/common/   Tile (tile that grows into a panel), CenterDialog (dialog grown from the line), PanelItem, Reading, Toggle, LineSlider, Icon
 modules/line/     the line and the per-screen surface
 modules/tiles/    the three tiles and their panels
 modules/desktop/  wallpaper, Kira's voice
