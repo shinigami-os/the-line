@@ -15,6 +15,7 @@ Singleton {
     readonly property real motionScale: adapter.motionScale
     readonly property string terminal: adapter.terminal
     readonly property string wallpaper: adapter.wallpaper
+    readonly property bool workspaceIcons: adapter.workspaceIcons
     readonly property var screenFilter: {
         const env = Quickshell.env("THE_LINE_SCREENS");
         return env ? env.split(",") : adapter.screens;
@@ -41,6 +42,7 @@ Singleton {
             property bool reduceMotion: false
             property real motionScale: 1.0
             property string terminal: "foot"
+            property bool workspaceIcons: false   // app icons on the workspace ruler
             property string wallpaper: "/usr/share/kira/wallpapers/default.png"   // "" = leave it to another tool
             property list<string> screens: []
         }

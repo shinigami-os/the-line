@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Shapes
 import Quickshell
 import Quickshell.Hyprland
+import Quickshell.Widgets
 import qs.modules.common
 import qs.services
 
@@ -71,14 +72,15 @@ Tile {
             UiState.launcherQuery = r.app.name;
     }
 
-    // Which panel is open on this screen: "tl" launcher, "tm" music.
-    readonly property string kind: UiState.isOpen(screenName, "tl") ? "tl" : (UiState.isOpen(screenName, "tm") ? "tm" : "")
+    // Which panel is open on this screen: "tl" launcher, "tm" music, "tw" workspace overview (double tap Super).
+    readonly property string kind: ["tl", "tm", "tw"].find(k => UiState.isOpen(screenName, k)) ?? ""
 
     anchorSide: "left"
     restW: Theme.wsBlockW + (musicShown ? Theme.musicW : 0)
-    openW: 560
+    openW: kind === "tw" ? 26 + 5 * 168 + 4 * 10 : 560
     // Launcher: search field, section label, one row per result, footer.
-    openH: Theme.tileHeight + (kind === "tm" ? 12 + musicPanel.implicitHeight + 6
+    openH: Theme.tileHeight + (kind === "tw" ? 12 + overviewPanel.implicitHeight + 12
+        : kind === "tm" ? 12 + musicPanel.implicitHeight + 6
         : 12 + 48 + 24 + Math.max(1, results.length) * 32 + 34 + 12)
     mode: kind !== "" ? "open" : "rest"
 
@@ -129,7 +131,28 @@ Tile {
                         color: cell.busy ? Theme.muted : Theme.borderStrong
                     }
 
+                    // Optional (config "workspaceIcons"): the icon of the workspace's first app instead of its numeral.
+                    readonly property string iconName: {
+                        if (!Config.workspaceIcons || !cell.busy)
+                            return "";
+                        const ws = Hyprland.workspaces.values.find(w => w.id === cell.n);
+                        const cls = ws?.toplevels?.values?.[0]?.lastIpcObject?.class ?? "";
+                        const name = cls === "" ? "" : (DesktopEntries.heuristicLookup(cls)?.icon ?? "");
+                        // An icon the theme doesn't have: keep the numeral.
+                        return name !== "" ? Quickshell.iconPath(name, true) : "";
+                    }
+
+                    IconImage {
+                        visible: cell.iconName !== ""
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        anchors.bottom: parent.bottom
+                        anchors.bottomMargin: 1
+                        implicitSize: 13
+                        source: cell.iconName
+                    }
+
                     Text {
+                        visible: cell.iconName === ""
                         anchors.horizontalCenter: parent.horizontalCenter
                         anchors.bottom: parent.bottom
                         text: cell.n % 10
@@ -320,6 +343,16 @@ Tile {
     }
 
     bodyData: [
+        WorkspaceOverview {
+            id: overviewPanel
+
+            x: 13
+            y: 12
+            enabled: tile.kind === "tw"
+            shown: tile.kind === "tw"
+            active: tile.workspace
+        },
+
         MusicPanel {
             id: musicPanel
 

@@ -21,6 +21,8 @@ Runs on Hyprland (FHT comes later). Done so far:
 - Kira's voice on an empty workspace, behind the windows, from `assets/quotes.txt` plus `~/.config/the-line/quotes.txt`, with live `{placeholders}`
 
 - notification daemon (org.freedesktop.Notifications) and the wallpaper
+- double tap Super: the workspace overview (ten small screens with live window thumbnails), grown from the same tile as the launcher
+- optional app icons on the workspace ruler (`workspaceIcons` in the config)
 - intro: each screen starts hidden and draws itself in once its wallpaper is shown
 
 Next: polkit agent, Super+F1 cheat sheet, first-run welcome, launcher shortcuts section, easter eggs from the backlog.
@@ -62,6 +64,7 @@ qs -p . ipc call line close
 qs -p . ipc call line clockFace         # the clock easter egg
 qs -p . ipc call line search fire        # open the launcher with a search typed in
 qs -p . ipc call line say "hello"        # Kira says a line on top of the windows
+qs -p . ipc call line overview           # the workspace overview
 ```
 
 ## Layout

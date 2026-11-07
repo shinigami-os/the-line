@@ -14,6 +14,8 @@ ShellRoot {
 
     readonly property var screens: Quickshell.screens.filter(s => Config.screenFilter.length === 0 || Config.screenFilter.includes(s.name))
 
+    property real lastSuperTap: 0
+
     // The focused screen, or the first one The Line runs on.
     function focusedScreen() {
         const focused = Hyprland.focusedMonitor?.name ?? "";
@@ -86,8 +88,19 @@ ShellRoot {
     // Tapping Super alone: bound on the key's release, which reaches the shell as a release.
     Shortcut {
         name: "launcherTap"
-        description: "Open the launcher (tap Super)"
-        onReleased: root.toggleFocused("tl")
+        description: "Open the launcher (tap Super); tap twice for the workspace overview"
+        onReleased: {
+            // A second tap right after the first turns the launcher into the workspace overview (same tile).
+            const now = Date.now();
+            if (now - root.lastSuperTap < 400) {
+                root.lastSuperTap = 0;
+                UiState.openPanel = "tw";
+                UiState.openScreen = root.focusedScreen();
+            } else {
+                root.lastSuperTap = now;
+                root.toggleFocused("tl");
+            }
+        }
     }
     Shortcut {
         name: "notifications"
@@ -135,6 +148,11 @@ ShellRoot {
         // Says a line on top of the windows of the focused screen, like the power easter egg.
         function say(text: string): void {
             Voice.say(text, root.focusedScreen());
+        }
+
+        function overview(): void {
+            UiState.openPanel = "tw";
+            UiState.openScreen = root.focusedScreen();
         }
 
         function close(): void {
