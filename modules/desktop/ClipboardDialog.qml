@@ -57,12 +57,50 @@ CenterDialog {
                 font.letterSpacing: 0.9
                 color: Theme.muted
             }
-            Text {
+            Row {
                 anchors.right: parent.right
-                text: Clipboard.entries.length + (Clipboard.entries.length === 1 ? " item" : " items") + " · up to " + Config.clipboardMax
-                font.family: Theme.fontMono
-                font.pixelSize: 10
-                color: Theme.muted
+                spacing: 14
+
+                Text {
+                    text: Clipboard.entries.length + (Clipboard.entries.length === 1 ? " item" : " items") + " · up to " + Config.clipboardMax
+                    font.family: Theme.fontMono
+                    font.pixelSize: 10
+                    color: Theme.muted
+                }
+
+                // Clears the whole history: a first click asks, a second one (within 3 s) does it.
+                Text {
+                    id: clear
+
+                    property bool asking: false
+
+                    visible: Clipboard.entries.length > 0
+                    text: asking ? "clear all? click again" : "clear"
+                    font.family: Theme.fontMono
+                    font.pixelSize: 10
+                    color: asking ? Theme.error : (clearHover.hovered ? Theme.accent : Theme.muted)
+
+                    HoverHandler {
+                        id: clearHover
+                        cursorShape: Qt.PointingHandCursor
+                    }
+                    TapHandler {
+                        onTapped: {
+                            if (clear.asking) {
+                                clear.asking = false;
+                                Clipboard.wipe();
+                            } else {
+                                clear.asking = true;
+                                askTimer.restart();
+                            }
+                        }
+                    }
+                    Timer {
+                        id: askTimer
+                        interval: 3000
+                        onTriggered: clear.asking = false
+                    }
+                }
             }
         }
 
@@ -170,6 +208,16 @@ CenterDialog {
                             font.pixelSize: 11
                             color: Theme.muted
                         }
+                    }
+
+                    // A fine line between entries, three quarters wide.
+                    Rectangle {
+                        visible: entry.index < list.count - 1
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        anchors.bottom: parent.bottom
+                        width: parent.width * 0.75
+                        height: 1
+                        color: Theme.border
                     }
 
                     HoverHandler {
