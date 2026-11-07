@@ -16,6 +16,7 @@ Scope {
     readonly property bool panelHere: UiState.openScreen === screenName && UiState.openPanel !== ""
     // A dialog from the line (polkit) is open on this screen: it takes the keyboard and every click.
     readonly property bool dialogHere: (Polkit.active && Polkit.screen === screenName) || UiState.sheetScreen === screenName
+        || UiState.powerScreen === screenName
     // A fullscreen window on this screen's workspace. Going fullscreen runs in stages, one after the other:
     //   1. the music part leaves the workspace tile,  2. the three tiles fold up into the line,
     //   3. the line withdraws into the screen edges.
@@ -224,6 +225,11 @@ Scope {
 
 
             CheatSheet {
+                anchors.fill: parent
+                screenName: root.screenName
+            }
+
+            PowerMenu {
                 anchors.fill: parent
                 screenName: root.screenName
             }

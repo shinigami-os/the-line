@@ -30,7 +30,9 @@ Runs on Hyprland (FHT comes later). Done so far:
 
 - cheat sheet (SUPER+F1): every shortcut, read live (Hyprland's binds and their "Group: what it does" descriptions, the touchpad gestures, foot's and zsh's own bindings), in tabs
 
-Next: power menu, first-run welcome, launcher shortcuts section, easter eggs from the backlog.
+- power menu (CTRL+ALT+Delete, the power button): the line runs through it, hold to confirm
+
+Next: welcome screen, first-run welcome, launcher shortcuts section, easter eggs from the backlog.
 
 ## Session
 
@@ -71,6 +73,7 @@ qs -p . ipc call line search fire        # open the launcher with a search typed
 qs -p . ipc call line say "hello"        # Kira says a line on top of the windows
 qs -p . ipc call line overview           # the workspace overview
 qs -p . ipc call line cheatsheet         # every shortcut (cheatsheetTab <n> opens a given tab)
+qs -p . ipc call line power              # the power menu
 ```
 
 ## Layout

@@ -115,6 +115,22 @@ ShellRoot {
             UiState.sheetScreen = UiState.sheetScreen === here ? "" : here;
         }
     }
+    // The power menu: on Log out from CTRL+ALT+Delete, on Power off from the power button. Again to close.
+    function togglePower(selected) {
+        const here = root.focusedScreen();
+        UiState.powerSelected = selected;
+        UiState.powerScreen = UiState.powerScreen === here ? "" : here;
+    }
+    Shortcut {
+        name: "power"
+        description: "Power menu"
+        onPressed: root.togglePower(0)
+    }
+    Shortcut {
+        name: "powerButton"
+        description: "Power menu, on Power off (the power button)"
+        onPressed: root.togglePower(3)
+    }
     Shortcut {
         name: "notifications"
         description: "Open notifications and calendar"
@@ -191,6 +207,10 @@ ShellRoot {
 
         function kbdStep(direction: int): void {
             KbdBacklight.step(direction);
+        }
+
+        function power(): void {
+            root.togglePower(0);
         }
 
         function overview(): void {

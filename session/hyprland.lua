@@ -214,7 +214,7 @@ hl.bind("SUPER+T", hl.dsp.global("the-line:wallpapers"), { desc = "The Line: wal
 hl.bind("SUPER+semicolon", hl.dsp.global("the-line:emoji"), { desc = "The Line: emoji picker" })
 hl.bind("SUPER+I", hl.dsp.global("the-line:settings"), { desc = "The Line: settings" })
 hl.bind("CTRL+ALT+Delete", hl.dsp.global("the-line:power"), { desc = "The Line: power menu" })
-hl.bind("XF86PowerOff", hl.dsp.global("the-line:power"), { locked = true, desc = "The Line: power menu (asks first)" })
+hl.bind("XF86PowerOff", hl.dsp.global("the-line:powerButton"), { locked = true, desc = "The Line: power menu (asks first)" })
 
 -- Session
 hl.bind("SUPER+L", hl.dsp.exec_cmd("hyprlock"), { desc = "Session: Lock" })

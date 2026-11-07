@@ -10,6 +10,10 @@ Singleton {
     property string openPanel: ""   // "" | "tl" | "tc" | "tr"
     property string openScreen: ""
 
+    // The screen the power menu is open on ("" for closed), and the action it opens on.
+    property string powerScreen: ""
+    property int powerSelected: 0
+
     // An area screenshot is being selected: the screens show their frozen capture.
     property bool frozen: false
 
