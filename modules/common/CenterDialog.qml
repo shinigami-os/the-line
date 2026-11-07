@@ -3,7 +3,8 @@ import qs.services
 
 // A dialog grown from the line: the screen dims, a line draws itself across its middle from both edges, then a box
 // opens on it, up and down at once (frame first, fill after), and its content arrives like a tile's panel.
-// Closing runs it backwards. The power menu and the polkit agent use it.
+// Closing keeps the same order: the content leaves, the line withdraws, then the box folds away.
+// The power menu and the polkit agent use it.
 Item {
     id: dialog
 
@@ -23,7 +24,7 @@ Item {
     property real reach: open ? 1 : 0
     Behavior on reach {
         SequentialAnimation {
-            PauseAnimation { duration: dialog.open ? 0 : Anim.closeLead + Anim.panel }
+            PauseAnimation { duration: dialog.open ? 0 : Anim.exitFade }
             NumberAnimation { duration: dialog.lineDraw; easing.type: Anim.easing }
         }
     }
@@ -87,7 +88,7 @@ Item {
 
         Behavior on height {
             SequentialAnimation {
-                PauseAnimation { duration: dialog.open ? Math.round(dialog.lineDraw * 0.6) : Anim.closeLead }
+                PauseAnimation { duration: dialog.open ? Math.round(dialog.lineDraw * 0.6) : Anim.exitFade + Math.round(dialog.lineDraw * 0.6) }
                 NumberAnimation { duration: Anim.panel; easing.type: Anim.easing }
             }
         }
@@ -101,7 +102,7 @@ Item {
 
             Behavior on height {
                 SequentialAnimation {
-                    PauseAnimation { duration: dialog.open ? Math.round(dialog.lineDraw * 0.6) + Anim.fillLag : Anim.closeLead }
+                    PauseAnimation { duration: dialog.open ? Math.round(dialog.lineDraw * 0.6) + Anim.fillLag : Anim.exitFade + Math.round(dialog.lineDraw * 0.6) }
                     NumberAnimation { duration: Anim.panel; easing.type: Anim.easing }
                 }
             }

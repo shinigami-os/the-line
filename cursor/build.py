@@ -6,7 +6,7 @@ no shadow. The arrow is a sharp blade with the logo's chevron notch; the link po
 the accent; the busy cursor is the three slanted blades of the loading indicator, lit one after the other.
 The pulse runs around the arrow and the link pointer at a steady pace, lap after lap: a short dash travelling
 along the outline, like the notification pulse on the line. On the text cursor, which has no lap to run, it
-bounces from one end of the I-beam to the other.
+bounces from one end of the I-beam to the other; on the crosshair it goes out along the four branches and back.
 
     python3 cursor/build.py [output dir]      (default: cursor/build/TheLine)
 
@@ -185,10 +185,16 @@ def c_vertical_text(pen, f):
     pen.stroke([(25, 12), (25, 20)], width=1.4)
 
 
+CROSS_BRANCHES = [[(16, 13), (16, 4)], [(16, 19), (16, 28)], [(13, 16), (4, 16)], [(19, 16), (28, 16)]]  # centre -> tip
+
+
 def c_crosshair(pen, f):
-    for seg in (((16, 4), (16, 13)), ((16, 19), (16, 28)), ((4, 16), (13, 16)), ((19, 16), (28, 16))):
-        pen.stroke(list(seg), width=1.2)
+    for branch in CROSS_BRANCHES:
+        pen.stroke(branch, width=1.2)
     pen.rect(15, 15, 17, 17, fill=ACCENT, outline=ACCENT)
+    # The pulse leaves the centre along the four branches at once, reaches the tips and comes back.
+    for branch in CROSS_BRANCHES:
+        pulse(pen, branch, f, closed=False, length=4)
 
 
 def c_cell(pen, f):
@@ -263,7 +269,7 @@ CURSORS = {
     "pointer": (c_pointer, (2, 2), PULSE_FRAMES),
     "text": (c_text, (16, 16), PULSE_FRAMES),
     "vertical-text": (c_vertical_text, (16, 16), 1),
-    "crosshair": (c_crosshair, (16, 16), 1),
+    "crosshair": (c_crosshair, (16, 16), PULSE_FRAMES),
     "cell": (c_cell, (16, 16), 1),
     "wait": (c_wait, (16, 16), 3),
     "progress": (c_progress, (2, 2), 3),
