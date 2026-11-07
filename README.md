@@ -21,7 +21,7 @@ Runs on Hyprland (FHT comes later). Done so far:
 - Kira's voice on an empty workspace, behind the windows, from `assets/quotes.txt` plus `~/.config/the-line/quotes.txt`, with live `{placeholders}`
 
 - notification daemon (org.freedesktop.Notifications) and the wallpaper
-- double tap Super: the workspace overview (ten small screens with live window thumbnails), grown from the same tile as the launcher
+- double tap Super: the workspace overview (ten small screens with live window thumbnails), grown from the same tile as the launcher; drag a window to another workspace to move it, click one to focus it
 - optional app icons on the workspace ruler (`workspaceIcons` in the config)
 - intro: each screen starts hidden and draws itself in once its wallpaper is shown
 
