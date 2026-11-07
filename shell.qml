@@ -108,6 +108,14 @@ ShellRoot {
         }
     }
     Shortcut {
+        name: "cheatsheet"
+        description: "Every shortcut, in one sheet"
+        onPressed: {
+            const here = root.focusedScreen();
+            UiState.sheetScreen = UiState.sheetScreen === here ? "" : here;
+        }
+    }
+    Shortcut {
         name: "notifications"
         description: "Open notifications and calendar"
         onPressed: root.toggleFocused("tc")
@@ -153,6 +161,17 @@ ShellRoot {
         // Says a line on top of the windows of the focused screen, like the power easter egg.
         function say(text: string): void {
             Voice.say(text, root.focusedScreen());
+        }
+
+        function cheatsheet(): void {
+            const here = root.focusedScreen();
+            UiState.sheetScreen = UiState.sheetScreen === here ? "" : here;
+        }
+
+        // Opens the cheat sheet on a given tab (0 = Desktop).
+        function cheatsheetTab(index: int): void {
+            UiState.sheetTab = index;
+            UiState.sheetScreen = root.focusedScreen();
         }
 
         function overview(): void {

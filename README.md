@@ -27,7 +27,9 @@ Runs on Hyprland (FHT comes later). Done so far:
 
 - polkit agent: an app asking for an admin password gets The Line's dialog (the line drawn across the screen, the box opening on it)
 
-Next: Super+F1 cheat sheet, first-run welcome, launcher shortcuts section, easter eggs from the backlog.
+- cheat sheet (SUPER+F1): every shortcut, read live (Hyprland's binds and their "Group: what it does" descriptions, the touchpad gestures, foot's and zsh's own bindings), in tabs
+
+Next: power menu, first-run welcome, launcher shortcuts section, easter eggs from the backlog.
 
 ## Session
 
@@ -67,6 +69,7 @@ qs -p . ipc call line clockFace         # the clock easter egg
 qs -p . ipc call line search fire        # open the launcher with a search typed in
 qs -p . ipc call line say "hello"        # Kira says a line on top of the windows
 qs -p . ipc call line overview           # the workspace overview
+qs -p . ipc call line cheatsheet         # every shortcut (cheatsheetTab <n> opens a given tab)
 ```
 
 ## Layout

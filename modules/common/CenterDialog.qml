@@ -13,6 +13,9 @@ Item {
     property real boxHeight: 240
     default property alias content: body.data
 
+    // A click outside the box: the sheet closes on it, the polkit dialog doesn't.
+    signal outsideClicked
+
     // The content's own "shown", for PanelItems inside: true once the box has started to open.
     property bool contentShown: false
 
@@ -57,6 +60,7 @@ Item {
         MouseArea {
             anchors.fill: parent
             enabled: dialog.open
+            onClicked: dialog.outsideClicked()
         }
     }
 

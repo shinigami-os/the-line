@@ -10,6 +10,10 @@ Singleton {
     property string openPanel: ""   // "" | "tl" | "tc" | "tr"
     property string openScreen: ""
 
+    // The screen the cheat sheet is open on ("" for closed).
+    property string sheetScreen: ""
+    property int sheetTab: 0   // the tab it opens on
+
     // Hyprland's resize mode (SUPER+R) is on.
     property bool resizing: false
 
