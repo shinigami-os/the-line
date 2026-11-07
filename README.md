@@ -77,6 +77,16 @@ assets/           quotes.txt (Kira's voice) and other static files
 scripts/          helpers
 ```
 
+## Cursor
+
+`cursor/build.py` draws The Line's cursor theme (24 shapes plus the usual alias names, 24 to 64 px) and writes the XCursor files, with nothing but Python and Pillow. Flat and square: a dark fill with a light 1 px outline, a blade arrow with the logo's notch, the link pointer in the accent, the busy cursor as the three loading blades.
+
+```sh
+python3 cursor/build.py ~/.local/share/icons/TheLine    # or /usr/share/icons/TheLine
+```
+
+The session sets it (`XCURSOR_THEME=TheLine`). `cursor/build/preview.png` shows every cursor on dark and light.
+
 ## Keybindings
 
 The Line registers Hyprland global shortcuts under the `the-line` app id: `launcher`, `notifications`, `quicksettings`, `performance`. For example:

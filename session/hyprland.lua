@@ -38,6 +38,8 @@ hl.env("GDK_BACKEND", "wayland,x11")
 hl.env("SDL_VIDEODRIVER", "wayland")
 hl.env("CLUTTER_BACKEND", "wayland")
 hl.env("MOZ_ENABLE_WAYLAND", "1")
+hl.env("XCURSOR_THEME", "TheLine")   -- The Line's cursors (cursor/build.py)
+hl.env("XCURSOR_SIZE", "24")
 
 ------------- Look -------------
 
@@ -167,6 +169,7 @@ hl.on("monitor.removed", spread_workspaces)
 hl.on("hyprland.start", function()
     spread_workspaces()
     hl.exec_cmd("dbus-update-activation-environment --all")
+    hl.exec_cmd("hyprctl setcursor TheLine 24")
     hl.exec_cmd("QT_QPA_PLATFORM=wayland " .. QS)
     hl.exec_cmd("wl-paste --type text --watch cliphist store")
     hl.exec_cmd("wl-paste --type image --watch cliphist store")
