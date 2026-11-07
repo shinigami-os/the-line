@@ -18,6 +18,13 @@ Singleton {
     readonly property bool workspaceIcons: adapter.workspaceIcons
     readonly property bool kiraVoice: adapter.kiraVoice
     readonly property real levelStep: adapter.levelStep
+    readonly property int clipboardMax: adapter.clipboardMax
+    readonly property bool clipboardImages: adapter.clipboardImages
+    readonly property bool clipboardWipeOnLogin: adapter.clipboardWipeOnLogin
+
+    // The clipboard recorders read their settings when they start: restart them when those change.
+    onClipboardMaxChanged: if (loadedOnce) Quickshell.execDetached([Qt.resolvedUrl("../session/the-line-clipboard").toString().replace("file://", "")])
+    onClipboardImagesChanged: if (loadedOnce) Quickshell.execDetached([Qt.resolvedUrl("../session/the-line-clipboard").toString().replace("file://", "")])
     readonly property bool workspaceScrollInverted: adapter.workspaceScrollInverted
 
     // Hyprland reads workspaceScrollInverted from this file itself: reload it when the setting changes.
@@ -51,6 +58,9 @@ Singleton {
             property real motionScale: 1.0
             property string terminal: "foot"
             property bool workspaceIcons: false            // app icons on the workspace ruler
+            property int clipboardMax: 200                 // clipboard history size
+            property bool clipboardImages: true            // keep copied images too
+            property bool clipboardWipeOnLogin: false      // empty the history at each login
             property real levelStep: 2                     // % per press for volume, brightness, keyboard backlight
             property bool kiraVoice: true                  // Kira's quotes on an empty workspace, and her one-off lines
             property bool workspaceScrollInverted: false   // SUPER+scroll: scroll down for the next workspace

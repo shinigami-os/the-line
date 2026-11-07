@@ -183,8 +183,7 @@ hl.on("hyprland.start", function()
     hl.exec_cmd("dbus-update-activation-environment --all")
     hl.exec_cmd("hyprctl setcursor TheLine 24")
     hl.exec_cmd("QT_QPA_PLATFORM=wayland " .. QS)
-    hl.exec_cmd("wl-paste --type text --watch cliphist store")
-    hl.exec_cmd("wl-paste --type image --watch cliphist store")
+    hl.exec_cmd(SHELL .. "/session/the-line-clipboard --login")   -- clipboard history, with its settings
     hl.exec_cmd("hypridle -c " .. SHELL .. "/session/hypridle.conf")
 end)
 

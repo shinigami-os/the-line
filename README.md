@@ -32,6 +32,8 @@ Runs on Hyprland (FHT comes later). Done so far:
 
 - power menu (CTRL+ALT+Delete, the power button): the line runs through it, hold to confirm
 
+- clipboard history (SUPER+V) and emoji picker (SUPER+semicolon), both grown from the line, with search
+
 Next: welcome screen, first-run welcome, launcher shortcuts section, easter eggs from the backlog.
 
 ## Session
@@ -117,7 +119,8 @@ hl.bind("SUPER+P", hl.dsp.global("the-line:performance"))
 ```json
 { "accent": "#9A5CFF", "reduceMotion": false, "motionScale": 1.0, "screens": [], "terminal": "foot",
   "wallpaper": "/usr/share/kira/wallpapers/default.png", "workspaceIcons": false,
-  "kiraVoice": true, "workspaceScrollInverted": false, "levelStep": 2 }
+  "kiraVoice": true, "workspaceScrollInverted": false, "levelStep": 2,
+  "clipboardMax": 200, "clipboardImages": true, "clipboardWipeOnLogin": false }
 ```
 
 ## Needs

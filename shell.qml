@@ -131,6 +131,21 @@ ShellRoot {
         description: "Power menu, on Power off (the power button)"
         onPressed: root.togglePower(3)
     }
+    // The line's dialogs: open on the focused screen, closed by the same key.
+    function toggleDialog(key) {
+        const here = root.focusedScreen();
+        UiState[key] = UiState[key] === here ? "" : here;
+    }
+    Shortcut {
+        name: "clipboard"
+        description: "Clipboard history"
+        onPressed: root.toggleDialog("clipScreen")
+    }
+    Shortcut {
+        name: "emoji"
+        description: "Emoji picker"
+        onPressed: root.toggleDialog("emojiScreen")
+    }
     Shortcut {
         name: "notifications"
         description: "Open notifications and calendar"
@@ -211,6 +226,14 @@ ShellRoot {
 
         function power(): void {
             root.togglePower(0);
+        }
+
+        function clipboard(): void {
+            root.toggleDialog("clipScreen");
+        }
+
+        function emoji(): void {
+            root.toggleDialog("emojiScreen");
         }
 
         function overview(): void {

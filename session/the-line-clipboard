@@ -1,0 +1,20 @@
+#!/bin/sh
+# Clipboard history: starts (or restarts) the cliphist recorders. Run at login with --login, and by the shell
+# when a clipboard setting changes. Settings, from ~/.config/the-line/config.json:
+#   clipboardMax          entries kept (default 200)
+#   clipboardImages       keep images too (default true)
+#   clipboardWipeOnLogin  empty the history at each login (default false)
+
+cfg="$HOME/.config/the-line/config.json"
+get() { jq -r "$1" "$cfg" 2>/dev/null; }
+
+max=$(get '.clipboardMax // 200')
+images=$(get 'if .clipboardImages == false then "false" else "true" end')
+wipe=$(get '.clipboardWipeOnLogin // false')
+[ -n "$max" ] || max=200
+
+[ "$1" = "--login" ] && [ "$wipe" = "true" ] && cliphist wipe
+
+pkill -f "wl-paste --type (text|image) --watch cliphist"
+wl-paste --type text --watch cliphist -max-items "$max" store &
+[ "$images" = "false" ] || wl-paste --type image --watch cliphist -max-items "$max" store &

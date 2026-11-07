@@ -1,0 +1,2025 @@
+# The emoji picker's list (SUPER+semicolon), built by scripts/build-emoji.py. char<TAB>group<TAB>name
+😀	smileys	grinning face
+😁	smileys	grinning face with smiling eyes
+😂	smileys	face with tears of joy
+😃	smileys	smiling face with open mouth
+😄	smileys	smiling face with open mouth and smiling eyes
+😅	smileys	smiling face with open mouth and cold sweat
+😆	smileys	smiling face with open mouth and tightly-closed eyes
+😇	smileys	smiling face with halo
+😈	smileys	smiling face with horns
+😉	smileys	winking face
+😊	smileys	smiling face with smiling eyes
+😋	smileys	face savouring delicious food
+😌	smileys	relieved face
+😍	smileys	smiling face with heart-shaped eyes
+😎	smileys	smiling face with sunglasses
+😏	smileys	smirking face
+😐	smileys	neutral face
+😑	smileys	expressionless face
+😒	smileys	unamused face
+😓	smileys	face with cold sweat
+😔	smileys	pensive face
+😕	smileys	confused face
+😖	smileys	confounded face
+😗	smileys	kissing face
+😘	smileys	face throwing a kiss
+😙	smileys	kissing face with smiling eyes
+😚	smileys	kissing face with closed eyes
+😛	smileys	face with stuck-out tongue
+😜	smileys	face with stuck-out tongue and winking eye
+😝	smileys	face with stuck-out tongue and tightly-closed eyes
+😞	smileys	disappointed face
+😟	smileys	worried face
+😠	smileys	angry face
+😡	smileys	pouting face
+😢	smileys	crying face
+😣	smileys	persevering face
+😤	smileys	face with look of triumph
+😥	smileys	disappointed but relieved face
+😦	smileys	frowning face with open mouth
+😧	smileys	anguished face
+😨	smileys	fearful face
+😩	smileys	weary face
+😪	smileys	sleepy face
+😫	smileys	tired face
+😬	smileys	grimacing face
+😭	smileys	loudly crying face
+😮	smileys	face with open mouth
+😯	smileys	hushed face
+😰	smileys	face with open mouth and cold sweat
+😱	smileys	face screaming in fear
+😲	smileys	astonished face
+😳	smileys	flushed face
+😴	smileys	sleeping face
+😵	smileys	dizzy face
+😶	smileys	face without mouth
+😷	smileys	face with medical mask
+😸	smileys	grinning cat face with smiling eyes
+😹	smileys	cat face with tears of joy
+😺	smileys	smiling cat face with open mouth
+😻	smileys	smiling cat face with heart-shaped eyes
+😼	smileys	cat face with wry smile
+😽	smileys	kissing cat face with closed eyes
+😾	smileys	pouting cat face
+😿	smileys	crying cat face
+🙀	smileys	weary cat face
+🙁	smileys	slightly frowning face
+🙂	smileys	slightly smiling face
+🙃	smileys	upside-down face
+🙄	smileys	face with rolling eyes
+🙅	smileys	face with no good gesture
+🙆	smileys	face with ok gesture
+🙇	smileys	person bowing deeply
+🙈	smileys	see-no-evil monkey
+🙉	smileys	hear-no-evil monkey
+🙊	smileys	speak-no-evil monkey
+🙋	smileys	happy person raising one hand
+🙌	smileys	person raising both hands in celebration
+🙍	smileys	person frowning
+🙎	smileys	person with pouting face
+🙏	smileys	person with folded hands
+🤐	smileys	zipper-mouth face
+🤑	smileys	money-mouth face
+🤒	smileys	face with thermometer
+🤓	smileys	nerd face
+🤔	smileys	thinking face
+🤕	smileys	face with head-bandage
+🤖	smileys	robot face
+🤗	smileys	hugging face
+🤘	smileys	sign of the horns
+🤙	smileys	call me hand
+🤚	smileys	raised back of hand
+🤛	smileys	left-facing fist
+🤜	smileys	right-facing fist
+🤝	smileys	handshake
+🤞	smileys	hand with index and middle fingers crossed
+🤟	smileys	i love you hand sign
+🤠	smileys	face with cowboy hat
+🤡	smileys	clown face
+🤢	smileys	nauseated face
+🤣	smileys	rolling on the floor laughing
+🤤	smileys	drooling face
+🤥	smileys	lying face
+🤦	smileys	face palm
+🤧	smileys	sneezing face
+🤨	smileys	face with one eyebrow raised
+🤩	smileys	grinning face with star eyes
+🤪	smileys	grinning face with one large and one small eye
+🤫	smileys	face with finger covering closed lips
+🤬	smileys	serious face with symbols covering mouth
+🤭	smileys	smiling face with smiling eyes and hand covering mouth
+🤮	smileys	face with open mouth vomiting
+🤯	smileys	shocked face with exploding head
+🥰	smileys	smiling face with smiling eyes and three hearts
+🥱	smileys	yawning face
+🥲	smileys	smiling face with tear
+🥳	smileys	face with party horn and party hat
+🥴	smileys	face with uneven eyes and wavy mouth
+🥵	smileys	overheated face
+🥶	smileys	freezing face
+🥷	smileys	ninja
+🥸	smileys	disguised face
+🥹	smileys	face holding back tears
+🥺	smileys	face with pleading eyes
+🥻	smileys	sari
+🥼	smileys	lab coat
+🥽	smileys	goggles
+🥾	smileys	hiking boot
+🥿	smileys	flat shoe
+🫠	smileys	melting face
+🫡	smileys	saluting face
+🫢	smileys	face with open eyes and hand over mouth
+🫣	smileys	face with peeking eye
+🫤	smileys	face with diagonal mouth
+🫥	smileys	dotted line face
+🫦	smileys	biting lip
+🫧	smileys	bubbles
+🫨	smileys	shaking face
+🫩	smileys	face with bags under eyes
+👦	people	boy
+👧	people	girl
+👨	people	man
+👩	people	woman
+👪	people	family
+👫	people	man and woman holding hands
+👬	people	two men holding hands
+👭	people	two women holding hands
+👮	people	police officer
+👯	people	woman with bunny ears
+👰	people	bride with veil
+👱	people	person with blond hair
+👲	people	man with gua pi mao
+👳	people	man with turban
+👴	people	older man
+👵	people	older woman
+👶	people	baby
+👷	people	construction worker
+👸	people	princess
+👹	people	japanese ogre
+👺	people	japanese goblin
+👻	people	ghost
+👼	people	baby angel
+👽	people	extraterrestrial alien
+👾	people	alien monster
+👿	people	imp
+💀	people	skull
+💁	people	information desk person
+💂	people	guardsman
+💃	people	dancer
+💄	people	lipstick
+💅	people	nail polish
+💆	people	face massage
+💇	people	haircut
+💈	people	barber pole
+💉	people	syringe
+💊	people	pill
+💋	people	kiss mark
+💌	people	love letter
+💍	people	ring
+💎	people	gem stone
+💏	people	kiss
+💐	people	bouquet
+💑	people	couple with heart
+💒	people	wedding
+💓	people	beating heart
+💔	people	broken heart
+💕	people	two hearts
+💖	people	sparkling heart
+💗	people	growing heart
+💘	people	heart with arrow
+💙	people	blue heart
+💚	people	green heart
+💛	people	yellow heart
+💜	people	purple heart
+💝	people	heart with ribbon
+💞	people	revolving hearts
+💟	people	heart decoration
+💠	people	diamond shape with a dot inside
+💡	people	electric light bulb
+💢	people	anger symbol
+💣	people	bomb
+💤	people	sleeping symbol
+💥	people	collision symbol
+💦	people	splashing sweat symbol
+💧	people	droplet
+💨	people	dash symbol
+💩	people	pile of poo
+💪	people	flexed biceps
+💫	people	dizzy symbol
+💬	people	speech balloon
+💭	people	thought balloon
+💮	people	white flower
+💯	people	hundred points symbol
+🤰	people	pregnant woman
+🤱	people	breast-feeding
+🤲	people	palms up together
+🤳	people	selfie
+🤴	people	prince
+🤵	people	man in tuxedo
+🤶	people	mother christmas
+🤷	people	shrug
+🤸	people	person doing cartwheel
+🤹	people	juggling
+🤺	people	fencer
+🤻	people	modern pentathlon
+🤼	people	wrestlers
+🤽	people	water polo
+🤾	people	handball
+🤿	people	diving mask
+🥀	people	wilted flower
+🥁	people	drum with drumsticks
+🥂	people	clinking glasses
+🥃	people	tumbler glass
+🥄	people	spoon
+🥅	people	goal net
+🥆	people	rifle
+🥇	people	first place medal
+🥈	people	second place medal
+🥉	people	third place medal
+🥊	people	boxing glove
+🥋	people	martial arts uniform
+🥌	people	curling stone
+🥍	people	lacrosse stick and ball
+🥎	people	softball
+🥏	people	flying disc
+🧐	people	face with monocle
+🧑	people	adult
+🧒	people	child
+🧓	people	older adult
+🧔	people	bearded person
+🧕	people	person with headscarf
+🧖	people	person in steamy room
+🧗	people	person climbing
+🧘	people	person in lotus position
+🧙	people	mage
+🧚	people	fairy
+🧛	people	vampire
+🧜	people	merperson
+🧝	people	elf
+🧞	people	genie
+🧟	people	zombie
+🧠	people	brain
+🧡	people	orange heart
+🧢	people	billed cap
+🧣	people	scarf
+🧤	people	gloves
+🧥	people	coat
+🧦	people	socks
+🧧	people	red gift envelope
+🧨	people	firecracker
+🧩	people	jigsaw puzzle piece
+🧪	people	test tube
+🧫	people	petri dish
+🧬	people	dna double helix
+🧭	people	compass
+🧮	people	abacus
+🧯	people	fire extinguisher
+🧰	people	toolbox
+🧱	people	brick
+🧲	people	magnet
+🧳	people	luggage
+🧴	people	lotion bottle
+🧵	people	spool of thread
+🧶	people	ball of yarn
+🧷	people	safety pin
+🧸	people	teddy bear
+🧹	people	broom
+🧺	people	basket
+🧻	people	roll of paper
+🧼	people	bar of soap
+🧽	people	sponge
+🧾	people	receipt
+🧿	people	nazar amulet
+👊	people	fisted hand sign
+👋	people	waving hand sign
+👌	people	ok hand sign
+👍	people	thumbs up sign
+👎	people	thumbs down sign
+👏	people	clapping hands sign
+👐	people	open hands sign
+👑	people	crown
+👒	people	womans hat
+👓	people	eyeglasses
+👔	people	necktie
+👕	people	t-shirt
+👖	people	jeans
+👗	people	dress
+👘	people	kimono
+👙	people	bikini
+👚	people	womans clothes
+👛	people	purse
+👜	people	handbag
+👝	people	pouch
+👞	people	mans shoe
+👟	people	athletic shoe
+👠	people	high-heeled shoe
+👡	people	womans sandal
+👢	people	womans boots
+👣	people	footprints
+👤	people	bust in silhouette
+👥	people	busts in silhouette
+🌰	nature	chestnut
+🌱	nature	seedling
+🌲	nature	evergreen tree
+🌳	nature	deciduous tree
+🌴	nature	palm tree
+🌵	nature	cactus
+🌶	nature	hot pepper
+🌷	nature	tulip
+🌸	nature	cherry blossom
+🌹	nature	rose
+🌺	nature	hibiscus
+🌻	nature	sunflower
+🌼	nature	blossom
+🌽	nature	ear of maize
+🌾	nature	ear of rice
+🌿	nature	herb
+🍀	nature	four leaf clover
+🍁	nature	maple leaf
+🍂	nature	fallen leaf
+🍃	nature	leaf fluttering in wind
+🍄	nature	mushroom
+🍅	nature	tomato
+🍆	nature	aubergine
+🍇	nature	grapes
+🍈	nature	melon
+🍉	nature	watermelon
+🍊	nature	tangerine
+🍋	nature	lemon
+🍌	nature	banana
+🍍	nature	pineapple
+🍎	nature	red apple
+🍏	nature	green apple
+🍐	nature	pear
+🍑	nature	peach
+🍒	nature	cherries
+🍓	nature	strawberry
+🍔	nature	hamburger
+🍕	nature	slice of pizza
+🍖	nature	meat on bone
+🍗	nature	poultry leg
+🍘	nature	rice cracker
+🍙	nature	rice ball
+🍚	nature	cooked rice
+🍛	nature	curry and rice
+🍜	nature	steaming bowl
+🍝	nature	spaghetti
+🍞	nature	bread
+🍟	nature	french fries
+🍠	nature	roasted sweet potato
+🍡	nature	dango
+🍢	nature	oden
+🍣	nature	sushi
+🍤	nature	fried shrimp
+🍥	nature	fish cake with swirl design
+🍦	nature	soft ice cream
+🍧	nature	shaved ice
+🍨	nature	ice cream
+🍩	nature	doughnut
+🍪	nature	cookie
+🍫	nature	chocolate bar
+🍬	nature	candy
+🍭	nature	lollipop
+🍮	nature	custard
+🍯	nature	honey pot
+🍰	nature	shortcake
+🍱	nature	bento box
+🍲	nature	pot of food
+🍳	nature	cooking
+🍴	nature	fork and knife
+🍵	nature	teacup without handle
+🍶	nature	sake bottle and cup
+🍷	nature	wine glass
+🍸	nature	cocktail glass
+🍹	nature	tropical drink
+🍺	nature	beer mug
+🍻	nature	clinking beer mugs
+🍼	nature	baby bottle
+🍽	nature	fork and knife with plate
+🍾	nature	bottle with popping cork
+🍿	nature	popcorn
+🐀	nature	rat
+🐁	nature	mouse
+🐂	nature	ox
+🐃	nature	water buffalo
+🐄	nature	cow
+🐅	nature	tiger
+🐆	nature	leopard
+🐇	nature	rabbit
+🐈	nature	cat
+🐉	nature	dragon
+🐊	nature	crocodile
+🐋	nature	whale
+🐌	nature	snail
+🐍	nature	snake
+🐎	nature	horse
+🐏	nature	ram
+🐐	nature	goat
+🐑	nature	sheep
+🐒	nature	monkey
+🐓	nature	rooster
+🐔	nature	chicken
+🐕	nature	dog
+🐖	nature	pig
+🐗	nature	boar
+🐘	nature	elephant
+🐙	nature	octopus
+🐚	nature	spiral shell
+🐛	nature	bug
+🐜	nature	ant
+🐝	nature	honeybee
+🐞	nature	lady beetle
+🐟	nature	fish
+🐠	nature	tropical fish
+🐡	nature	blowfish
+🐢	nature	turtle
+🐣	nature	hatching chick
+🐤	nature	baby chick
+🐥	nature	front-facing baby chick
+🐦	nature	bird
+🐧	nature	penguin
+🐨	nature	koala
+🐩	nature	poodle
+🐪	nature	dromedary camel
+🐫	nature	bactrian camel
+🐬	nature	dolphin
+🐭	nature	mouse face
+🐮	nature	cow face
+🐯	nature	tiger face
+🐰	nature	rabbit face
+🐱	nature	cat face
+🐲	nature	dragon face
+🐳	nature	spouting whale
+🐴	nature	horse face
+🐵	nature	monkey face
+🐶	nature	dog face
+🐷	nature	pig face
+🐸	nature	frog face
+🐹	nature	hamster face
+🐺	nature	wolf face
+🐻	nature	bear face
+🐼	nature	panda face
+🐽	nature	pig nose
+🐾	nature	paw prints
+🐿	nature	chipmunk
+🦀	nature	crab
+🦁	nature	lion face
+🦂	nature	scorpion
+🦃	nature	turkey
+🦄	nature	unicorn face
+🦅	nature	eagle
+🦆	nature	duck
+🦇	nature	bat
+🦈	nature	shark
+🦉	nature	owl
+🦊	nature	fox face
+🦋	nature	butterfly
+🦌	nature	deer
+🦍	nature	gorilla
+🦎	nature	lizard
+🦏	nature	rhinoceros
+🦐	nature	shrimp
+🦑	nature	squid
+🦒	nature	giraffe face
+🦓	nature	zebra face
+🦔	nature	hedgehog
+🦕	nature	sauropod
+🦖	nature	t-rex
+🦗	nature	cricket
+🦘	nature	kangaroo
+🦙	nature	llama
+🦚	nature	peacock
+🦛	nature	hippopotamus
+🦜	nature	parrot
+🦝	nature	raccoon
+🦞	nature	lobster
+🦟	nature	mosquito
+🦠	nature	microbe
+🦡	nature	badger
+🦢	nature	swan
+🦣	nature	mammoth
+🦤	nature	dodo
+🦥	nature	sloth
+🦦	nature	otter
+🦧	nature	orangutan
+🦨	nature	skunk
+🦩	nature	flamingo
+🦪	nature	oyster
+🦫	nature	beaver
+🦬	nature	bison
+🦭	nature	seal
+🦮	nature	guide dog
+🦯	nature	probing cane
+🪰	nature	fly
+🪱	nature	worm
+🪲	nature	beetle
+🪳	nature	cockroach
+🪴	nature	potted plant
+🪵	nature	wood
+🪶	nature	feather
+🪷	nature	lotus
+🪸	nature	coral
+🪹	nature	empty nest
+🪺	nature	nest with eggs
+🪻	nature	hyacinth
+🪼	nature	jellyfish
+🪽	nature	wing
+🪾	nature	leafless tree
+🪿	nature	goose
+🥐	food	croissant
+🥑	food	avocado
+🥒	food	cucumber
+🥓	food	bacon
+🥔	food	potato
+🥕	food	carrot
+🥖	food	baguette bread
+🥗	food	green salad
+🥘	food	shallow pan of food
+🥙	food	stuffed flatbread
+🥚	food	egg
+🥛	food	glass of milk
+🥜	food	peanuts
+🥝	food	kiwifruit
+🥞	food	pancakes
+🥟	food	dumpling
+🥠	food	fortune cookie
+🥡	food	takeout box
+🥢	food	chopsticks
+🥣	food	bowl with spoon
+🥤	food	cup with straw
+🥥	food	coconut
+🥦	food	broccoli
+🥧	food	pie
+🥨	food	pretzel
+🥩	food	cut of meat
+🥪	food	sandwich
+🥫	food	canned food
+🥬	food	leafy green
+🥭	food	mango
+🥮	food	moon cake
+🥯	food	bagel
+🫐	food	blueberries
+🫑	food	bell pepper
+🫒	food	olive
+🫓	food	flatbread
+🫔	food	tamale
+🫕	food	fondue
+🫖	food	teapot
+🫗	food	pouring liquid
+🫘	food	beans
+🫙	food	jar
+🫚	food	ginger root
+🫛	food	pea pod
+🫜	food	root vegetable
+🫟	food	splatter
+🎀	activities	ribbon
+🎁	activities	wrapped present
+🎂	activities	birthday cake
+🎃	activities	jack-o-lantern
+🎄	activities	christmas tree
+🎅	activities	father christmas
+🎆	activities	fireworks
+🎇	activities	firework sparkler
+🎈	activities	balloon
+🎉	activities	party popper
+🎊	activities	confetti ball
+🎋	activities	tanabata tree
+🎌	activities	crossed flags
+🎍	activities	pine decoration
+🎎	activities	japanese dolls
+🎏	activities	carp streamer
+🎐	activities	wind chime
+🎑	activities	moon viewing ceremony
+🎒	activities	school satchel
+🎓	activities	graduation cap
+🎔	activities	heart with tip on the left
+🎕	activities	bouquet of flowers
+🎖	activities	military medal
+🎗	activities	reminder ribbon
+🎘	activities	musical keyboard with jacks
+🎙	activities	studio microphone
+🎚	activities	level slider
+🎛	activities	control knobs
+🎜	activities	beamed ascending musical notes
+🎝	activities	beamed descending musical notes
+🎞	activities	film frames
+🎟	activities	admission tickets
+🎠	activities	carousel horse
+🎡	activities	ferris wheel
+🎢	activities	roller coaster
+🎣	activities	fishing pole and fish
+🎤	activities	microphone
+🎥	activities	movie camera
+🎦	activities	cinema
+🎧	activities	headphone
+🎨	activities	artist palette
+🎩	activities	top hat
+🎪	activities	circus tent
+🎫	activities	ticket
+🎬	activities	clapper board
+🎭	activities	performing arts
+🎮	activities	video game
+🎯	activities	direct hit
+🎰	activities	slot machine
+🎱	activities	billiards
+🎲	activities	game die
+🎳	activities	bowling
+🎴	activities	flower playing cards
+🎵	activities	musical note
+🎶	activities	multiple musical notes
+🎷	activities	saxophone
+🎸	activities	guitar
+🎹	activities	musical keyboard
+🎺	activities	trumpet
+🎻	activities	violin
+🎼	activities	musical score
+🎽	activities	running shirt with sash
+🎾	activities	tennis racquet and ball
+🎿	activities	ski and ski boot
+🏀	activities	basketball and hoop
+🏁	activities	chequered flag
+🏂	activities	snowboarder
+🏃	activities	runner
+🏄	activities	surfer
+🏅	activities	sports medal
+🏆	activities	trophy
+🏇	activities	horse racing
+🏈	activities	american football
+🏉	activities	rugby football
+🏊	activities	swimmer
+🏋	activities	weight lifter
+🏌	activities	golfer
+🏍	activities	racing motorcycle
+🏎	activities	racing car
+🏏	activities	cricket bat and ball
+🏐	activities	volleyball
+🏑	activities	field hockey stick and ball
+🏒	activities	ice hockey stick and puck
+🏓	activities	table tennis paddle and ball
+🏔	activities	snow capped mountain
+🏕	activities	camping
+🏖	activities	beach with umbrella
+🏗	activities	building construction
+🏘	activities	house buildings
+🏙	activities	cityscape
+🏚	activities	derelict house building
+🏛	activities	classical building
+🏜	activities	desert
+🏝	activities	desert island
+🏞	activities	national park
+🏟	activities	stadium
+🏠	activities	house building
+🏡	activities	house with garden
+🏢	activities	office building
+🏣	activities	japanese post office
+🏤	activities	european post office
+🏥	activities	hospital
+🏦	activities	bank
+🏧	activities	automated teller machine
+🏨	activities	hotel
+🏩	activities	love hotel
+🏪	activities	convenience store
+🏫	activities	school
+🏬	activities	department store
+🏭	activities	factory
+🏮	activities	izakaya lantern
+🏯	activities	japanese castle
+🏰	activities	european castle
+🏱	activities	white pennant
+🏲	activities	black pennant
+🏳	activities	waving white flag
+🏴	activities	waving black flag
+🏵	activities	rosette
+🏶	activities	black rosette
+🏷	activities	label
+🏸	activities	badminton racquet and shuttlecock
+🏹	activities	bow and arrow
+🏺	activities	amphora
+🩰	activities	ballet shoes
+🩱	activities	one-piece swimsuit
+🩲	activities	briefs
+🩳	activities	shorts
+🩴	activities	thong sandal
+🩵	activities	light blue heart
+🩶	activities	grey heart
+🩷	activities	pink heart
+🩸	activities	drop of blood
+🩹	activities	adhesive bandage
+🩺	activities	stethoscope
+🩻	activities	x-ray
+🩼	activities	crutch
+🚀	travel	rocket
+🚁	travel	helicopter
+🚂	travel	steam locomotive
+🚃	travel	railway car
+🚄	travel	high-speed train
+🚅	travel	high-speed train with bullet nose
+🚆	travel	train
+🚇	travel	metro
+🚈	travel	light rail
+🚉	travel	station
+🚊	travel	tram
+🚋	travel	tram car
+🚌	travel	bus
+🚍	travel	oncoming bus
+🚎	travel	trolleybus
+🚏	travel	bus stop
+🚐	travel	minibus
+🚑	travel	ambulance
+🚒	travel	fire engine
+🚓	travel	police car
+🚔	travel	oncoming police car
+🚕	travel	taxi
+🚖	travel	oncoming taxi
+🚗	travel	automobile
+🚘	travel	oncoming automobile
+🚙	travel	recreational vehicle
+🚚	travel	delivery truck
+🚛	travel	articulated lorry
+🚜	travel	tractor
+🚝	travel	monorail
+🚞	travel	mountain railway
+🚟	travel	suspension railway
+🚠	travel	mountain cableway
+🚡	travel	aerial tramway
+🚢	travel	ship
+🚣	travel	rowboat
+🚤	travel	speedboat
+🚥	travel	horizontal traffic light
+🚦	travel	vertical traffic light
+🚧	travel	construction sign
+🚨	travel	police cars revolving light
+🚩	travel	triangular flag on post
+🚪	travel	door
+🚫	travel	no entry sign
+🚬	travel	smoking symbol
+🚭	travel	no smoking symbol
+🚮	travel	put litter in its place symbol
+🚯	travel	do not litter symbol
+🚰	travel	potable water symbol
+🚱	travel	non-potable water symbol
+🚲	travel	bicycle
+🚳	travel	no bicycles
+🚴	travel	bicyclist
+🚵	travel	mountain bicyclist
+🚶	travel	pedestrian
+🚷	travel	no pedestrians
+🚸	travel	children crossing
+🚹	travel	mens symbol
+🚺	travel	womens symbol
+🚻	travel	restroom
+🚼	travel	baby symbol
+🚽	travel	toilet
+🚾	travel	water closet
+🚿	travel	shower
+🛀	travel	bath
+🛁	travel	bathtub
+🛂	travel	passport control
+🛃	travel	customs
+🛄	travel	baggage claim
+🛅	travel	left luggage
+🛆	travel	triangle with rounded corners
+🛇	travel	prohibited sign
+🛈	travel	circled information source
+🛉	travel	boys symbol
+🛊	travel	girls symbol
+🛋	travel	couch and lamp
+🛌	travel	sleeping accommodation
+🛍	travel	shopping bags
+🛎	travel	bellhop bell
+🛏	travel	bed
+🛐	travel	place of worship
+🛑	travel	octagonal sign
+🛒	travel	shopping trolley
+🛓	travel	stupa
+🛔	travel	pagoda
+🛕	travel	hindu temple
+🛖	travel	hut
+🛗	travel	elevator
+🛜	travel	wireless
+🛝	travel	playground slide
+🛞	travel	wheel
+🛟	travel	ring buoy
+🛠	travel	hammer and wrench
+🛡	travel	shield
+🛢	travel	oil drum
+🛣	travel	motorway
+🛤	travel	railway track
+🛥	travel	motor boat
+🛦	travel	up-pointing military airplane
+🛧	travel	up-pointing airplane
+🛨	travel	up-pointing small airplane
+🛩	travel	small airplane
+🛪	travel	northeast-pointing airplane
+🛫	travel	airplane departure
+🛬	travel	airplane arriving
+🛰	travel	satellite
+🛱	travel	oncoming fire engine
+🛲	travel	diesel locomotive
+🛳	travel	passenger ship
+🛴	travel	scooter
+🛵	travel	motor scooter
+🛶	travel	canoe
+🛷	travel	sled
+🛸	travel	flying saucer
+🛹	travel	skateboard
+🛺	travel	auto rickshaw
+🛻	travel	pickup truck
+🛼	travel	roller skate
+💰	objects	money bag
+💱	objects	currency exchange
+💲	objects	heavy dollar sign
+💳	objects	credit card
+💴	objects	banknote with yen sign
+💵	objects	banknote with dollar sign
+💶	objects	banknote with euro sign
+💷	objects	banknote with pound sign
+💸	objects	money with wings
+💹	objects	chart with upwards trend and yen sign
+💺	objects	seat
+💻	objects	personal computer
+💼	objects	briefcase
+💽	objects	minidisc
+💾	objects	floppy disk
+💿	objects	optical disc
+📀	objects	dvd
+📁	objects	file folder
+📂	objects	open file folder
+📃	objects	page with curl
+📄	objects	page facing up
+📅	objects	calendar
+📆	objects	tear-off calendar
+📇	objects	card index
+📈	objects	chart with upwards trend
+📉	objects	chart with downwards trend
+📊	objects	bar chart
+📋	objects	clipboard
+📌	objects	pushpin
+📍	objects	round pushpin
+📎	objects	paperclip
+📏	objects	straight ruler
+📐	objects	triangular ruler
+📑	objects	bookmark tabs
+📒	objects	ledger
+📓	objects	notebook
+📔	objects	notebook with decorative cover
+📕	objects	closed book
+📖	objects	open book
+📗	objects	green book
+📘	objects	blue book
+📙	objects	orange book
+📚	objects	books
+📛	objects	name badge
+📜	objects	scroll
+📝	objects	memo
+📞	objects	telephone receiver
+📟	objects	pager
+📠	objects	fax machine
+📡	objects	satellite antenna
+📢	objects	public address loudspeaker
+📣	objects	cheering megaphone
+📤	objects	outbox tray
+📥	objects	inbox tray
+📦	objects	package
+📧	objects	e-mail symbol
+📨	objects	incoming envelope
+📩	objects	envelope with downwards arrow above
+📪	objects	closed mailbox with lowered flag
+📫	objects	closed mailbox with raised flag
+📬	objects	open mailbox with raised flag
+📭	objects	open mailbox with lowered flag
+📮	objects	postbox
+📯	objects	postal horn
+📰	objects	newspaper
+📱	objects	mobile phone
+📲	objects	mobile phone with rightwards arrow at left
+📳	objects	vibration mode
+📴	objects	mobile phone off
+📵	objects	no mobile phones
+📶	objects	antenna with bars
+📷	objects	camera
+📸	objects	camera with flash
+📹	objects	video camera
+📺	objects	television
+📻	objects	radio
+📼	objects	videocassette
+📽	objects	film projector
+📾	objects	portable stereo
+📿	objects	prayer beads
+🔀	objects	twisted rightwards arrows
+🔁	objects	clockwise rightwards and leftwards open circle arrows
+🔂	objects	clockwise rightwards and leftwards open circle arrows with circled one overlay
+🔃	objects	clockwise downwards and upwards open circle arrows
+🔄	objects	anticlockwise downwards and upwards open circle arrows
+🔅	objects	low brightness symbol
+🔆	objects	high brightness symbol
+🔇	objects	speaker with cancellation stroke
+🔈	objects	speaker
+🔉	objects	speaker with one sound wave
+🔊	objects	speaker with three sound waves
+🔋	objects	battery
+🔌	objects	electric plug
+🔍	objects	left-pointing magnifying glass
+🔎	objects	right-pointing magnifying glass
+🔏	objects	lock with ink pen
+🔐	objects	closed lock with key
+🔑	objects	key
+🔒	objects	lock
+🔓	objects	open lock
+🔔	objects	bell
+🔕	objects	bell with cancellation stroke
+🔖	objects	bookmark
+🔗	objects	link symbol
+🔘	objects	radio button
+🔙	objects	back with leftwards arrow above
+🔚	objects	end with leftwards arrow above
+🔛	objects	on with exclamation mark with left right arrow above
+🔜	objects	soon with rightwards arrow above
+🔝	objects	top with upwards arrow above
+🔞	objects	no one under eighteen symbol
+🔟	objects	keycap ten
+🔠	objects	input symbol for latin capital letters
+🔡	objects	input symbol for latin small letters
+🔢	objects	input symbol for numbers
+🔣	objects	input symbol for symbols
+🔤	objects	input symbol for latin letters
+🔥	objects	fire
+🔦	objects	electric torch
+🔧	objects	wrench
+🔨	objects	hammer
+🔩	objects	nut and bolt
+🔪	objects	hocho
+🔫	objects	pistol
+🔬	objects	microscope
+🔭	objects	telescope
+🔮	objects	crystal ball
+🔯	objects	six pointed star with middle dot
+🔰	objects	japanese symbol for beginner
+🔱	objects	trident emblem
+🔲	objects	black square button
+🔳	objects	white square button
+🔴	objects	large red circle
+🔵	objects	large blue circle
+🔶	objects	large orange diamond
+🔷	objects	large blue diamond
+🔸	objects	small orange diamond
+🔹	objects	small blue diamond
+🔺	objects	up-pointing red triangle
+🔻	objects	down-pointing red triangle
+🔼	objects	up-pointing small red triangle
+🔽	objects	down-pointing small red triangle
+🔾	objects	lower right shadowed white circle
+🔿	objects	upper right shadowed white circle
+🕀	objects	circled cross pommee
+🕁	objects	cross pommee with half-circle below
+🕂	objects	cross pommee
+🕃	objects	notched left semicircle with three dots
+🕄	objects	notched right semicircle with three dots
+🕅	objects	symbol for marks chapter
+🕆	objects	white latin cross
+🕇	objects	heavy latin cross
+🕈	objects	celtic cross
+🕉	objects	om symbol
+🕊	objects	dove of peace
+🕋	objects	kaaba
+🕌	objects	mosque
+🕍	objects	synagogue
+🕎	objects	menorah with nine branches
+🕏	objects	bowl of hygieia
+🕐	objects	clock face one oclock
+🕑	objects	clock face two oclock
+🕒	objects	clock face three oclock
+🕓	objects	clock face four oclock
+🕔	objects	clock face five oclock
+🕕	objects	clock face six oclock
+🕖	objects	clock face seven oclock
+🕗	objects	clock face eight oclock
+🕘	objects	clock face nine oclock
+🕙	objects	clock face ten oclock
+🕚	objects	clock face eleven oclock
+🕛	objects	clock face twelve oclock
+🕜	objects	clock face one-thirty
+🕝	objects	clock face two-thirty
+🕞	objects	clock face three-thirty
+🕟	objects	clock face four-thirty
+🕠	objects	clock face five-thirty
+🕡	objects	clock face six-thirty
+🕢	objects	clock face seven-thirty
+🕣	objects	clock face eight-thirty
+🕤	objects	clock face nine-thirty
+🕥	objects	clock face ten-thirty
+🕦	objects	clock face eleven-thirty
+🕧	objects	clock face twelve-thirty
+🕨	objects	right speaker
+🕩	objects	right speaker with one sound wave
+🕪	objects	right speaker with three sound waves
+🕫	objects	bullhorn
+🕬	objects	bullhorn with sound waves
+🕭	objects	ringing bell
+🕮	objects	book
+🕯	objects	candle
+🕰	objects	mantelpiece clock
+🕱	objects	black skull and crossbones
+🕲	objects	no piracy
+🕳	objects	hole
+🕴	objects	man in business suit levitating
+🕵	objects	sleuth or spy
+🕶	objects	dark sunglasses
+🕷	objects	spider
+🕸	objects	spider web
+🕹	objects	joystick
+🕺	objects	man dancing
+🕻	objects	left hand telephone receiver
+🕼	objects	telephone receiver with page
+🕽	objects	right hand telephone receiver
+🕾	objects	white touchtone telephone
+🕿	objects	black touchtone telephone
+🖀	objects	telephone on top of modem
+🖁	objects	clamshell mobile phone
+🖂	objects	back of envelope
+🖃	objects	stamped envelope
+🖄	objects	envelope with lightning
+🖅	objects	flying envelope
+🖆	objects	pen over stamped envelope
+🖇	objects	linked paperclips
+🖈	objects	black pushpin
+🖉	objects	lower left pencil
+🖊	objects	lower left ballpoint pen
+🖋	objects	lower left fountain pen
+🖌	objects	lower left paintbrush
+🖍	objects	lower left crayon
+🖎	objects	left writing hand
+🖏	objects	turned ok hand sign
+🖐	objects	raised hand with fingers splayed
+🖑	objects	reversed raised hand with fingers splayed
+🖒	objects	reversed thumbs up sign
+🖓	objects	reversed thumbs down sign
+🖔	objects	reversed victory hand
+🖕	objects	reversed hand with middle finger extended
+🖖	objects	raised hand with part between middle and ring fingers
+🖗	objects	white down pointing left hand index
+🖘	objects	sideways white left pointing index
+🖙	objects	sideways white right pointing index
+🖚	objects	sideways black left pointing index
+🖛	objects	sideways black right pointing index
+🖜	objects	black left pointing backhand index
+🖝	objects	black right pointing backhand index
+🖞	objects	sideways white up pointing index
+🖟	objects	sideways white down pointing index
+🖠	objects	sideways black up pointing index
+🖡	objects	sideways black down pointing index
+🖢	objects	black up pointing backhand index
+🖣	objects	black down pointing backhand index
+🖤	objects	black heart
+🖥	objects	desktop computer
+🖦	objects	keyboard and mouse
+🖧	objects	three networked computers
+🖨	objects	printer
+🖩	objects	pocket calculator
+🖪	objects	black hard shell floppy disk
+🖫	objects	white hard shell floppy disk
+🖬	objects	soft shell floppy disk
+🖭	objects	tape cartridge
+🖮	objects	wired keyboard
+🖯	objects	one button mouse
+🖰	objects	two button mouse
+🖱	objects	three button mouse
+🖲	objects	trackball
+🖳	objects	old personal computer
+🖴	objects	hard disk
+🖵	objects	screen
+🖶	objects	printer icon
+🖷	objects	fax icon
+🖸	objects	optical disc icon
+🖹	objects	document with text
+🖺	objects	document with text and picture
+🖻	objects	document with picture
+🖼	objects	frame with picture
+🖽	objects	frame with tiles
+🖾	objects	frame with an x
+🖿	objects	black folder
+🗀	objects	folder
+🗁	objects	open folder
+🗂	objects	card index dividers
+🗃	objects	card file box
+🗄	objects	file cabinet
+🗅	objects	empty note
+🗆	objects	empty note page
+🗇	objects	empty note pad
+🗈	objects	note
+🗉	objects	note page
+🗊	objects	note pad
+🗋	objects	empty document
+🗌	objects	empty page
+🗍	objects	empty pages
+🗎	objects	document
+🗏	objects	page
+🗐	objects	pages
+🗑	objects	wastebasket
+🗒	objects	spiral note pad
+🗓	objects	spiral calendar pad
+🗔	objects	desktop window
+🗕	objects	minimize
+🗖	objects	maximize
+🗗	objects	overlap
+🗘	objects	clockwise right and left semicircle arrows
+🗙	objects	cancellation x
+🗚	objects	increase font size symbol
+🗛	objects	decrease font size symbol
+🗜	objects	compression
+🗝	objects	old key
+🗞	objects	rolled-up newspaper
+🗟	objects	page with circled text
+🗠	objects	stock chart
+🗡	objects	dagger knife
+🗢	objects	lips
+🗣	objects	speaking head in silhouette
+🗤	objects	three rays above
+🗥	objects	three rays below
+🗦	objects	three rays left
+🗧	objects	three rays right
+🗨	objects	left speech bubble
+🗩	objects	right speech bubble
+🗪	objects	two speech bubbles
+🗫	objects	three speech bubbles
+🗬	objects	left thought bubble
+🗭	objects	right thought bubble
+🗮	objects	left anger bubble
+🗯	objects	right anger bubble
+🗰	objects	mood bubble
+🗱	objects	lightning mood bubble
+🗲	objects	lightning mood
+🗳	objects	ballot box with ballot
+🗴	objects	ballot script x
+🗵	objects	ballot box with script x
+🗶	objects	ballot bold script x
+🗷	objects	ballot box with bold script x
+🗸	objects	light check mark
+🗹	objects	ballot box with bold check
+🗺	objects	world map
+🗻	objects	mount fuji
+🗼	objects	tokyo tower
+🗽	objects	statue of liberty
+🗾	objects	silhouette of japan
+🗿	objects	moyai
+🪀	objects	yo-yo
+🪁	objects	kite
+🪂	objects	parachute
+🪃	objects	boomerang
+🪄	objects	magic wand
+🪅	objects	pinata
+🪆	objects	nesting dolls
+🪇	objects	maracas
+🪈	objects	flute
+🪉	objects	harp
+🪏	objects	shovel
+🪐	objects	ringed planet
+🪑	objects	chair
+🪒	objects	razor
+🪓	objects	axe
+🪔	objects	diya lamp
+🪕	objects	banjo
+🪖	objects	military helmet
+🪗	objects	accordion
+🪘	objects	long drum
+🪙	objects	coin
+🪚	objects	carpentry saw
+🪛	objects	screwdriver
+🪜	objects	ladder
+🪝	objects	hook
+🪞	objects	mirror
+🪟	objects	window
+🪠	objects	plunger
+🪡	objects	sewing needle
+🪢	objects	knot
+🪣	objects	bucket
+🪤	objects	mouse trap
+🪥	objects	toothbrush
+🪦	objects	headstone
+🪧	objects	placard
+🪨	objects	rock
+🪩	objects	mirror ball
+🪪	objects	identification card
+🪫	objects	low battery
+🪬	objects	hamsa
+🪭	objects	folding hand fan
+🪮	objects	hair pick
+🪯	objects	khanda
+☀	symbols	black sun with rays
+☁	symbols	cloud
+☂	symbols	umbrella
+☃	symbols	snowman
+☄	symbols	comet
+★	symbols	black star
+☆	symbols	white star
+☇	symbols	lightning
+☈	symbols	thunderstorm
+☉	symbols	sun
+☊	symbols	ascending node
+☋	symbols	descending node
+☌	symbols	conjunction
+☍	symbols	opposition
+☎	symbols	black telephone
+☏	symbols	white telephone
+☐	symbols	ballot box
+☑	symbols	ballot box with check
+☒	symbols	ballot box with x
+☓	symbols	saltire
+☔	symbols	umbrella with rain drops
+☕	symbols	hot beverage
+☖	symbols	white shogi piece
+☗	symbols	black shogi piece
+☘	symbols	shamrock
+☙	symbols	reversed rotated floral heart bullet
+☚	symbols	black left pointing index
+☛	symbols	black right pointing index
+☜	symbols	white left pointing index
+☝	symbols	white up pointing index
+☞	symbols	white right pointing index
+☟	symbols	white down pointing index
+☠	symbols	skull and crossbones
+☡	symbols	caution sign
+☢	symbols	radioactive sign
+☣	symbols	biohazard sign
+☤	symbols	caduceus
+☥	symbols	ankh
+☦	symbols	orthodox cross
+☧	symbols	chi rho
+☨	symbols	cross of lorraine
+☩	symbols	cross of jerusalem
+☪	symbols	star and crescent
+☫	symbols	farsi symbol
+☬	symbols	adi shakti
+☭	symbols	hammer and sickle
+☮	symbols	peace symbol
+☯	symbols	yin yang
+☰	symbols	trigram for heaven
+☱	symbols	trigram for lake
+☲	symbols	trigram for fire
+☳	symbols	trigram for thunder
+☴	symbols	trigram for wind
+☵	symbols	trigram for water
+☶	symbols	trigram for mountain
+☷	symbols	trigram for earth
+☸	symbols	wheel of dharma
+☹	symbols	white frowning face
+☺	symbols	white smiling face
+☻	symbols	black smiling face
+☼	symbols	white sun with rays
+☽	symbols	first quarter moon
+☾	symbols	last quarter moon
+☿	symbols	mercury
+♀	symbols	female sign
+♁	symbols	earth
+♂	symbols	male sign
+♃	symbols	jupiter
+♄	symbols	saturn
+♅	symbols	uranus
+♆	symbols	neptune
+♇	symbols	pluto
+♈	symbols	aries
+♉	symbols	taurus
+♊	symbols	gemini
+♋	symbols	cancer
+♌	symbols	leo
+♍	symbols	virgo
+♎	symbols	libra
+♏	symbols	scorpius
+♐	symbols	sagittarius
+♑	symbols	capricorn
+♒	symbols	aquarius
+♓	symbols	pisces
+♔	symbols	white chess king
+♕	symbols	white chess queen
+♖	symbols	white chess rook
+♗	symbols	white chess bishop
+♘	symbols	white chess knight
+♙	symbols	white chess pawn
+♚	symbols	black chess king
+♛	symbols	black chess queen
+♜	symbols	black chess rook
+♝	symbols	black chess bishop
+♞	symbols	black chess knight
+♟	symbols	black chess pawn
+♠	symbols	black spade suit
+♡	symbols	white heart suit
+♢	symbols	white diamond suit
+♣	symbols	black club suit
+♤	symbols	white spade suit
+♥	symbols	black heart suit
+♦	symbols	black diamond suit
+♧	symbols	white club suit
+♨	symbols	hot springs
+♩	symbols	quarter note
+♪	symbols	eighth note
+♫	symbols	beamed eighth notes
+♬	symbols	beamed sixteenth notes
+♭	symbols	music flat sign
+♮	symbols	music natural sign
+♯	symbols	music sharp sign
+♰	symbols	west syriac cross
+♱	symbols	east syriac cross
+♲	symbols	universal recycling symbol
+♳	symbols	recycling symbol for type-1 plastics
+♴	symbols	recycling symbol for type-2 plastics
+♵	symbols	recycling symbol for type-3 plastics
+♶	symbols	recycling symbol for type-4 plastics
+♷	symbols	recycling symbol for type-5 plastics
+♸	symbols	recycling symbol for type-6 plastics
+♹	symbols	recycling symbol for type-7 plastics
+♺	symbols	recycling symbol for generic materials
+♻	symbols	black universal recycling symbol
+♼	symbols	recycled paper symbol
+♽	symbols	partially-recycled paper symbol
+♾	symbols	permanent paper sign
+♿	symbols	wheelchair symbol
+⚀	symbols	die face-1
+⚁	symbols	die face-2
+⚂	symbols	die face-3
+⚃	symbols	die face-4
+⚄	symbols	die face-5
+⚅	symbols	die face-6
+⚆	symbols	white circle with dot right
+⚇	symbols	white circle with two dots
+⚈	symbols	black circle with white dot right
+⚉	symbols	black circle with two white dots
+⚊	symbols	monogram for yang
+⚋	symbols	monogram for yin
+⚌	symbols	digram for greater yang
+⚍	symbols	digram for lesser yin
+⚎	symbols	digram for lesser yang
+⚏	symbols	digram for greater yin
+⚐	symbols	white flag
+⚑	symbols	black flag
+⚒	symbols	hammer and pick
+⚓	symbols	anchor
+⚔	symbols	crossed swords
+⚕	symbols	staff of aesculapius
+⚖	symbols	scales
+⚗	symbols	alembic
+⚘	symbols	flower
+⚙	symbols	gear
+⚚	symbols	staff of hermes
+⚛	symbols	atom symbol
+⚜	symbols	fleur-de-lis
+⚝	symbols	outlined white star
+⚞	symbols	three lines converging right
+⚟	symbols	three lines converging left
+⚠	symbols	warning sign
+⚡	symbols	high voltage sign
+⚢	symbols	doubled female sign
+⚣	symbols	doubled male sign
+⚤	symbols	interlocked female and male sign
+⚥	symbols	male and female sign
+⚦	symbols	male with stroke sign
+⚧	symbols	male with stroke and male and female sign
+⚨	symbols	vertical male with stroke sign
+⚩	symbols	horizontal male with stroke sign
+⚪	symbols	medium white circle
+⚫	symbols	medium black circle
+⚬	symbols	medium small white circle
+⚭	symbols	marriage symbol
+⚮	symbols	divorce symbol
+⚯	symbols	unmarried partnership symbol
+⚰	symbols	coffin
+⚱	symbols	funeral urn
+⚲	symbols	neuter
+⚳	symbols	ceres
+⚴	symbols	pallas
+⚵	symbols	juno
+⚶	symbols	vesta
+⚷	symbols	chiron
+⚸	symbols	black moon lilith
+⚹	symbols	sextile
+⚺	symbols	semisextile
+⚻	symbols	quincunx
+⚼	symbols	sesquiquadrate
+⚽	symbols	soccer ball
+⚾	symbols	baseball
+⚿	symbols	squared key
+⛀	symbols	white draughts man
+⛁	symbols	white draughts king
+⛂	symbols	black draughts man
+⛃	symbols	black draughts king
+⛄	symbols	snowman without snow
+⛅	symbols	sun behind cloud
+⛆	symbols	rain
+⛇	symbols	black snowman
+⛈	symbols	thunder cloud and rain
+⛉	symbols	turned white shogi piece
+⛊	symbols	turned black shogi piece
+⛋	symbols	white diamond in square
+⛌	symbols	crossing lanes
+⛍	symbols	disabled car
+⛎	symbols	ophiuchus
+⛏	symbols	pick
+⛐	symbols	car sliding
+⛑	symbols	helmet with white cross
+⛒	symbols	circled crossing lanes
+⛓	symbols	chains
+⛔	symbols	no entry
+⛕	symbols	alternate one-way left way traffic
+⛖	symbols	black two-way left way traffic
+⛗	symbols	white two-way left way traffic
+⛘	symbols	black left lane merge
+⛙	symbols	white left lane merge
+⛚	symbols	drive slow sign
+⛛	symbols	heavy white down-pointing triangle
+⛜	symbols	left closed entry
+⛝	symbols	squared saltire
+⛞	symbols	falling diagonal in white circle in black square
+⛟	symbols	black truck
+⛠	symbols	restricted left entry-1
+⛡	symbols	restricted left entry-2
+⛢	symbols	astronomical symbol for uranus
+⛣	symbols	heavy circle with stroke and two dots above
+⛤	symbols	pentagram
+⛥	symbols	right-handed interlaced pentagram
+⛦	symbols	left-handed interlaced pentagram
+⛧	symbols	inverted pentagram
+⛨	symbols	black cross on shield
+⛩	symbols	shinto shrine
+⛪	symbols	church
+⛫	symbols	castle
+⛬	symbols	historic site
+⛭	symbols	gear without hub
+⛮	symbols	gear with handles
+⛯	symbols	map symbol for lighthouse
+⛰	symbols	mountain
+⛱	symbols	umbrella on ground
+⛲	symbols	fountain
+⛳	symbols	flag in hole
+⛴	symbols	ferry
+⛵	symbols	sailboat
+⛶	symbols	square four corners
+⛷	symbols	skier
+⛸	symbols	ice skate
+⛹	symbols	person with ball
+⛺	symbols	tent
+⛻	symbols	japanese bank symbol
+⛼	symbols	headstone graveyard symbol
+⛽	symbols	fuel pump
+⛾	symbols	cup on black square
+⛿	symbols	white flag with horizontal middle black stripe
+✀	symbols	black safety scissors
+✁	symbols	upper blade scissors
+✂	symbols	black scissors
+✃	symbols	lower blade scissors
+✄	symbols	white scissors
+✅	symbols	white heavy check mark
+✆	symbols	telephone location sign
+✇	symbols	tape drive
+✈	symbols	airplane
+✉	symbols	envelope
+✊	symbols	raised fist
+✋	symbols	raised hand
+✌	symbols	victory hand
+✍	symbols	writing hand
+✎	symbols	lower right pencil
+✏	symbols	pencil
+✐	symbols	upper right pencil
+✑	symbols	white nib
+✒	symbols	black nib
+✓	symbols	check mark
+✔	symbols	heavy check mark
+✕	symbols	multiplication x
+✖	symbols	heavy multiplication x
+✗	symbols	ballot x
+✘	symbols	heavy ballot x
+✙	symbols	outlined greek cross
+✚	symbols	heavy greek cross
+✛	symbols	open centre cross
+✜	symbols	heavy open centre cross
+✝	symbols	latin cross
+✞	symbols	shadowed white latin cross
+✟	symbols	outlined latin cross
+✠	symbols	maltese cross
+✡	symbols	star of david
+✢	symbols	four teardrop-spoked asterisk
+✣	symbols	four balloon-spoked asterisk
+✤	symbols	heavy four balloon-spoked asterisk
+✥	symbols	four club-spoked asterisk
+✦	symbols	black four pointed star
+✧	symbols	white four pointed star
+✨	symbols	sparkles
+✩	symbols	stress outlined white star
+✪	symbols	circled white star
+✫	symbols	open centre black star
+✬	symbols	black centre white star
+✭	symbols	outlined black star
+✮	symbols	heavy outlined black star
+✯	symbols	pinwheel star
+✰	symbols	shadowed white star
+✱	symbols	heavy asterisk
+✲	symbols	open centre asterisk
+✳	symbols	eight spoked asterisk
+✴	symbols	eight pointed black star
+✵	symbols	eight pointed pinwheel star
+✶	symbols	six pointed black star
+✷	symbols	eight pointed rectilinear black star
+✸	symbols	heavy eight pointed rectilinear black star
+✹	symbols	twelve pointed black star
+✺	symbols	sixteen pointed asterisk
+✻	symbols	teardrop-spoked asterisk
+✼	symbols	open centre teardrop-spoked asterisk
+✽	symbols	heavy teardrop-spoked asterisk
+✾	symbols	six petalled black and white florette
+✿	symbols	black florette
+❀	symbols	white florette
+❁	symbols	eight petalled outlined black florette
+❂	symbols	circled open centre eight pointed star
+❃	symbols	heavy teardrop-spoked pinwheel asterisk
+❄	symbols	snowflake
+❅	symbols	tight trifoliate snowflake
+❆	symbols	heavy chevron snowflake
+❇	symbols	sparkle
+❈	symbols	heavy sparkle
+❉	symbols	balloon-spoked asterisk
+❊	symbols	eight teardrop-spoked propeller asterisk
+❋	symbols	heavy eight teardrop-spoked propeller asterisk
+❌	symbols	cross mark
+❍	symbols	shadowed white circle
+❎	symbols	negative squared cross mark
+❏	symbols	lower right drop-shadowed white square
+❐	symbols	upper right drop-shadowed white square
+❑	symbols	lower right shadowed white square
+❒	symbols	upper right shadowed white square
+❓	symbols	black question mark ornament
+❔	symbols	white question mark ornament
+❕	symbols	white exclamation mark ornament
+❖	symbols	black diamond minus white x
+❗	symbols	heavy exclamation mark symbol
+❘	symbols	light vertical bar
+❙	symbols	medium vertical bar
+❚	symbols	heavy vertical bar
+❛	symbols	heavy single turned comma quotation mark ornament
+❜	symbols	heavy single comma quotation mark ornament
+❝	symbols	heavy double turned comma quotation mark ornament
+❞	symbols	heavy double comma quotation mark ornament
+❟	symbols	heavy low single comma quotation mark ornament
+❠	symbols	heavy low double comma quotation mark ornament
+❡	symbols	curved stem paragraph sign ornament
+❢	symbols	heavy exclamation mark ornament
+❣	symbols	heavy heart exclamation mark ornament
+❤	symbols	heavy black heart
+❥	symbols	rotated heavy black heart bullet
+❦	symbols	floral heart
+❧	symbols	rotated floral heart bullet
+➔	symbols	heavy wide-headed rightwards arrow
+➕	symbols	heavy plus sign
+➖	symbols	heavy minus sign
+➗	symbols	heavy division sign
+➘	symbols	heavy south east arrow
+➙	symbols	heavy rightwards arrow
+➚	symbols	heavy north east arrow
+➛	symbols	drafting point rightwards arrow
+➜	symbols	heavy round-tipped rightwards arrow
+➝	symbols	triangle-headed rightwards arrow
+➞	symbols	heavy triangle-headed rightwards arrow
+➟	symbols	dashed triangle-headed rightwards arrow
+➠	symbols	heavy dashed triangle-headed rightwards arrow
+➡	symbols	black rightwards arrow
+➢	symbols	three-d top-lighted rightwards arrowhead
+➣	symbols	three-d bottom-lighted rightwards arrowhead
+➤	symbols	black rightwards arrowhead
+➥	symbols	heavy black curved downwards and rightwards arrow
+➦	symbols	heavy black curved upwards and rightwards arrow
+➧	symbols	squat black rightwards arrow
+➨	symbols	heavy concave-pointed black rightwards arrow
+➩	symbols	right-shaded white rightwards arrow
+➪	symbols	left-shaded white rightwards arrow
+➫	symbols	back-tilted shadowed white rightwards arrow
+➬	symbols	front-tilted shadowed white rightwards arrow
+➭	symbols	heavy lower right-shadowed white rightwards arrow
+➮	symbols	heavy upper right-shadowed white rightwards arrow
+➯	symbols	notched lower right-shadowed white rightwards arrow
+➰	symbols	curly loop
+➱	symbols	notched upper right-shadowed white rightwards arrow
+➲	symbols	circled heavy white rightwards arrow
+➳	symbols	white-feathered rightwards arrow
+➴	symbols	black-feathered south east arrow
+➵	symbols	black-feathered rightwards arrow
+➶	symbols	black-feathered north east arrow
+➷	symbols	heavy black-feathered south east arrow
+➸	symbols	heavy black-feathered rightwards arrow
+➹	symbols	heavy black-feathered north east arrow
+➺	symbols	teardrop-barbed rightwards arrow
+➻	symbols	heavy teardrop-shanked rightwards arrow
+➼	symbols	wedge-tailed rightwards arrow
+➽	symbols	heavy wedge-tailed rightwards arrow
+➾	symbols	open-outlined rightwards arrow
+➿	symbols	double curly loop
+🌀	symbols	cyclone
+🌁	symbols	foggy
+🌂	symbols	closed umbrella
+🌃	symbols	night with stars
+🌄	symbols	sunrise over mountains
+🌅	symbols	sunrise
+🌆	symbols	cityscape at dusk
+🌇	symbols	sunset over buildings
+🌈	symbols	rainbow
+🌉	symbols	bridge at night
+🌊	symbols	water wave
+🌋	symbols	volcano
+🌌	symbols	milky way
+🌍	symbols	earth globe europe-africa
+🌎	symbols	earth globe americas
+🌏	symbols	earth globe asia-australia
+🌐	symbols	globe with meridians
+🌑	symbols	new moon symbol
+🌒	symbols	waxing crescent moon symbol
+🌓	symbols	first quarter moon symbol
+🌔	symbols	waxing gibbous moon symbol
+🌕	symbols	full moon symbol
+🌖	symbols	waning gibbous moon symbol
+🌗	symbols	last quarter moon symbol
+🌘	symbols	waning crescent moon symbol
+🌙	symbols	crescent moon
+🌚	symbols	new moon with face
+🌛	symbols	first quarter moon with face
+🌜	symbols	last quarter moon with face
+🌝	symbols	full moon with face
+🌞	symbols	sun with face
+🌟	symbols	glowing star
+🌠	symbols	shooting star
+🌡	symbols	thermometer
+🌢	symbols	black droplet
+🌣	symbols	white sun
+🌤	symbols	white sun with small cloud
+🌥	symbols	white sun behind cloud
+🌦	symbols	white sun behind cloud with rain
+🌧	symbols	cloud with rain
+🌨	symbols	cloud with snow
+🌩	symbols	cloud with lightning
+🌪	symbols	cloud with tornado
+🌫	symbols	fog
+🌬	symbols	wind blowing face
+🌭	symbols	hot dog
+🌮	symbols	taco
+🌯	symbols	burrito
+←	symbols	leftwards arrow
+↑	symbols	upwards arrow
+→	symbols	rightwards arrow
+↓	symbols	downwards arrow
+↔	symbols	left right arrow
+↕	symbols	up down arrow
+↖	symbols	north west arrow
+↗	symbols	north east arrow
+↘	symbols	south east arrow
+↙	symbols	south west arrow
+↚	symbols	leftwards arrow with stroke
+↛	symbols	rightwards arrow with stroke
+↜	symbols	leftwards wave arrow
+↝	symbols	rightwards wave arrow
+↞	symbols	leftwards two headed arrow
+↟	symbols	upwards two headed arrow
+↠	symbols	rightwards two headed arrow
+↡	symbols	downwards two headed arrow
+↢	symbols	leftwards arrow with tail
+↣	symbols	rightwards arrow with tail
+↤	symbols	leftwards arrow from bar
+↥	symbols	upwards arrow from bar
+↦	symbols	rightwards arrow from bar
+↧	symbols	downwards arrow from bar
+↨	symbols	up down arrow with base
+↩	symbols	leftwards arrow with hook
+↪	symbols	rightwards arrow with hook
+↫	symbols	leftwards arrow with loop
+↬	symbols	rightwards arrow with loop
+↭	symbols	left right wave arrow
+↮	symbols	left right arrow with stroke
+↯	symbols	downwards zigzag arrow
+↰	symbols	upwards arrow with tip leftwards
+↱	symbols	upwards arrow with tip rightwards
+↲	symbols	downwards arrow with tip leftwards
+↳	symbols	downwards arrow with tip rightwards
+↴	symbols	rightwards arrow with corner downwards
+↵	symbols	downwards arrow with corner leftwards
+↶	symbols	anticlockwise top semicircle arrow
+↷	symbols	clockwise top semicircle arrow
+↸	symbols	north west arrow to long bar
+↹	symbols	leftwards arrow to bar over rightwards arrow to bar
+↺	symbols	anticlockwise open circle arrow
+↻	symbols	clockwise open circle arrow
+↼	symbols	leftwards harpoon with barb upwards
+↽	symbols	leftwards harpoon with barb downwards
+↾	symbols	upwards harpoon with barb rightwards
+↿	symbols	upwards harpoon with barb leftwards
+⇀	symbols	rightwards harpoon with barb upwards
+⇁	symbols	rightwards harpoon with barb downwards
+⇂	symbols	downwards harpoon with barb rightwards
+⇃	symbols	downwards harpoon with barb leftwards
+⇄	symbols	rightwards arrow over leftwards arrow
+⇅	symbols	upwards arrow leftwards of downwards arrow
+⇆	symbols	leftwards arrow over rightwards arrow
+⇇	symbols	leftwards paired arrows
+⇈	symbols	upwards paired arrows
+⇉	symbols	rightwards paired arrows
+⇊	symbols	downwards paired arrows
+⇋	symbols	leftwards harpoon over rightwards harpoon
+⇌	symbols	rightwards harpoon over leftwards harpoon
+⇍	symbols	leftwards double arrow with stroke
+⇎	symbols	left right double arrow with stroke
+⇏	symbols	rightwards double arrow with stroke
+⇐	symbols	leftwards double arrow
+⇑	symbols	upwards double arrow
+⇒	symbols	rightwards double arrow
+⇓	symbols	downwards double arrow
+⇔	symbols	left right double arrow
+⇕	symbols	up down double arrow
+⇖	symbols	north west double arrow
+⇗	symbols	north east double arrow
+⇘	symbols	south east double arrow
+⇙	symbols	south west double arrow
+⇚	symbols	leftwards triple arrow
+⇛	symbols	rightwards triple arrow
+⇜	symbols	leftwards squiggle arrow
+⇝	symbols	rightwards squiggle arrow
+⇞	symbols	upwards arrow with double stroke
+⇟	symbols	downwards arrow with double stroke
+⇠	symbols	leftwards dashed arrow
+⇡	symbols	upwards dashed arrow
+⇢	symbols	rightwards dashed arrow
+⇣	symbols	downwards dashed arrow
+⇤	symbols	leftwards arrow to bar
+⇥	symbols	rightwards arrow to bar
+⇦	symbols	leftwards white arrow
+⇧	symbols	upwards white arrow
+⇨	symbols	rightwards white arrow
+⇩	symbols	downwards white arrow
+⇪	symbols	upwards white arrow from bar
+⇫	symbols	upwards white arrow on pedestal
+⇬	symbols	upwards white arrow on pedestal with horizontal bar
+⇭	symbols	upwards white arrow on pedestal with vertical bar
+⇮	symbols	upwards white double arrow
+⇯	symbols	upwards white double arrow on pedestal
+⇰	symbols	rightwards white arrow from wall
+⇱	symbols	north west arrow to corner
+⇲	symbols	south east arrow to corner
+⇳	symbols	up down white arrow
+⇴	symbols	right arrow with small circle
+⇵	symbols	downwards arrow leftwards of upwards arrow
+⇶	symbols	three rightwards arrows
+⇷	symbols	leftwards arrow with vertical stroke
+⇸	symbols	rightwards arrow with vertical stroke
+⇹	symbols	left right arrow with vertical stroke
+⇺	symbols	leftwards arrow with double vertical stroke
+⇻	symbols	rightwards arrow with double vertical stroke
+⇼	symbols	left right arrow with double vertical stroke
+⇽	symbols	leftwards open-headed arrow
+⇾	symbols	rightwards open-headed arrow
+⇿	symbols	left right open-headed arrow
+⬀	symbols	north east white arrow
+⬁	symbols	north west white arrow
+⬂	symbols	south east white arrow
+⬃	symbols	south west white arrow
+⬄	symbols	left right white arrow
+⬅	symbols	leftwards black arrow
+⬆	symbols	upwards black arrow
+⬇	symbols	downwards black arrow
+⬈	symbols	north east black arrow
+⬉	symbols	north west black arrow
+⬊	symbols	south east black arrow
+⬋	symbols	south west black arrow
+⬌	symbols	left right black arrow
+⬍	symbols	up down black arrow
+⬎	symbols	rightwards arrow with tip downwards
+⬏	symbols	rightwards arrow with tip upwards
+⬐	symbols	leftwards arrow with tip downwards
+⬑	symbols	leftwards arrow with tip upwards
+⬒	symbols	square with top half black
+⬓	symbols	square with bottom half black
+⬔	symbols	square with upper right diagonal half black
+⬕	symbols	square with lower left diagonal half black
+⬖	symbols	diamond with left half black
+⬗	symbols	diamond with right half black
+⬘	symbols	diamond with top half black
+⬙	symbols	diamond with bottom half black
+⬚	symbols	dotted square
+⬛	symbols	black large square
+⬜	symbols	white large square
+⬝	symbols	black very small square
+⬞	symbols	white very small square
+⬟	symbols	black pentagon
+⬠	symbols	white pentagon
+⬡	symbols	white hexagon
+⬢	symbols	black hexagon
+⬣	symbols	horizontal black hexagon
+⬤	symbols	black large circle
+⬥	symbols	black medium diamond
+⬦	symbols	white medium diamond
+⬧	symbols	black medium lozenge
+⬨	symbols	white medium lozenge
+⬩	symbols	black small diamond
+⬪	symbols	black small lozenge
+⬫	symbols	white small lozenge
+⬬	symbols	black horizontal ellipse
+⬭	symbols	white horizontal ellipse
+⬮	symbols	black vertical ellipse
+⬯	symbols	white vertical ellipse
+⬰	symbols	left arrow with small circle
+⬱	symbols	three leftwards arrows
+⬲	symbols	left arrow with circled plus
+⬳	symbols	long leftwards squiggle arrow
+⬴	symbols	leftwards two-headed arrow with vertical stroke
+⬵	symbols	leftwards two-headed arrow with double vertical stroke
+⬶	symbols	leftwards two-headed arrow from bar
+⬷	symbols	leftwards two-headed triple dash arrow
+⬸	symbols	leftwards arrow with dotted stem
+⬹	symbols	leftwards arrow with tail with vertical stroke
+⬺	symbols	leftwards arrow with tail with double vertical stroke
+⬻	symbols	leftwards two-headed arrow with tail
+⬼	symbols	leftwards two-headed arrow with tail with vertical stroke
+⬽	symbols	leftwards two-headed arrow with tail with double vertical stroke
+⬾	symbols	leftwards arrow through x
+⬿	symbols	wave arrow pointing directly left
+⭀	symbols	equals sign above leftwards arrow
+⭁	symbols	reverse tilde operator above leftwards arrow
+⭂	symbols	leftwards arrow above reverse almost equal to
+⭃	symbols	rightwards arrow through greater-than
+⭄	symbols	rightwards arrow through superset
+⭅	symbols	leftwards quadruple arrow
+⭆	symbols	rightwards quadruple arrow
+⭇	symbols	reverse tilde operator above rightwards arrow
+⭈	symbols	rightwards arrow above reverse almost equal to
+⭉	symbols	tilde operator above leftwards arrow
+⭊	symbols	leftwards arrow above almost equal to
+⭋	symbols	leftwards arrow above reverse tilde operator
+⭌	symbols	rightwards arrow above reverse tilde operator
+⭍	symbols	downwards triangle-headed zigzag arrow
+⭎	symbols	short slanted north arrow
+⭏	symbols	short backslanted south arrow
+⭐	symbols	white medium star
+⭑	symbols	black small star
+⭒	symbols	white small star
+⭓	symbols	black right-pointing pentagon
+⭔	symbols	white right-pointing pentagon
+⭕	symbols	heavy large circle
+⭖	symbols	heavy oval with oval inside
+⭗	symbols	heavy circle with circle inside
+⭘	symbols	heavy circle
+⭙	symbols	heavy circled saltire
+⭚	symbols	slanted north arrow with hooked head
+⭛	symbols	backslanted south arrow with hooked tail
+⭜	symbols	slanted north arrow with horizontal tail
+⭝	symbols	backslanted south arrow with horizontal tail
+⭞	symbols	bent arrow pointing downwards then north east
+⭟	symbols	short bent arrow pointing downwards then north east
+⭠	symbols	leftwards triangle-headed arrow
+⭡	symbols	upwards triangle-headed arrow
+⭢	symbols	rightwards triangle-headed arrow
+⭣	symbols	downwards triangle-headed arrow
+⭤	symbols	left right triangle-headed arrow
+⭥	symbols	up down triangle-headed arrow
+⭦	symbols	north west triangle-headed arrow
+⭧	symbols	north east triangle-headed arrow
+⭨	symbols	south east triangle-headed arrow
+⭩	symbols	south west triangle-headed arrow
+⭪	symbols	leftwards triangle-headed dashed arrow
+⭫	symbols	upwards triangle-headed dashed arrow
+⭬	symbols	rightwards triangle-headed dashed arrow
+⭭	symbols	downwards triangle-headed dashed arrow
+⭮	symbols	clockwise triangle-headed open circle arrow
+⭯	symbols	anticlockwise triangle-headed open circle arrow
+⭰	symbols	leftwards triangle-headed arrow to bar
+⭱	symbols	upwards triangle-headed arrow to bar
+⭲	symbols	rightwards triangle-headed arrow to bar
+⭳	symbols	downwards triangle-headed arrow to bar
+⭶	symbols	north west triangle-headed arrow to bar
+⭷	symbols	north east triangle-headed arrow to bar
+⭸	symbols	south east triangle-headed arrow to bar
+⭹	symbols	south west triangle-headed arrow to bar
+⭺	symbols	leftwards triangle-headed arrow with double horizontal stroke
+⭻	symbols	upwards triangle-headed arrow with double horizontal stroke
+⭼	symbols	rightwards triangle-headed arrow with double horizontal stroke
+⭽	symbols	downwards triangle-headed arrow with double horizontal stroke
+⭾	symbols	horizontal tab key
+⭿	symbols	vertical tab key
+⮀	symbols	leftwards triangle-headed arrow over rightwards triangle-headed arrow
+⮁	symbols	upwards triangle-headed arrow leftwards of downwards triangle-headed arrow
+⮂	symbols	rightwards triangle-headed arrow over leftwards triangle-headed arrow
+⮃	symbols	downwards triangle-headed arrow leftwards of upwards triangle-headed arrow
+⮄	symbols	leftwards triangle-headed paired arrows
+⮅	symbols	upwards triangle-headed paired arrows
+⮆	symbols	rightwards triangle-headed paired arrows
+⮇	symbols	downwards triangle-headed paired arrows
+⮈	symbols	leftwards black circled white arrow
+⮉	symbols	upwards black circled white arrow
+⮊	symbols	rightwards black circled white arrow
+⮋	symbols	downwards black circled white arrow
+⮌	symbols	anticlockwise triangle-headed right u-shaped arrow
+⮍	symbols	anticlockwise triangle-headed bottom u-shaped arrow
+⮎	symbols	anticlockwise triangle-headed left u-shaped arrow
+⮏	symbols	anticlockwise triangle-headed top u-shaped arrow
+⮐	symbols	return left
+⮑	symbols	return right
+⮒	symbols	newline left
+⮓	symbols	newline right
+⮔	symbols	four corner arrows circling anticlockwise
+⮕	symbols	rightwards black arrow
+⮗	symbols	symbol for type a electronics
+⮘	symbols	three-d top-lighted leftwards equilateral arrowhead
+⮙	symbols	three-d right-lighted upwards equilateral arrowhead
+⮚	symbols	three-d top-lighted rightwards equilateral arrowhead
+⮛	symbols	three-d left-lighted downwards equilateral arrowhead
+⮜	symbols	black leftwards equilateral arrowhead
+⮝	symbols	black upwards equilateral arrowhead
+⮞	symbols	black rightwards equilateral arrowhead
+⮟	symbols	black downwards equilateral arrowhead
+⮠	symbols	downwards triangle-headed arrow with long tip leftwards
+⮡	symbols	downwards triangle-headed arrow with long tip rightwards
+⮢	symbols	upwards triangle-headed arrow with long tip leftwards
+⮣	symbols	upwards triangle-headed arrow with long tip rightwards
+⮤	symbols	leftwards triangle-headed arrow with long tip upwards
+⮥	symbols	rightwards triangle-headed arrow with long tip upwards
+⮦	symbols	leftwards triangle-headed arrow with long tip downwards
+⮧	symbols	rightwards triangle-headed arrow with long tip downwards
+⮨	symbols	black curved downwards and leftwards arrow
+⮩	symbols	black curved downwards and rightwards arrow
+⮪	symbols	black curved upwards and leftwards arrow
+⮫	symbols	black curved upwards and rightwards arrow
+⮬	symbols	black curved leftwards and upwards arrow
+⮭	symbols	black curved rightwards and upwards arrow
+⮮	symbols	black curved leftwards and downwards arrow
+⮯	symbols	black curved rightwards and downwards arrow
+⮰	symbols	ribbon arrow down left
+⮱	symbols	ribbon arrow down right
+⮲	symbols	ribbon arrow up left
+⮳	symbols	ribbon arrow up right
+⮴	symbols	ribbon arrow left up
+⮵	symbols	ribbon arrow right up
+⮶	symbols	ribbon arrow left down
+⮷	symbols	ribbon arrow right down
+⮸	symbols	upwards white arrow from bar with horizontal bar
+⮹	symbols	up arrowhead in a rectangle box
+⮺	symbols	overlapping white squares
+⮻	symbols	overlapping white and black squares
+⮼	symbols	overlapping black squares
+⮽	symbols	ballot box with light x
+⮾	symbols	circled x
+⮿	symbols	circled bold x
+⯀	symbols	black square centred
+⯁	symbols	black diamond centred
+⯂	symbols	turned black pentagon
+⯃	symbols	horizontal black octagon
+⯄	symbols	black octagon
+⯅	symbols	black medium up-pointing triangle centred
+⯆	symbols	black medium down-pointing triangle centred
+⯇	symbols	black medium left-pointing triangle centred
+⯈	symbols	black medium right-pointing triangle centred
+⯉	symbols	neptune form two
+⯊	symbols	top half black circle
+⯋	symbols	bottom half black circle
+⯌	symbols	light four pointed black cusp
+⯍	symbols	rotated light four pointed black cusp
+⯎	symbols	white four pointed cusp
+⯏	symbols	rotated white four pointed cusp
+⯐	symbols	square position indicator
+⯑	symbols	uncertainty sign
+⯒	symbols	group mark
+⯓	symbols	pluto form two
+⯔	symbols	pluto form three
+⯕	symbols	pluto form four
+⯖	symbols	pluto form five
+⯗	symbols	transpluto
+⯘	symbols	proserpina
+⯙	symbols	astraea
+⯚	symbols	hygiea
+⯛	symbols	pholus
+⯜	symbols	nessus
+⯝	symbols	white moon selena
+⯞	symbols	black diamond on cross
+⯟	symbols	true light moon arta
+⯠	symbols	cupido
+⯡	symbols	hades
+⯢	symbols	zeus
+⯣	symbols	kronos
+⯤	symbols	apollon
+⯥	symbols	admetos
+⯦	symbols	vulcanus
+⯧	symbols	poseidon
+⯨	symbols	left half black star
+⯩	symbols	right half black star
+⯪	symbols	star with left half black
+⯫	symbols	star with right half black
+⯬	symbols	leftwards two-headed arrow with triangle arrowheads
+⯭	symbols	upwards two-headed arrow with triangle arrowheads
+⯮	symbols	rightwards two-headed arrow with triangle arrowheads
+⯯	symbols	downwards two-headed arrow with triangle arrowheads
+⯰	symbols	eris form one
+⯱	symbols	eris form two
+⯲	symbols	sedna
+⯳	symbols	russian astrological symbol vigintile
+⯴	symbols	russian astrological symbol novile
+⯵	symbols	russian astrological symbol quintile
+⯶	symbols	russian astrological symbol binovile
+⯷	symbols	russian astrological symbol sentagon
+⯸	symbols	russian astrological symbol tredecile
+⯹	symbols	equals sign with infinity below
+⯺	symbols	united symbol
+⯻	symbols	separated symbol
+⯼	symbols	doubled symbol
+⯽	symbols	passed symbol
+⯾	symbols	reversed right angle
+⯿	symbols	hellschreiber pause symbol
