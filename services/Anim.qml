@@ -31,7 +31,6 @@ Singleton {
     readonly property int stagger: d(24)
     readonly property int closeLead: d(70)
     readonly property int toastContent: d(120)
-    readonly property int hintStagger: d(40)
 
     // Holds are not scaled.
     readonly property int gaugeHold: 1400

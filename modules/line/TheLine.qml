@@ -18,9 +18,22 @@ Scope {
     //   1. the music part leaves the workspace tile,  2. the three tiles fold up into the line,
     //   3. the line withdraws into the screen edges.
     // Leaving fullscreen runs them backwards. `stage` is where the screen is now (0 = everything shown).
+    // The shell also starts hidden (stage 3) and plays the way back in as its intro, once the wallpaper is up.
     readonly property bool fullscreen: Hyprland.monitorFor(modelData)?.activeWorkspace?.hasFullscreen ?? false
     readonly property int lineDraw: Math.round(Anim.panel * 1.6)
-    property int stage: 0
+    property int stage: 3
+    property bool introDone: false
+    readonly property bool hidden: fullscreen || !introDone
+
+    onIntroDoneChanged: scheduleStage()
+
+    // Intro: a moment after this screen's wallpaper is shown (or right away without one).
+    Timer {
+        id: introTimer
+        interval: 700
+        running: !root.introDone && (Config.wallpaper === "" || (wallpaper.item?.ready ?? false))
+        onTriggered: root.introDone = true
+    }
 
     // While the line is withdrawn, a notification or a level change draws it back for the event (peek).
     readonly property bool lineEvent: LineState.pulseActive || LineState.gaugeKind !== ""
@@ -28,13 +41,13 @@ Scope {
 
     // How long the current stage's animation needs before the next one starts.
     function stageDelay() {
-        if (fullscreen)
+        if (hidden)
             return [0, Media.active ? Anim.closeLead + Anim.panel : 0, Anim.closeLead + Anim.panel][stage];
         return [0, Anim.panel + Anim.fillLag, root.lineDraw, 0][stage];
     }
 
     function scheduleStage() {
-        if ((fullscreen && stage < 3) || (!fullscreen && stage > 0)) {
+        if ((hidden && stage < 3) || (!hidden && stage > 0)) {
             stageTimer.interval = Math.max(1, stageDelay());
             stageTimer.restart();
         } else {
@@ -55,7 +68,7 @@ Scope {
 
     Timer {
         id: stageTimer
-        onTriggered: root.stage += root.fullscreen ? 1 : -1
+        onTriggered: root.stage += root.hidden ? 1 : -1
     }
 
     // Keeps the line out a moment after the event, so the gauge fades before the line withdraws.
@@ -73,6 +86,7 @@ Scope {
     }
 
     Loader {
+        id: wallpaper
         active: Config.wallpaper !== ""
         sourceComponent: Wallpaper {
             screen: root.modelData
@@ -200,13 +214,6 @@ Scope {
                 }
             }
 
-            Hints {
-                anchors.fill: parent
-                leftTile: workspaceTile
-                centerTile: clockTile
-                rightTile: statusTile
-                shown: UiState.hints && Config.superHints && root.stage === 0 && !root.panelHere
-            }
         }
     }
 }

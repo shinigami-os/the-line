@@ -1,6 +1,6 @@
 -- The Line: Hyprland configuration.
 -- Square corners, 1px borders, one curve (quartic ease-out) shared with the shell's motion.
--- Your own settings go in ~/.config/the-line/hypr/: monitors.lua, apps.lua, custom.lua (loaded last).
+-- Your own settings go in ~/.config/the-line/hypr/: monitors.lua, apps.lua (your app keys), custom.lua (loaded last).
 
 local HOME = os.getenv("HOME")
 local SHELL = os.getenv("THE_LINE_DIR") or "/usr/share/the-line"
@@ -134,9 +134,38 @@ hl.animation({ leaf = "specialWorkspace", enabled = true, speed = 2.6, bezier = 
 -- The shell animates itself: no compositor fade on its surfaces.
 hl.layer_rule({ match = { namespace = "^the-line" }, no_anim = true })
 
+------------- Workspaces across screens -------------
+-- The ten workspaces are shared out evenly: each screen starts on its own one, from left to right
+-- (2 screens: 1 and 5; 3 screens: 1, 4 and 7). Set `primary_monitor = "DP-2"` in custom.lua to put a
+-- given screen first.
+
+local function spread_workspaces()
+    local monitors = hl.get_monitors()
+    table.sort(monitors, function(a, b)
+        if a.name == primary_monitor then return true end
+        if b.name == primary_monitor then return false end
+        if a.x ~= b.x then return a.x < b.x end
+        return a.y < b.y
+    end)
+    local count = #monitors
+    for i, m in ipairs(monitors) do
+        local ws = 1 + math.floor((i - 1) * 9 / count)
+        hl.workspace_rule({ workspace = tostring(ws), monitor = m.name, default = true })
+        hl.dispatch(hl.dsp.focus({ monitor = m.name }))
+        hl.dispatch(hl.dsp.focus({ workspace = ws }))
+    end
+    if count > 0 then
+        hl.dispatch(hl.dsp.focus({ monitor = monitors[1].name }))
+    end
+end
+
+hl.on("monitor.added", spread_workspaces)
+hl.on("monitor.removed", spread_workspaces)
+
 ------------- Startup -------------
 
 hl.on("hyprland.start", function()
+    spread_workspaces()
     hl.exec_cmd("dbus-update-activation-environment --all")
     hl.exec_cmd("QT_QPA_PLATFORM=wayland " .. QS)
     hl.exec_cmd("wl-paste --type text --watch cliphist store")
@@ -151,13 +180,10 @@ hl.bind("SUPER+Space", hl.dsp.global("the-line:launcher"), { desc = "The Line: l
 hl.bind("SUPER+N", hl.dsp.global("the-line:notifications"), { desc = "The Line: notifications and calendar" })
 hl.bind("SUPER+A", hl.dsp.global("the-line:quicksettings"), { desc = "The Line: quick settings" })
 hl.bind("SUPER+P", hl.dsp.global("the-line:performance"), { desc = "The Line: performance" })
-hl.bind("SUPER_L", hl.dsp.global("the-line:hints"), { ignore_mods = true, transparent = true })
-hl.bind("SUPER_L", hl.dsp.global("the-line:hints"), { ignore_mods = true, transparent = true, release = true })
 hl.bind("SUPER+End", hl.dsp.exec_cmd("pkill -f '^qs -p " .. SHELL .. "$'; " .. QS), { desc = "The Line: restart the shell" })
 
 -- Session
 hl.bind("SUPER+L", hl.dsp.exec_cmd("hyprlock"), { desc = "Session: lock" })
-hl.bind("SUPER+Return", hl.dsp.exec_cmd("foot"), { desc = "Terminal" })
 
 -- Volume and brightness: the line itself shows the level, no popup.
 hl.bind("XF86AudioMute", hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"), { locked = true })

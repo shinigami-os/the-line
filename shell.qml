@@ -52,26 +52,6 @@ ShellRoot {
         appid: "the-line"
     }
 
-    // Hold Super for the key hints. Bound on press and on release:
-    //   hl.bind("SUPER_L", hl.dsp.global("the-line:hints"), { ignore_mods = true, transparent = true })
-    //   hl.bind("SUPER_L", hl.dsp.global("the-line:hints"), { ignore_mods = true, transparent = true, release = true })
-    // They only show after 250 ms, so quick Super shortcuts don't flash them.
-    Shortcut {
-        name: "hints"
-        description: "Hold to show key hints"
-        onPressed: hintsDelay.restart()
-        onReleased: {
-            hintsDelay.stop();
-            UiState.hints = false;
-        }
-    }
-
-    Timer {
-        id: hintsDelay
-        interval: 250
-        onTriggered: UiState.hints = true
-    }
-
     Shortcut {
         name: "launcher"
         description: "Open the launcher"
@@ -123,10 +103,6 @@ ShellRoot {
         // Says a line on top of the windows of the focused screen, like the power easter egg.
         function say(text: string): void {
             Voice.say(text, root.focusedScreen());
-        }
-
-        function hints(on: bool): void {
-            UiState.hints = on;
         }
 
         function close(): void {

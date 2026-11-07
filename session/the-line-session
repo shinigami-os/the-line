@@ -34,7 +34,7 @@ rm -f "$XDG_RUNTIME_DIR/pipewire-0.lock" "$XDG_RUNTIME_DIR/pipewire-0-manager.lo
 hypr="$HOME/.config/the-line/hypr"
 mkdir -p "$hypr"
 [ -s "$hypr/monitors.lua" ] || cp "$HOME/.config/sleex/monitors.lua" "$hypr/monitors.lua" 2>/dev/null
-[ -s "$hypr/apps.lua" ] || cp "$HOME/.config/sleex/apps.lua" "$hypr/apps.lua" 2>/dev/null
+[ -s "$hypr/apps.lua" ] || cp "$HOME/.config/sleex/apps.lua" "$hypr/apps.lua" 2>/dev/null || cp "$THE_LINE_DIR/session/apps.lua" "$hypr/apps.lua"
 [ -s "$hypr/custom.lua" ] || cp "$HOME/.config/sleex/custom/general.lua" "$hypr/custom.lua" 2>/dev/null
 
 i=0

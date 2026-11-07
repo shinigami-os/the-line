@@ -13,7 +13,6 @@ Singleton {
     readonly property string accent: adapter.accent
     readonly property bool reduceMotion: adapter.reduceMotion
     readonly property real motionScale: adapter.motionScale
-    readonly property bool superHints: adapter.superHints
     readonly property string terminal: adapter.terminal
     readonly property string wallpaper: adapter.wallpaper
     readonly property var screenFilter: {
@@ -41,7 +40,6 @@ Singleton {
             property string accent: "#9A5CFF"
             property bool reduceMotion: false
             property real motionScale: 1.0
-            property bool superHints: true
             property string terminal: "foot"
             property string wallpaper: "/usr/share/kira/wallpapers/default.png"   // "" = leave it to another tool
             property list<string> screens: []

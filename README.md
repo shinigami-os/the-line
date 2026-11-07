@@ -18,10 +18,10 @@ Runs on Hyprland (FHT comes later). Done so far:
 
 - fullscreen, in stages: the music part leaves, the tiles fold up into the line, the line withdraws into the screen edges. A notification or a level change draws the line back for the event, then it withdraws again
 
-- hold Super: key hints hang from the tiles on threads (`superHints` in the config to turn off)
 - Kira's voice on an empty workspace, behind the windows, from `assets/quotes.txt` plus `~/.config/the-line/quotes.txt`, with live `{placeholders}`
 
 - notification daemon (org.freedesktop.Notifications) and the wallpaper
+- intro: each screen starts hidden and draws itself in once its wallpaper is shown
 
 Next: polkit agent, Super+F1 cheat sheet, first-run welcome, launcher shortcuts section, easter eggs from the backlog.
 
@@ -33,8 +33,9 @@ Next: polkit agent, Super+F1 cheat sheet, first-run welcome, launcher shortcuts 
 - `the-line-session`: environment, session bus, audio, then Hyprland (`/usr/bin/the-line-session`)
 - `hyprland.lua`: The Line's Hyprland config (square, 1 px borders, the shell's curve and timings, the keys)
 - `hypridle.conf`: dim at 2 min, lock (hyprlock) at 5, suspend at 15
+- `apps.lua`: the default app keys (just the terminal), copied to `~/.config/the-line/hypr/` on first login
 
-The shell is expected in `/usr/share/the-line` (or wherever `THE_LINE_DIR` points). Your own Hyprland bits go in `~/.config/the-line/hypr/` (`monitors.lua`, `apps.lua`, `custom.lua`); coming from Sleex, its monitors, app keys and custom general settings are copied there on the first login.
+The shell is expected in `/usr/share/the-line` (or wherever `THE_LINE_DIR` points). Workspaces are shared out evenly between screens, left to right (2 screens: 1 and 5; 3 screens: 1, 4, 7; `primary_monitor = "<name>"` in `custom.lua` puts a screen first). Your own Hyprland bits go in `~/.config/the-line/hypr/` (`monitors.lua`, `apps.lua`, `custom.lua`); coming from Sleex, its monitors, app keys and custom general settings are copied there on the first login.
 
 To try it from a checkout before it is packaged:
 
@@ -71,23 +72,20 @@ services/         singletons: Theme, Anim, Config, UiState, LineState, Notifs, A
 modules/common/   Tile (tile that grows into a panel), PanelItem, Reading, Toggle, LineSlider, Icon
 modules/line/     the line and the per-screen surface
 modules/tiles/    the three tiles and their panels
-modules/desktop/  Kira's voice, Super key hints
+modules/desktop/  wallpaper, Kira's voice
 assets/           quotes.txt (Kira's voice) and other static files
 scripts/          helpers
 ```
 
 ## Keybindings
 
-The Line registers Hyprland global shortcuts under the `the-line` app id: `launcher`, `notifications`, `quicksettings`, `performance`, `hints`. For example:
+The Line registers Hyprland global shortcuts under the `the-line` app id: `launcher`, `notifications`, `quicksettings`, `performance`. For example:
 
 ```lua
 hl.bind("SUPER+SPACE", hl.dsp.global("the-line:launcher"))
 hl.bind("SUPER+N", hl.dsp.global("the-line:notifications"))
 hl.bind("SUPER+A", hl.dsp.global("the-line:quicksettings"))
 hl.bind("SUPER+P", hl.dsp.global("the-line:performance"))
--- hold Super for the key hints (press and release)
-hl.bind("SUPER_L", hl.dsp.global("the-line:hints"), { ignore_mods = true, transparent = true })
-hl.bind("SUPER_L", hl.dsp.global("the-line:hints"), { ignore_mods = true, transparent = true, release = true })
 ```
 
 ## Config
@@ -96,7 +94,7 @@ hl.bind("SUPER_L", hl.dsp.global("the-line:hints"), { ignore_mods = true, transp
 
 ```json
 { "accent": "#9A5CFF", "reduceMotion": false, "motionScale": 1.0, "screens": [], "terminal": "foot",
-  "wallpaper": "/usr/share/kira/wallpapers/default.png", "superHints": true }
+  "wallpaper": "/usr/share/kira/wallpapers/default.png" }
 ```
 
 ## Needs
