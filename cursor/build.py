@@ -4,6 +4,8 @@
 Flat and square like the rest of The Line: a dark fill, a 1 px light outline (visible on dark and light),
 no shadow. The arrow is a sharp blade with the logo's chevron notch; the link pointer is the same arrow in
 the accent; the busy cursor is the three slanted blades of the loading indicator, lit one after the other.
+Every few seconds the pulse runs around the arrow, the link pointer and the text cursor: a short dash travels
+once along the outline, like the notification pulse on the line, then everything is still again.
 
     python3 cursor/build.py [output dir]      (default: cursor/build/TheLine)
 
@@ -58,8 +60,55 @@ class Pen:
     def rect(self, x0, y0, x1, y1, fill=FILL, outline=LINE):
         self.shape([(x0, y0), (x1, y0), (x1, y1), (x0, y1)], fill, outline)
 
+    def dash(self, pts, start, length, color, closed=True, width=1.6):
+        """A piece of the outline `pts`, from `start` along it, `length` long (grid units)."""
+        path = pts + [pts[0]] if closed else pts
+        out, walked = [], 0.0
+        lo, hi = max(0.0, start), start + length
+        for (x0, y0), (x1, y1) in zip(path, path[1:]):
+            seg = math.hypot(x1 - x0, y1 - y0)
+            a, b = max(lo, walked), min(hi, walked + seg)
+            if a < b:
+                f0, f1 = (a - walked) / seg, (b - walked) / seg
+                p0 = (x0 + (x1 - x0) * f0, y0 + (y1 - y0) * f0)
+                p1 = (x0 + (x1 - x0) * f1, y0 + (y1 - y0) * f1)
+                if out and out[-1] == p0:
+                    out.append(p1)
+                else:
+                    if len(out) > 1:
+                        self.d.line(self.p(out), fill=color, width=round(width * self.k), joint="curve")
+                    out = [p0, p1]
+            walked += seg
+        if len(out) > 1:
+            self.d.line(self.p(out), fill=color, width=round(width * self.k), joint="curve")
+
     def done(self):
         return self.img.resize((self.size, self.size), Image.LANCZOS)
+
+
+# ---------------------------------------------------------------- pulse
+
+PULSE_FRAMES = 16      # frames of travel
+PULSE_STEP = 30        # ms per travel frame (about half a second in all)
+PULSE_REST = 7000      # ms of stillness between two pulses
+
+
+def perimeter(pts, closed=True):
+    path = pts + [pts[0]] if closed else pts
+    return sum(math.hypot(b[0] - a[0], b[1] - a[1]) for a, b in zip(path, path[1:]))
+
+
+def pulse(pen, pts, f, color=ACCENT, closed=True, length=9):
+    """Frame 0 is the still cursor; frames 1..PULSE_FRAMES move the dash in and out along the outline."""
+    if f == 0:
+        return
+    total = perimeter(pts, closed)
+    t = -length + (f - 1) / (PULSE_FRAMES - 1) * (total + length)
+    pen.dash(pts, t, length, color, closed)
+
+
+def pulse_delay(f):
+    return PULSE_REST if f == 0 else PULSE_STEP
 
 
 # ---------------------------------------------------------------- shapes
@@ -112,16 +161,19 @@ def double_arrow(pen, angle, bar=False):
 
 def c_default(pen, f):
     arrow(pen)
+    pulse(pen, ARROW, f)
 
 
 def c_pointer(pen, f):
     arrow(pen, ACCENT)
+    pulse(pen, ARROW, f, color=LINE)
 
 
 def c_text(pen, f):
     pen.stroke([(16, 7), (16, 25)], width=1.4)
     pen.stroke([(12, 7), (20, 7)], width=1.4)
     pen.stroke([(12, 25), (20, 25)], width=1.4)
+    pulse(pen, [(16, 7), (16, 25)], f, closed=False, length=6)
 
 
 def c_vertical_text(pen, f):
@@ -204,9 +256,9 @@ def c_zoom(pen, plus):
 
 
 CURSORS = {
-    "default": (c_default, (2, 2), 1),
-    "pointer": (c_pointer, (2, 2), 1),
-    "text": (c_text, (16, 16), 1),
+    "default": (c_default, (2, 2), 1 + PULSE_FRAMES),
+    "pointer": (c_pointer, (2, 2), 1 + PULSE_FRAMES),
+    "text": (c_text, (16, 16), 1 + PULSE_FRAMES),
     "vertical-text": (c_vertical_text, (16, 16), 1),
     "crosshair": (c_crosshair, (16, 16), 1),
     "cell": (c_cell, (16, 16), 1),
@@ -291,7 +343,8 @@ def render(name):
             pen = Pen(size)
             draw(pen, f)
             img = pen.done()
-            images.append((size, img, round(hx * size / 32), round(hy * size / 32), 150 if frames > 1 else 0))
+            delay = (pulse_delay(f) if frames == 1 + PULSE_FRAMES else 150) if frames > 1 else 0
+            images.append((size, img, round(hx * size / 32), round(hy * size / 32), delay))
     return images
 
 
@@ -320,7 +373,8 @@ def main():
     sheet = Image.new("RGBA", (cols * cell, rows * cell * 2), (0, 0, 0, 255))
     ImageDraw.Draw(sheet).rectangle([0, rows * cell, cols * cell, rows * cell * 2], fill=(236, 232, 225, 255))
     for i, name in enumerate(names):
-        img = render(name)[2 * CURSORS[name][2]][1]  # 48 px, first frame
+        frames = CURSORS[name][2]
+        img = render(name)[2 * frames + (6 if frames > 3 else 0)][1]  # 48 px, a frame mid-pulse for the pulsing ones
         x, y = (i % cols) * cell + 12, (i // cols) * cell + 12
         sheet.alpha_composite(img, (x, y))
         sheet.alpha_composite(img, (x, y + rows * cell))
