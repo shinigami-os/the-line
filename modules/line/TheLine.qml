@@ -25,7 +25,8 @@ Scope {
     property bool introDone: false
     readonly property bool hidden: fullscreen || !introDone
 
-    onIntroDoneChanged: scheduleStage()
+    // React to `hidden` itself: a handler on fullscreen or introDone can run before `hidden` has caught up.
+    onHiddenChanged: scheduleStage()
 
     // Intro: a moment after this screen's wallpaper is shown (or right away without one).
     Timer {
@@ -55,11 +56,7 @@ Scope {
         }
     }
 
-    onFullscreenChanged: {
-        if (fullscreen && UiState.openScreen === screenName)
-            UiState.close();
-        scheduleStage();
-    }
+    onFullscreenChanged: if (fullscreen && UiState.openScreen === screenName) UiState.close()
     onStageChanged: {
         scheduleStage();
         LineState.setWithdrawn(screenName, stage >= 3);
