@@ -236,6 +236,11 @@ ShellRoot {
             root.toggleDialog("emojiScreen");
         }
 
+        // Float / tile the focused window (SUPER+ALT+Space), remembering floated apps (FloatMemory).
+        function toggleFloat(): void {
+            FloatMemory.toggle();
+        }
+
         function overview(): void {
             UiState.openPanel = "tw";
             UiState.openScreen = root.focusedScreen();

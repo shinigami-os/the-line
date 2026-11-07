@@ -34,6 +34,9 @@ Runs on Hyprland (FHT comes later). Done so far:
 
 - clipboard history (SUPER+V) and emoji picker (SUPER+semicolon), both grown from the line, with search
 
+- floating (SUPER+ALT+Space): a window floats at 75% of its tiled size, centred; floated apps are remembered with their size and place (`~/.config/the-line/hypr/floating.lua`)
+- screenshots with Flameshot on the focused screen; The Line's defaults for foot (black glass, VS Code-style keys) and Flameshot are installed on first login
+
 Next: welcome screen, first-run welcome, launcher shortcuts section, easter eggs from the backlog.
 
 ## Session
@@ -46,7 +49,7 @@ Next: welcome screen, first-run welcome, launcher shortcuts section, easter eggs
 - `hypridle.conf`: dim at 10 min, lock (hyprlock) at 30, suspend at 1 h; screens never turned off, no hibernation
 - `apps.lua`: the default app keys (just the terminal), copied to `~/.config/the-line/hypr/` on first login
 
-The shell is expected in `/usr/share/the-line` (or wherever `THE_LINE_DIR` points). Workspaces are shared out evenly between screens, left to right (2 screens: 1 and 5; 3 screens: 1, 4, 7; `primary_monitor = "<name>"` in `custom.lua` puts a screen first). Your own Hyprland bits go in `~/.config/the-line/hypr/` (`monitors.lua`, `apps.lua`, `custom.lua`); coming from Sleex, its monitors, app keys and custom general settings are copied there on the first login.
+The shell is expected in `/usr/share/the-line` (or wherever `THE_LINE_DIR` points). Workspaces are shared out evenly between screens, left to right (2 screens: 1 and 5; 3 screens: 1, 4, 7; `primary_monitor = "<name>"` in `custom.lua` puts a screen first). Your own Hyprland bits go in `~/.config/the-line/hypr/` (`monitors.lua`, `apps.lua`, `custom.lua`; The Line writes `floating.lua`); coming from Sleex, its monitors, app keys and custom general settings are copied there on the first login.
 
 To try it from a checkout before it is packaged:
 

@@ -247,7 +247,7 @@ hl.bind("SUPER+ALT+R", hl.dsp.exec_cmd("pkill -INT -x wf-recorder || { mkdir -p 
 hl.bind("SUPER+Q", hl.dsp.window.close(), { desc = "Windows: Close the window" })
 hl.bind("SUPER+SHIFT+Q", hl.dsp.exec_cmd("hyprctl kill"), { desc = "Windows: Kill a window (pick it)" })
 hl.bind("SUPER+F", hl.dsp.window.fullscreen(), { desc = "Windows: Fullscreen" })
-hl.bind("SUPER+ALT+Space", hl.dsp.window.float(), { desc = "Windows: Float / tile" })
+hl.bind("SUPER+ALT+Space", hl.dsp.exec_cmd(LINE .. "toggleFloat"), { desc = "Windows: Float / tile (floated apps are remembered)" })
 hl.bind("SUPER+SHIFT+Space", hl.dsp.window.center(), { desc = "Windows: Centre a floating window" })
 hl.bind("SUPER+Y", hl.dsp.layout("togglesplit"), { desc = "Windows: Toggle split" })
 for _, d in ipairs(dirs) do
@@ -302,4 +302,5 @@ hl.gesture({ fingers = 4, direction = "vertical", action = "fullscreen" })
 
 load_user("monitors")
 load_user("apps")
+load_user("floating")   -- written by The Line: the apps you float, where you left them
 load_user("custom")
