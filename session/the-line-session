@@ -1,0 +1,56 @@
+#!/bin/sh
+# Starts a The Line session: environment, session bus, audio, then Hyprland with The Line's config.
+# The shell itself lives in $THE_LINE_DIR (default /usr/share/the-line); Hyprland starts it.
+# Log: /tmp/the-line-session-<uid>.log
+
+exec > "/tmp/the-line-session-$(id -u).log" 2>&1
+set -x
+
+export THE_LINE_DIR="${THE_LINE_DIR:-/usr/share/the-line}"
+
+export XDG_CURRENT_DESKTOP=Hyprland:the-line
+export XDG_SESSION_TYPE=wayland
+export XDG_SESSION_DESKTOP=the-line
+export XDG_RUNTIME_DIR="/run/user/$(id -u)"
+export QT_QPA_PLATFORM=wayland
+export QT_WAYLAND_DISABLE_WINDOWDECORATION=1
+export QT_STYLE_OVERRIDE=kvantum
+export MOZ_ENABLE_WAYLAND=1
+export SDL_VIDEODRIVER=wayland
+export _JAVA_AWT_WM_NONREPARENTING=1
+
+# Flatpak apps in the launcher and on the PATH.
+export XDG_DATA_DIRS="$HOME/.local/share/flatpak/exports/share:/var/lib/flatpak/exports/share:${XDG_DATA_DIRS:-/usr/local/share:/usr/share}"
+export PATH="$HOME/.local/share/flatpak/exports/bin:/var/lib/flatpak/exports/bin:$PATH"
+
+# glib looks for /run/dbus/..., Kira's socket is /var/run/dbus/...
+export DBUS_SYSTEM_BUS_ADDRESS=unix:path=/var/run/dbus/system_bus_socket
+
+mkdir -p "$XDG_RUNTIME_DIR" && chmod 700 "$XDG_RUNTIME_DIR"
+rm -f "$XDG_RUNTIME_DIR/pipewire-0.lock" "$XDG_RUNTIME_DIR/pipewire-0-manager.lock" "$XDG_RUNTIME_DIR/pulse/native" 2>/dev/null
+
+# First run: your own Hyprland bits live in ~/.config/the-line/hypr/ (monitors, apps, custom).
+# If you come from Sleex, its monitor layout and app keybinds are copied over once.
+hypr="$HOME/.config/the-line/hypr"
+mkdir -p "$hypr"
+[ -s "$hypr/monitors.lua" ] || cp "$HOME/.config/sleex/monitors.lua" "$hypr/monitors.lua" 2>/dev/null
+[ -s "$hypr/apps.lua" ] || cp "$HOME/.config/sleex/apps.lua" "$hypr/apps.lua" 2>/dev/null
+[ -s "$hypr/custom.lua" ] || cp "$HOME/.config/sleex/custom/general.lua" "$hypr/custom.lua" 2>/dev/null
+
+i=0
+while [ ! -S /var/run/dbus/system_bus_socket ] && [ $i -lt 15 ]; do
+    sleep 1
+    i=$((i + 1))
+done
+
+# Audio and the per-user runit tree need the session bus, so they start inside it.
+exec dbus-run-session -- sh -c '
+    pipewire &
+    wireplumber &
+    pipewire-pulse &
+    mkdir -p "$HOME/.local/service"
+    pkill -HUP -f "runsvdir $HOME/.local/service" && sleep 1
+    runsvdir "$HOME/.local/service" >/dev/null 2>&1 &
+    trap "kill -HUP $! 2>/dev/null" EXIT TERM HUP
+    start-hyprland -- --config "$THE_LINE_DIR/session/hyprland.lua"
+'

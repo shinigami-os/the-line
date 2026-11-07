@@ -21,9 +21,29 @@ Runs on Hyprland (FHT comes later). Done so far:
 - hold Super: key hints hang from the tiles on threads (`superHints` in the config to turn off)
 - Kira's voice on an empty workspace, behind the windows, from `assets/quotes.txt` plus `~/.config/the-line/quotes.txt`, with live `{placeholders}`
 
-Next: Super+F1 cheat sheet, first-run welcome, launcher shortcuts section, easter eggs from the backlog.
+- notification daemon (org.freedesktop.Notifications) and the wallpaper
 
-## Run
+Next: polkit agent, Super+F1 cheat sheet, first-run welcome, launcher shortcuts section, easter eggs from the backlog.
+
+## Session
+
+`session/` holds everything to log into The Line from the greeter:
+
+- `the-line.desktop`: the greeter entry, installed in `/usr/share/wayland-sessions/`
+- `the-line-session`: environment, session bus, audio, then Hyprland (`/usr/bin/the-line-session`)
+- `hyprland.lua`: The Line's Hyprland config (square, 1 px borders, the shell's curve and timings, the keys)
+
+The shell is expected in `/usr/share/the-line` (or wherever `THE_LINE_DIR` points). Your own Hyprland bits go in `~/.config/the-line/hypr/` (`monitors.lua`, `apps.lua`, `custom.lua`); coming from Sleex, its monitors, app keys and custom general settings are copied there on the first login.
+
+To try it from a checkout before it is packaged:
+
+```sh
+sudo ln -s ~/Documents/Kira-Linux/the-line /usr/share/the-line
+sudo cp session/the-line-session /usr/bin/
+sudo cp session/the-line.desktop /usr/share/wayland-sessions/
+```
+
+## Run (development)
 
 ```sh
 qs -p /path/to/this/repo
@@ -74,7 +94,8 @@ hl.bind("SUPER_L", hl.dsp.global("the-line:hints"), { ignore_mods = true, transp
 `~/.config/the-line/config.json`, every key optional:
 
 ```json
-{ "accent": "#9A5CFF", "reduceMotion": false, "motionScale": 1.0, "screens": [], "terminal": "foot" }
+{ "accent": "#9A5CFF", "reduceMotion": false, "motionScale": 1.0, "screens": [], "terminal": "foot",
+  "wallpaper": "/usr/share/kira/wallpapers/default.png", "superHints": true }
 ```
 
 ## Needs

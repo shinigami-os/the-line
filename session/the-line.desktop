@@ -1,0 +1,6 @@
+[Desktop Entry]
+Name=The Line
+Comment=Kira Linux's desktop, built on one line
+Exec=/usr/bin/the-line-session
+Type=Application
+DesktopNames=Hyprland;the-line

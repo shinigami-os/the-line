@@ -372,9 +372,21 @@ Tile {
 
                         Rectangle {
                             anchors.fill: parent
-                            color: "transparent"
+                            color: cardHover.hovered ? Theme.surface2 : "transparent"
                             border.width: 1
                             border.color: card.modelData.read ? Theme.border : Theme.borderStrong
+
+                            Behavior on color {
+                                ColorAnimation { duration: Anim.hover }
+                            }
+                        }
+
+                        // Click: the notification's default action, then it's gone.
+                        HoverHandler {
+                            id: cardHover
+                        }
+                        TapHandler {
+                            onTapped: Notifs.activate(card.modelData.id)
                         }
 
                         Column {
