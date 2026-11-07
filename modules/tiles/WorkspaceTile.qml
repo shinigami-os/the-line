@@ -79,7 +79,7 @@ Tile {
     restW: Theme.wsBlockW + (musicShown ? Theme.musicW : 0)
     openW: kind === "tw" ? 26 + 5 * 168 + 4 * 10 : 560
     // Launcher: search field, section label, one row per result, footer.
-    openH: Theme.tileHeight + (kind === "tw" ? 12 + overviewPanel.implicitHeight + 12
+    openH: Theme.tileHeight + (kind === "tw" ? 12 + overviewPanel.implicitH + 12
         : kind === "tm" ? 12 + musicPanel.implicitHeight + 6
         : 12 + 48 + 24 + Math.max(1, results.length) * 32 + 34 + 12)
     mode: kind !== "" ? "open" : "rest"
@@ -343,14 +343,33 @@ Tile {
     }
 
     bodyData: [
-        WorkspaceOverview {
+        // Only exists while open: its live window captures crashed Quickshell when torn down mid-switch or on reload.
+        Loader {
             id: overviewPanel
+
+            readonly property real implicitH: item?.implicitHeight ?? (2 * (95 + 20) + 10)
 
             x: 13
             y: 12
-            enabled: tile.kind === "tw"
-            shown: tile.kind === "tw"
-            active: tile.workspace
+            active: tile.kind === "tw" || overviewLinger.running
+            sourceComponent: WorkspaceOverview {
+                enabled: tile.kind === "tw"
+                shown: tile.kind === "tw"
+                active: tile.workspace
+            }
+
+            // Kept a moment after closing, so its items can fade out with the frame.
+            Timer {
+                id: overviewLinger
+                interval: Anim.panel + Anim.closeLead
+            }
+            Connections {
+                target: tile
+                function onKindChanged() {
+                    if (tile.kind !== "tw")
+                        overviewLinger.restart();
+                }
+            }
         },
 
         MusicPanel {
@@ -500,6 +519,7 @@ Tile {
                         width: parent.width
                         selected: tile.selected === appSlot.index
                         glyph: appSlot.result?.kind === "run" ? "$" : Apps.glyph(appSlot.result?.app?.name ?? "")
+                        icon: appSlot.result?.kind === "app" && (appSlot.result.app.icon ?? "") !== "" ? Quickshell.iconPath(appSlot.result.app.icon, true) : ""
                         name: appSlot.result?.kind === "run" ? tile.query.trim() : (appSlot.result?.app?.name ?? "")
                         monoName: appSlot.result?.kind === "run"
                         description: appSlot.result?.kind === "run" ? "run in terminal" : (appSlot.result?.app?.genericName || appSlot.result?.app?.comment || "")

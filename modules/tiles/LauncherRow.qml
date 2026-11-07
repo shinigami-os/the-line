@@ -1,11 +1,14 @@
 import QtQuick
+import Quickshell.Widgets
 import qs.services
 
-// One launcher row: glyph box, name, muted description, and a key cap or a state pill on the right.
+// One launcher row: the app's icon (or, without one, a mono glyph in a box), name, muted description, and a key cap
+// or a state pill on the right.
 Rectangle {
     id: row
 
     property string glyph
+    property string icon   // an icon path from Quickshell.iconPath, "" for none
     property string name
     property string description
     property bool monoName: false
@@ -24,7 +27,16 @@ Rectangle {
         ColorAnimation { duration: Anim.hover }
     }
 
+    IconImage {
+        visible: row.icon !== ""
+        x: 10
+        anchors.verticalCenter: parent.verticalCenter
+        implicitSize: 20
+        source: row.icon
+    }
+
     Rectangle {
+        visible: row.icon === ""
         x: 8
         anchors.verticalCenter: parent.verticalCenter
         width: 24
