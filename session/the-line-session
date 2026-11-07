@@ -37,6 +37,10 @@ mkdir -p "$hypr"
 [ -s "$hypr/apps.lua" ] || cp "$HOME/.config/sleex/apps.lua" "$hypr/apps.lua" 2>/dev/null || cp "$THE_LINE_DIR/session/apps.lua" "$hypr/apps.lua"
 [ -s "$hypr/custom.lua" ] || cp "$HOME/.config/sleex/custom/general.lua" "$hypr/custom.lua" 2>/dev/null
 
+# The Line's defaults for its apps, when you have none yet: foot (black glass, VS Code-style keys), Flameshot.
+[ -s "$HOME/.config/foot/foot.ini" ] || { mkdir -p "$HOME/.config/foot" && cp "$THE_LINE_DIR/session/foot.ini" "$HOME/.config/foot/foot.ini"; }
+[ -s "$HOME/.config/flameshot/flameshot.ini" ] || { mkdir -p "$HOME/.config/flameshot" && cp "$THE_LINE_DIR/session/flameshot.ini" "$HOME/.config/flameshot/flameshot.ini"; }
+
 i=0
 while [ ! -S /var/run/dbus/system_bus_socket ] && [ $i -lt 15 ]; do
     sleep 1

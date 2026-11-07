@@ -19,9 +19,16 @@ Tile {
 
     readonly property bool musicShown: Media.active && !musicHidden
 
-    // The focused window, the same on every screen.
-    // (activeToplevel is empty after a shell restart until focus moves: fall back to the activated window.)
-    readonly property var toplevel: Hyprland.activeToplevel ?? Hyprland.toplevels.values.find(t => t.activated) ?? null
+    // The focused window, the same on every screen. The desktop counts as an app: on a workspace without windows
+    // nothing is focused (Hyprland drops the focus), and the tile says "Desktop" (Quickshell keeps reporting the
+    // last window, so it is checked against the focused workspace).
+    readonly property var toplevel: {
+        const wins = Hyprland.focusedWorkspace?.toplevels?.values ?? [];
+        if (wins.length === 0)
+            return null;
+        const t = Hyprland.activeToplevel ?? Hyprland.toplevels.values.find(w => w.activated) ?? null;
+        return t && wins.includes(t) ? t : wins[0];
+    }
 
     // The app's name; its window title only when several windows of that app are open (to tell them apart).
     readonly property string appClass: toplevel?.lastIpcObject?.class ?? ""
