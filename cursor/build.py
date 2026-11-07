@@ -4,8 +4,8 @@
 Flat and square like the rest of The Line: a dark fill, a 1 px light outline (visible on dark and light),
 no shadow. The arrow is a sharp blade with the logo's chevron notch; the link pointer is the same arrow in
 the accent; the busy cursor is the three slanted blades of the loading indicator, lit one after the other.
-Every few seconds the pulse runs around the arrow, the link pointer and the text cursor: a short dash travels
-once along the outline, like the notification pulse on the line, then everything is still again.
+The pulse runs around the arrow, the link pointer and the text cursor in a loop: a short dash travels along the
+outline, like the notification pulse on the line, pauses a moment, and goes round again.
 
     python3 cursor/build.py [output dir]      (default: cursor/build/TheLine)
 
@@ -90,9 +90,9 @@ class Pen:
 
 # ---------------------------------------------------------------- pulse
 
-PULSE_FRAMES = 16      # frames of travel
-PULSE_STEP = 30        # ms per travel frame (about half a second in all)
-PULSE_REST = 7000      # ms of stillness between two pulses
+PULSE_FRAMES = 20      # frames of travel
+PULSE_STEP = 30        # ms per travel frame (600 ms around the outline)
+PULSE_REST = 300       # ms of stillness between two passes: it loops
 
 
 def perimeter(pts, closed=True):
@@ -100,13 +100,13 @@ def perimeter(pts, closed=True):
     return sum(math.hypot(b[0] - a[0], b[1] - a[1]) for a, b in zip(path, path[1:]))
 
 
-def pulse(pen, pts, f, color=ACCENT, closed=True, length=9):
+def pulse(pen, pts, f, color=ACCENT, closed=True, length=13):
     """Frame 0 is the still cursor; frames 1..PULSE_FRAMES move the dash in and out along the outline."""
     if f == 0:
         return
     total = perimeter(pts, closed)
     t = -length + (f - 1) / (PULSE_FRAMES - 1) * (total + length)
-    pen.dash(pts, t, length, color, closed)
+    pen.dash(pts, t, length, color, closed, width=2.2)
 
 
 def pulse_delay(f):
@@ -175,7 +175,7 @@ def c_text(pen, f):
     pen.stroke([(16, 7), (16, 25)], width=1.4)
     pen.stroke([(12, 7), (20, 7)], width=1.4)
     pen.stroke([(12, 25), (20, 25)], width=1.4)
-    pulse(pen, [(16, 7), (16, 25)], f, closed=False, length=6)
+    pulse(pen, [(16, 7), (16, 25)], f, closed=False, length=7)
 
 
 def c_vertical_text(pen, f):

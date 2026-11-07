@@ -79,7 +79,7 @@ scripts/          helpers
 
 ## Cursor
 
-`cursor/build.py` draws The Line's cursor theme (24 shapes plus the usual alias names, 24 to 64 px) and writes the XCursor files, with nothing but Python and Pillow. Flat and square: a dark fill with a light 1 px outline, a blade arrow with the logo's notch, the link pointer in the accent, the busy cursor as the three loading blades. Every 7 s a short dash runs once around the arrow, the link pointer and the text cursor, like the pulse on the line.
+`cursor/build.py` draws The Line's cursor theme (24 shapes plus the usual alias names, 24 to 64 px) and writes the XCursor files, with nothing but Python and Pillow. Flat and square: a dark fill with a light 1 px outline, a blade arrow with the logo's notch, the link pointer in the accent, the busy cursor as the three loading blades. A short dash runs around the arrow, the link pointer and the text cursor in a loop, like the pulse on the line.
 
 ```sh
 python3 cursor/build.py ~/.local/share/icons/TheLine    # or /usr/share/icons/TheLine
