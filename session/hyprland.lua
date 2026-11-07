@@ -222,10 +222,14 @@ hl.bind("SUPER+L", hl.dsp.exec_cmd("hyprlock"), { desc = "Session: Lock" })
 -- Volume and brightness: the line itself shows the level, no popup.
 hl.bind("XF86AudioMute", hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"), { locked = true, desc = "Volume and brightness: Mute" })
 hl.bind("SUPER+XF86AudioMute", hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"), { locked = true, desc = "Volume and brightness: Mute the microphone" })
-hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd("wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+"), { locked = true, repeating = true, desc = "Volume and brightness: Volume up" })
-hl.bind("XF86AudioLowerVolume", hl.dsp.exec_cmd("wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"), { locked = true, repeating = true, desc = "Volume and brightness: Volume down" })
-hl.bind("XF86MonBrightnessUp", hl.dsp.exec_cmd("brightnessctl -q set 5%+"), { locked = true, repeating = true, desc = "Volume and brightness: Brightness up" })
-hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd("brightnessctl -q set 5%-"), { locked = true, repeating = true, desc = "Volume and brightness: Brightness down" })
+-- The step size is the shell's "levelStep" setting (2% by default).
+local LINE = QS .. " ipc call line "
+hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd(LINE .. "volumeStep 1"), { locked = true, repeating = true, desc = "Volume and brightness: Volume up" })
+hl.bind("XF86AudioLowerVolume", hl.dsp.exec_cmd(LINE .. "volumeStep -1"), { locked = true, repeating = true, desc = "Volume and brightness: Volume down" })
+hl.bind("XF86MonBrightnessUp", hl.dsp.exec_cmd(LINE .. "brightnessStep 1"), { locked = true, repeating = true, desc = "Volume and brightness: Brightness up" })
+hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd(LINE .. "brightnessStep -1"), { locked = true, repeating = true, desc = "Volume and brightness: Brightness down" })
+hl.bind("XF86KbdBrightnessUp", hl.dsp.exec_cmd(LINE .. "kbdStep 1"), { locked = true, repeating = true, desc = "Volume and brightness: Keyboard backlight up" })
+hl.bind("XF86KbdBrightnessDown", hl.dsp.exec_cmd(LINE .. "kbdStep -1"), { locked = true, repeating = true, desc = "Volume and brightness: Keyboard backlight down" })
 
 -- Media
 hl.bind("XF86AudioPlay", hl.dsp.exec_cmd("playerctl play-pause"), { locked = true, desc = "Media: Play / pause" })

@@ -22,7 +22,13 @@ Tile {
     }
 
     anchorSide: "center"
-    restW: ClockFace.binary ? 176 : 152
+    // While the line shows a level (volume, brightness, keyboard backlight), the clock gives way to its name and
+    // exact value, so you know which one the line is showing.
+    readonly property bool levelShown: LineState.gaugeKind !== "" && mode === "rest"
+    readonly property string levelName: ({ "vol": "Volume", "bri": "Brightness", "kbd": "Keyboard backlight" })[LineState.gaugeKind] ?? ""
+    readonly property string levelValue: LineState.gaugeKind === "vol" && Audio.muted ? "muted" : Math.round(LineState.gaugeValue * 100) + "%"
+
+    restW: levelShown ? Math.max(152, levelRow.implicitWidth + 40) : (ClockFace.binary ? 176 : 152)
     toastW: LineState.toastW
     toastH: LineState.toastH
     openW: 720
@@ -67,7 +73,39 @@ Tile {
         }
 
         Row {
+            id: levelRow
             anchors.centerIn: parent
+            spacing: 10
+            opacity: tile.levelShown ? 1 : 0
+
+            Behavior on opacity {
+                NumberAnimation { duration: Anim.base }
+            }
+
+            Text {
+                anchors.verticalCenter: parent.verticalCenter
+                text: tile.levelName
+                font.family: Theme.fontUi
+                font.pixelSize: 13
+                font.weight: Font.Medium
+                color: Theme.text
+            }
+            Text {
+                anchors.verticalCenter: parent.verticalCenter
+                text: tile.levelValue
+                font.family: Theme.fontMono
+                font.pixelSize: 15
+                color: Theme.accent
+            }
+        }
+
+        Row {
+            anchors.centerIn: parent
+            opacity: tile.levelShown ? 0 : 1
+
+            Behavior on opacity {
+                NumberAnimation { duration: Anim.base }
+            }
             spacing: 10
 
             // HH:mm with the seconds as a small accent superscript (13:49²²). The ticking part is the tile's accent,

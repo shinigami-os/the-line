@@ -25,6 +25,7 @@ Runs on Hyprland (FHT comes later). Done so far:
 - optional app icons on the workspace ruler (`workspaceIcons` in the config)
 - intro: each screen starts hidden and draws itself in once its wallpaper is shown
 
+- volume, brightness and keyboard backlight keys step by `levelStep`; the clock tile shows which level the line is showing, and its value
 - polkit agent: an app asking for an admin password gets The Line's dialog (the line drawn across the screen, the box opening on it)
 
 - cheat sheet (SUPER+F1): every shortcut, read live (Hyprland's binds and their "Group: what it does" descriptions, the touchpad gestures, foot's and zsh's own bindings), in tabs
@@ -113,7 +114,7 @@ hl.bind("SUPER+P", hl.dsp.global("the-line:performance"))
 ```json
 { "accent": "#9A5CFF", "reduceMotion": false, "motionScale": 1.0, "screens": [], "terminal": "foot",
   "wallpaper": "/usr/share/kira/wallpapers/default.png", "workspaceIcons": false,
-  "kiraVoice": true, "workspaceScrollInverted": false }
+  "kiraVoice": true, "workspaceScrollInverted": false, "levelStep": 2 }
 ```
 
 ## Needs

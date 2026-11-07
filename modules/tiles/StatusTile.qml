@@ -89,7 +89,7 @@ Tile {
 
             // Scrolling over the status group changes the volume.
             WheelHandler {
-                onWheel: event => Audio.step(event.angleDelta.y > 0 ? 0.02 : -0.02)
+                onWheel: event => Audio.step((event.angleDelta.y > 0 ? 1 : -1) * Config.levelStep / 100)
             }
         }
 

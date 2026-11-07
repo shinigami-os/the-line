@@ -20,6 +20,11 @@ Singleton {
 
     onValueChanged: if (armed) LineState.showGauge("bri", value)
 
+    function step(direction) {
+        set(value + direction * Config.levelStep / 100);
+        LineState.showGauge("bri", value);
+    }
+
     Process {
         id: getter
         command: ["brightnessctl", "-m"]

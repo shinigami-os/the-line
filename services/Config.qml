@@ -17,6 +17,7 @@ Singleton {
     readonly property string wallpaper: adapter.wallpaper
     readonly property bool workspaceIcons: adapter.workspaceIcons
     readonly property bool kiraVoice: adapter.kiraVoice
+    readonly property real levelStep: adapter.levelStep
     readonly property bool workspaceScrollInverted: adapter.workspaceScrollInverted
 
     // Hyprland reads workspaceScrollInverted from this file itself: reload it when the setting changes.
@@ -50,6 +51,7 @@ Singleton {
             property real motionScale: 1.0
             property string terminal: "foot"
             property bool workspaceIcons: false            // app icons on the workspace ruler
+            property real levelStep: 2                     // % per press for volume, brightness, keyboard backlight
             property bool kiraVoice: true                  // Kira's quotes on an empty workspace, and her one-off lines
             property bool workspaceScrollInverted: false   // SUPER+scroll: scroll down for the next workspace
             property string wallpaper: "/usr/share/kira/wallpapers/default.png"   // "" = leave it to another tool

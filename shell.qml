@@ -179,6 +179,20 @@ ShellRoot {
             UiState.frozen = on;
         }
 
+        // Volume, screen brightness and keyboard backlight keys: one step up (1) or down (-1), the size of the
+        // "levelStep" setting. The level shows on the line, and its name and value in the clock tile.
+        function volumeStep(direction: int): void {
+            Audio.step(direction * Config.levelStep / 100);
+        }
+
+        function brightnessStep(direction: int): void {
+            Brightness.step(direction);
+        }
+
+        function kbdStep(direction: int): void {
+            KbdBacklight.step(direction);
+        }
+
         function overview(): void {
             UiState.openPanel = "tw";
             UiState.openScreen = root.focusedScreen();
