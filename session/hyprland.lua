@@ -6,6 +6,21 @@ local HOME = os.getenv("HOME")
 local SHELL = os.getenv("THE_LINE_DIR") or "/usr/share/the-line"
 local QS = "qs -p " .. SHELL
 
+-- A setting from The Line's own config (~/.config/the-line/config.json, written by the shell and its settings).
+-- Only true / false values are read here; nil when unset. The shell reloads Hyprland when one of them changes.
+local function the_line_setting(key)
+    local f = io.open(HOME .. "/.config/the-line/config.json", "r")
+    if not f then
+        return nil
+    end
+    local text = f:read("*a")
+    f:close()
+    local v = text:match('"' .. key .. '"%s*:%s*(%a+)')
+    if v == "true" then return true end
+    if v == "false" then return false end
+    return nil
+end
+
 local function load_user(name)
     local path = HOME .. "/.config/the-line/hypr/" .. name .. ".lua"
     local f = io.open(path, "r")
@@ -218,7 +233,7 @@ hl.bind("XF86AudioPrev", hl.dsp.exec_cmd("playerctl previous"), { locked = true,
 
 -- Screenshots and tools
 hl.bind("Print", hl.dsp.exec_cmd("grim - | wl-copy"), { locked = true, desc = "Screenshot to the clipboard" })
-hl.bind("SUPER+SHIFT+S", hl.dsp.exec_cmd("flameshot gui"), { desc = "Screenshot an area (frozen screen)" })
+hl.bind("SUPER+SHIFT+S", hl.dsp.exec_cmd(SHELL .. "/session/the-line-shot"), { desc = "Screenshot an area, any screen (frozen with hyprpicker)" })
 hl.bind("CTRL+Print", hl.dsp.exec_cmd("grim -g \"$(slurp)\" - | tesseract - - | wl-copy"), { desc = "Text from an area (OCR) to the clipboard" })
 hl.bind("ALT+Print", hl.dsp.exec_cmd("hyprpicker -a"), { desc = "Colour picker to the clipboard" })
 hl.bind("SUPER+ALT+R", hl.dsp.exec_cmd("pkill -INT -x wf-recorder || { mkdir -p ~/Videos/Recordings && wf-recorder -g \"$(slurp)\" -f ~/Videos/Recordings/$(date +%Y-%m-%d_%H.%M.%S).mp4; }"), { desc = "Record an area (again to stop)" })
@@ -262,9 +277,11 @@ for i = 1, 10 do
     hl.bind("SUPER+CTRL+code:" .. code, hl.dsp.window.move({ workspace = i, follow = false }), { desc = "Send to workspace " .. i })
     hl.bind("SUPER+SHIFT+code:" .. code, hl.dsp.window.move({ workspace = i, follow = true }), { desc = "Send to workspace " .. i .. " and follow" })
 end
--- Next / previous workspace: one step per scroll notch or key press.
-hl.bind("SUPER+mouse_up", hl.dsp.focus({ workspace = "r+1" }), { desc = "Next workspace" })
-hl.bind("SUPER+mouse_down", hl.dsp.focus({ workspace = "r-1" }), { desc = "Previous workspace" })
+-- Next / previous workspace: one step per scroll notch or key press. Scroll up goes to the next one, unless the
+-- "workspaceScrollInverted" setting is on.
+local scroll_inverted = the_line_setting("workspaceScrollInverted") == true
+hl.bind(scroll_inverted and "SUPER+mouse_down" or "SUPER+mouse_up", hl.dsp.focus({ workspace = "r+1" }), { desc = "Next workspace" })
+hl.bind(scroll_inverted and "SUPER+mouse_up" or "SUPER+mouse_down", hl.dsp.focus({ workspace = "r-1" }), { desc = "Previous workspace" })
 for _, key in ipairs({ "Right", "K" }) do
     hl.bind("SUPER+ALT+" .. key, hl.dsp.focus({ workspace = "r+1" }), { desc = "Next workspace" })
 end

@@ -23,6 +23,8 @@ Singleton {
     readonly property bool eventActive: eventTimer.running
 
     function say(line, screen) {
+        if (!Config.kiraVoice)
+            return;
         eventText = render(line);
         eventScreen = screen;
         eventTimer.restart();

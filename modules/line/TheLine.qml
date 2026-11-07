@@ -93,7 +93,7 @@ Scope {
     // Kira's voice on an empty workspace, behind the windows. It steps aside while a one-off line plays here.
     DesktopVoice {
         screen: root.modelData
-        active: root.desktopEmpty && root.stage === 0 && !(Voice.eventActive && Voice.eventScreen === root.screenName)
+        active: Config.kiraVoice && root.desktopEmpty && root.stage === 0 && !(Voice.eventActive && Voice.eventScreen === root.screenName)
     }
 
     // Reserves the top of the screen (line at 10 + tile height) so tiled windows start under the tiles.

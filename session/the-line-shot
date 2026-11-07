@@ -1,0 +1,14 @@
+#!/bin/sh
+# Area screenshot to the clipboard. Any screen (or several) can be selected; the screens are frozen while
+# selecting when hyprpicker is installed. SUPER+SHIFT+S in session/hyprland.lua.
+
+if command -v hyprpicker >/dev/null 2>&1; then
+    hyprpicker -r -z >/dev/null 2>&1 &
+    freeze=$!
+    sleep 0.15
+fi
+
+area=$(slurp -d)
+
+[ -n "$freeze" ] && kill "$freeze" 2>/dev/null
+[ -n "$area" ] && grim -g "$area" - | wl-copy

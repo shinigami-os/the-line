@@ -107,7 +107,8 @@ hl.bind("SUPER+P", hl.dsp.global("the-line:performance"))
 
 ```json
 { "accent": "#9A5CFF", "reduceMotion": false, "motionScale": 1.0, "screens": [], "terminal": "foot",
-  "wallpaper": "/usr/share/kira/wallpapers/default.png" }
+  "wallpaper": "/usr/share/kira/wallpapers/default.png", "workspaceIcons": false,
+  "kiraVoice": true, "workspaceScrollInverted": false }
 ```
 
 ## Needs
