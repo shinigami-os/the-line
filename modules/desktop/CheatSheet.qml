@@ -27,8 +27,9 @@ CenterDialog {
 
     open: UiState.sheetScreen === screenName
     onOutsideClicked: UiState.sheetScreen = ""
-    boxWidth: Math.min(1040, width - 80)
-    boxHeight: Math.min(660, height - 120)
+    boxWidth: Math.min(1080, width - 80)
+    // As tall as the content, up to 70% of the screen (it scrolls beyond).
+    boxHeight: Math.min(62 + cols.implicitHeight + 22, Math.round(height * 0.7))
 
     onOpenChanged: {
         if (open) {
@@ -48,6 +49,7 @@ CenterDialog {
         Keys.onLeftPressed: sheet.tab = (sheet.tab + sheet.tabs.length - 1) % sheet.tabs.length
         Keys.onRightPressed: sheet.tab = (sheet.tab + 1) % sheet.tabs.length
         Keys.onTabPressed: sheet.tab = (sheet.tab + 1) % sheet.tabs.length
+        Keys.onBacktabPressed: sheet.tab = (sheet.tab + sheet.tabs.length - 1) % sheet.tabs.length
 
         // Header: the title, and the tabs with their marker.
         PanelItem {
@@ -129,9 +131,23 @@ CenterDialog {
             clip: true
             boundsBehavior: Flickable.StopAtBounds
 
+            // Hairlines between the columns (outside the columns, so they don't feed their own height).
+            Repeater {
+                model: 2
+
+                Rectangle {
+                    required property int index
+
+                    x: (index + 1) * ((sheet.boxWidth - 44 - 2 * 41) / 3 + 41) - 21
+                    width: 1
+                    height: cols.implicitHeight
+                    color: Theme.border
+                }
+            }
+
             Row {
                 id: cols
-                spacing: 28
+                spacing: 41
 
                 Repeater {
                     model: sheet.columns
@@ -142,8 +158,9 @@ CenterDialog {
                         required property var modelData
                         required property int index
 
-                        width: (sheet.boxWidth - 44 - 2 * 28) / 3
+                        width: (sheet.boxWidth - 44 - 2 * 41) / 3
                         spacing: 18
+
 
                         Repeater {
                             model: column.modelData
@@ -176,39 +193,35 @@ CenterDialog {
                                     Repeater {
                                         model: group.modelData.rows
 
+                                        // "What it does ....... keys": the description on the left, the keys on the
+                                        // right (one combination per line), a dotted leader between them.
                                         Item {
                                             id: row
 
                                             required property var modelData
+                                            readonly property real descEnd: Math.min(desc.implicitWidth, desc.width)
 
                                             width: groupCol.width
-                                            height: Math.max(capsFlow.implicitHeight, desc.implicitHeight)
+                                            height: Math.max(keyCol.implicitHeight, desc.implicitHeight) + 2
 
-                                            Flow {
-                                                id: capsFlow
-                                                width: 150
+                                            Column {
+                                                id: keyCol
+                                                anchors.right: parent.right
                                                 spacing: 3
 
                                                 Repeater {
-                                                    model: row.modelData.keys.length
+                                                    model: row.modelData.keys
 
                                                     Row {
                                                         id: combo
 
-                                                        required property int index
+                                                        required property var modelData
 
+                                                        anchors.right: parent.right
                                                         spacing: 3
 
-                                                        Text {
-                                                            visible: combo.index > 0
-                                                            text: "/"
-                                                            font.family: Theme.fontMono
-                                                            font.pixelSize: 10
-                                                            color: Theme.muted
-                                                        }
-
                                                         Repeater {
-                                                            model: row.modelData.keys[combo.index]
+                                                            model: combo.modelData
 
                                                             Rectangle {
                                                                 required property string modelData
@@ -235,14 +248,29 @@ CenterDialog {
 
                                             Text {
                                                 id: desc
-                                                x: 158
-                                                width: parent.width - 158
+                                                width: Math.max(40, row.width - keyCol.implicitWidth - 20)
                                                 text: row.modelData.text
                                                 wrapMode: Text.Wrap
                                                 font.family: Theme.fontUi
                                                 font.pixelSize: 12
                                                 font.weight: Font.Medium
                                                 color: Theme.text
+                                            }
+
+                                            Row {
+                                                x: row.descEnd + 6
+                                                y: 10
+                                                spacing: 3
+
+                                                Repeater {
+                                                    model: Math.max(0, Math.floor((row.width - keyCol.implicitWidth - row.descEnd - 14) / 4))
+
+                                                    Rectangle {
+                                                        width: 1
+                                                        height: 1
+                                                        color: Theme.borderStrong
+                                                    }
+                                                }
                                             }
                                         }
                                     }

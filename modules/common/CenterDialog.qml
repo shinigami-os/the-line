@@ -3,7 +3,7 @@ import qs.services
 
 // A dialog grown from the line: the screen dims, a line draws itself across its middle from both edges, then a box
 // opens on it, up and down at once (frame first, fill after), and its content arrives like a tile's panel.
-// Closing keeps the same order: the content leaves, the line withdraws, then the box folds away.
+// Closing keeps the same order: the content leaves, the line withdraws completely, a beat, then the box folds away.
 // The power menu and the polkit agent use it.
 Item {
     id: dialog
@@ -21,6 +21,8 @@ Item {
 
     readonly property int lineDraw: Math.round(Anim.panel * 1.6)
     readonly property real mid: Math.round(height / 2)
+    // Closing: the box folds once the line is fully back in the screen edges, and a beat after.
+    readonly property int foldDelay: Anim.exitFade + lineDraw + Anim.d(60)
 
     visible: open || reach > 0 || box.height > 0
 
@@ -92,9 +94,16 @@ Item {
 
         Behavior on height {
             SequentialAnimation {
-                PauseAnimation { duration: dialog.open ? Math.round(dialog.lineDraw * 0.6) : Anim.exitFade + Math.round(dialog.lineDraw * 0.6) }
+                // Opening waits for the line; a size change while open (another tab) doesn't wait.
+                PauseAnimation { duration: dialog.open ? (box.height < 2 ? Math.round(dialog.lineDraw * 0.6) : 0) : dialog.foldDelay }
                 NumberAnimation { duration: Anim.panel; easing.type: Anim.easing }
             }
+        }
+
+        // The box's own clicks stay in it (they would reach the dim layer below and count as "outside").
+        MouseArea {
+            anchors.fill: parent
+            acceptedButtons: Qt.AllButtons
         }
 
         Rectangle {
@@ -106,7 +115,7 @@ Item {
 
             Behavior on height {
                 SequentialAnimation {
-                    PauseAnimation { duration: dialog.open ? Math.round(dialog.lineDraw * 0.6) + Anim.fillLag : Anim.exitFade + Math.round(dialog.lineDraw * 0.6) }
+                    PauseAnimation { duration: dialog.open ? (fill.height < 2 ? Math.round(dialog.lineDraw * 0.6) : 0) + Anim.fillLag : dialog.foldDelay }
                     NumberAnimation { duration: Anim.panel; easing.type: Anim.easing }
                 }
             }
