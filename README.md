@@ -32,6 +32,7 @@ Next: polkit agent, Super+F1 cheat sheet, first-run welcome, launcher shortcuts 
 - `the-line.desktop`: the greeter entry, installed in `/usr/share/wayland-sessions/`
 - `the-line-session`: environment, session bus, audio, then Hyprland (`/usr/bin/the-line-session`)
 - `hyprland.lua`: The Line's Hyprland config (square, 1 px borders, the shell's curve and timings, the keys)
+- `hypridle.conf`: dim at 2 min, lock (hyprlock) at 5, suspend at 15
 
 The shell is expected in `/usr/share/the-line` (or wherever `THE_LINE_DIR` points). Your own Hyprland bits go in `~/.config/the-line/hypr/` (`monitors.lua`, `apps.lua`, `custom.lua`); coming from Sleex, its monitors, app keys and custom general settings are copied there on the first login.
 
