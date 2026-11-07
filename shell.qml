@@ -5,6 +5,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import Quickshell.Hyprland
+import Quickshell.Services.UPower
 import qs.modules.line
 import qs.services
 
@@ -13,11 +14,31 @@ ShellRoot {
 
     readonly property var screens: Quickshell.screens.filter(s => Config.screenFilter.length === 0 || Config.screenFilter.includes(s.name))
 
-    // Panels opened from the keyboard go to the focused screen (or the first one The Line runs on).
-    function toggleFocused(panel) {
+    // The focused screen, or the first one The Line runs on.
+    function focusedScreen() {
         const focused = Hyprland.focusedMonitor?.name ?? "";
         const names = screens.map(s => s.name);
-        UiState.toggle(names.includes(focused) ? focused : names[0], panel);
+        return names.includes(focused) ? focused : names[0];
+    }
+
+    // Panels opened from the keyboard go to the focused screen.
+    function toggleFocused(panel) {
+        UiState.toggle(focusedScreen(), panel);
+    }
+
+    // Easter egg: on a laptop, Kira says something when the charger is plugged in or pulled out.
+    readonly property var pluggedLines: ["i've got the power.", "plugged in. unlimited power. almost.", "charging. feel the volts.", "back on the grid at {battery}."]
+    readonly property var unpluggedLines: ["on battery. make it count.", "unplugged. every watt counts now.", "cord cut. we ride on {battery}.", "wireless mode. stay close to a socket."]
+
+    Connections {
+        target: UPower
+
+        function onOnBatteryChanged() {
+            if (!(UPower.displayDevice?.isLaptopBattery ?? false))
+                return;
+            const lines = UPower.onBattery ? root.unpluggedLines : root.pluggedLines;
+            Voice.say(lines[Math.floor(Math.random() * lines.length)], root.focusedScreen());
+        }
     }
 
     Variants {
@@ -97,6 +118,11 @@ ShellRoot {
             if (UiState.openPanel !== "tl")
                 root.toggleFocused("tl");
             UiState.launcherQuery = text;
+        }
+
+        // Says a line on top of the windows of the focused screen, like the power easter egg.
+        function say(text: string): void {
+            Voice.say(text, root.focusedScreen());
         }
 
         function hints(on: bool): void {

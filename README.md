@@ -19,7 +19,7 @@ Runs on Hyprland (FHT comes later). Done so far:
 - fullscreen, in stages: the music part leaves, the tiles fold up into the line, the line withdraws into the screen edges. A notification or a level change draws the line back for the event, then it withdraws again
 
 - hold Super: key hints hang from the tiles on threads (`superHints` in the config to turn off)
-- Kira's voice on an empty workspace, from `assets/quotes.txt` plus `~/.config/the-line/quotes.txt`, with live `{placeholders}`
+- Kira's voice on an empty workspace, behind the windows, from `assets/quotes.txt` plus `~/.config/the-line/quotes.txt`, with live `{placeholders}`
 
 Next: Super+F1 cheat sheet, first-run welcome, launcher shortcuts section, easter eggs from the backlog.
 
@@ -39,6 +39,7 @@ qs -p . ipc call line toggle eDP-1 tc    # notifications (tl: launcher, tm: musi
 qs -p . ipc call line close
 qs -p . ipc call line clockFace         # the clock easter egg
 qs -p . ipc call line search fire        # open the launcher with a search typed in
+qs -p . ipc call line say "hello"        # Kira says a line on top of the windows
 ```
 
 ## Layout

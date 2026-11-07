@@ -2,13 +2,16 @@ import QtQuick
 import qs.services
 
 // Flat analog clock: twelve ticks and three hands, no face, no round edges.
-// Angles come from a monotonic seconds count so the hands never spin backwards at midnight.
+// Angles stay within 0-360 (large angles lose precision in the transform and the hands freeze); the rotation
+// always turns clockwise, so a hand passing 12 never spins backwards.
 Item {
     id: clock
 
     property real size: 140
 
-    readonly property real localSeconds: Time.now.getTime() / 1000 - Time.now.getTimezoneOffset() * 60
+    readonly property int h: Time.now.getHours() % 12
+    readonly property int m: Time.now.getMinutes()
+    readonly property int sec: Time.now.getSeconds()
     readonly property real c: size / 2
 
     width: size
@@ -51,7 +54,11 @@ Item {
             angle: hand.angle
 
             Behavior on angle {
-                NumberAnimation { duration: Anim.base; easing.type: Anim.easing }
+                RotationAnimation {
+                    direction: RotationAnimation.Clockwise
+                    duration: Anim.base
+                    easing.type: Anim.easing
+                }
             }
         }
     }
@@ -59,19 +66,19 @@ Item {
     Hand {
         width: 3
         length: clock.c * 0.5
-        angle: clock.localSeconds / 120
+        angle: (clock.h * 3600 + clock.m * 60 + clock.sec) / 120
         color: Theme.text
     }
     Hand {
         width: 2
         length: clock.c * 0.78
-        angle: clock.localSeconds / 10
+        angle: (clock.m * 60 + clock.sec) / 10
         color: Theme.text
     }
     Hand {
         width: 1
         length: clock.c * 0.86
-        angle: clock.localSeconds * 6
+        angle: clock.sec * 6
         color: Theme.accent
     }
 

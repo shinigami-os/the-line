@@ -3,6 +3,7 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import Quickshell.Services.UPower
 
 // Kira's voice: quotes from assets/quotes.txt plus the user's ~/.config/the-line/quotes.txt.
 // A quote may hold {placeholders}; each one maps to a fixed value below, so a quotes file can never run anything.
@@ -14,13 +15,30 @@ Singleton {
     property int packages: 0
 
     // The quote with its placeholders filled in. Live: {uptime} keeps counting while it is shown.
-    readonly property string text: current.replace(/\{(\w+)\}/g, (match, key) => {
-        const v = value(key);
-        return v === undefined ? match : v;
-    })
+    readonly property string text: render(current)
 
-    // "kira · user@host · up 3 h 12 min"
-    readonly property string meta: "kira · " + Session.user + "@" + Session.host.toLowerCase() + " · up " + SystemStats.formatUptime(SystemStats.uptime)
+    // A one-off line said on top of the windows, on one screen, for a few seconds (easter eggs).
+    property string eventText: ""
+    property string eventScreen: ""
+    readonly property bool eventActive: eventTimer.running
+
+    function say(line, screen) {
+        eventText = render(line);
+        eventScreen = screen;
+        eventTimer.restart();
+    }
+
+    function render(line) {
+        return line.replace(/\{(\w+)\}/g, (match, key) => {
+            const v = value(key);
+            return v === undefined ? match : v;
+        });
+    }
+
+    Timer {
+        id: eventTimer
+        interval: 5000
+    }
 
     function value(key) {
         switch (key) {
@@ -33,6 +51,7 @@ Singleton {
         case "load": return SystemStats.load.split(" ")[0] ?? "";
         case "cpu": return Math.round(SystemStats.cpu * 100) + "%";
         case "ram": return Math.round(SystemStats.ram * 100) + "%";
+        case "battery": return Math.round((UPower.displayDevice?.percentage ?? 0) * 100) + "%";
         }
         return undefined;
     }

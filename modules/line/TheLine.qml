@@ -72,6 +72,12 @@ Scope {
         return ws;
     }
 
+    // Kira's voice on an empty workspace, behind the windows. It steps aside while a one-off line plays here.
+    DesktopVoice {
+        screen: root.modelData
+        active: root.desktopEmpty && root.stage === 0 && !(Voice.eventActive && Voice.eventScreen === root.screenName)
+    }
+
     // Reserves the top of the screen (line at 10 + tile height) so tiled windows start under the tiles.
     PanelWindow {
         screen: root.modelData
@@ -137,8 +143,12 @@ Scope {
                 onClicked: UiState.close()
             }
 
+            // Kira's voice on top of the windows, for one-off lines (power plugged / unplugged).
             KiraVoice {
-                active: root.desktopEmpty && root.stage === 0
+                x: 16
+                y: parent.height - 22 - height
+                text: Voice.eventText
+                shown: Voice.eventActive && Voice.eventScreen === root.screenName && root.stage === 0
             }
 
             // The three tiles. In fullscreen they fold up into the line (stage 2).

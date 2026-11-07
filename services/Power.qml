@@ -2,6 +2,7 @@ pragma Singleton
 
 import QtQuick
 import Quickshell
+import Quickshell.Hyprland
 
 // Session and power actions. They live only in the quick settings panel.
 Singleton {
@@ -10,7 +11,7 @@ Singleton {
     }
 
     function logout() {
-        Quickshell.execDetached(["hyprctl", "dispatch", "exit"]);
+        Hyprland.dispatch("hl.dsp.exit()");   // Hyprland 0.55 Lua dispatcher
     }
 
     function restart() {

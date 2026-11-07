@@ -126,7 +126,8 @@ Tile {
                         id: cellHover
                     }
                     TapHandler {
-                        onTapped: Hyprland.dispatch("workspace " + cell.n)
+                        // Hyprland 0.55 takes Lua dispatchers.
+                        onTapped: Hyprland.dispatch("hl.dsp.focus({ workspace = " + cell.n + " })")
                     }
                 }
             }
