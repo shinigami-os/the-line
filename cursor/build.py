@@ -4,8 +4,9 @@
 Flat and square like the rest of The Line: a dark fill, a 1 px light outline (visible on dark and light),
 no shadow. The arrow is a sharp blade with the logo's chevron notch; the link pointer is the same arrow in
 the accent; the busy cursor is the three slanted blades of the loading indicator, lit one after the other.
-The pulse runs around the arrow, the link pointer and the text cursor in a loop: a short dash travels along the
-outline, like the notification pulse on the line, pauses a moment, and goes round again.
+The pulse runs around the arrow and the link pointer at a steady pace, lap after lap: a short dash travelling
+along the outline, like the notification pulse on the line. On the text cursor, which has no lap to run, it
+bounces from one end of the I-beam to the other.
 
     python3 cursor/build.py [output dir]      (default: cursor/build/TheLine)
 
@@ -90,9 +91,8 @@ class Pen:
 
 # ---------------------------------------------------------------- pulse
 
-PULSE_FRAMES = 20      # frames of travel
-PULSE_STEP = 30        # ms per travel frame (600 ms around the outline)
-PULSE_REST = 300       # ms of stillness between two passes: it loops
+PULSE_FRAMES = 40      # frames per lap (or per bounce, there and back)
+PULSE_STEP = 40        # ms per frame: 1.6 s a lap, no pause, so the motion stays even
 
 
 def perimeter(pts, closed=True):
@@ -101,16 +101,17 @@ def perimeter(pts, closed=True):
 
 
 def pulse(pen, pts, f, color=ACCENT, closed=True, length=13):
-    """Frame 0 is the still cursor; frames 1..PULSE_FRAMES move the dash in and out along the outline."""
-    if f == 0:
-        return
+    """Frame f of the pulse: round a closed outline, or there and back along an open one."""
     total = perimeter(pts, closed)
-    t = -length + (f - 1) / (PULSE_FRAMES - 1) * (total + length)
-    pen.dash(pts, t, length, color, closed, width=2.2)
-
-
-def pulse_delay(f):
-    return PULSE_REST if f == 0 else PULSE_STEP
+    if closed:
+        t = f / PULSE_FRAMES * total
+        pen.dash(pts, t, length, color, closed, width=2.2)
+        if t + length > total:  # the part that has already come round past the start
+            pen.dash(pts, t - total, length, color, closed, width=2.2)
+    else:
+        phase = f / PULSE_FRAMES
+        t = (total - length) * (1 - abs(1 - 2 * phase))
+        pen.dash(pts, t, length, color, closed, width=2.2)
 
 
 # ---------------------------------------------------------------- shapes
@@ -258,9 +259,9 @@ def c_zoom(pen, plus):
 
 
 CURSORS = {
-    "default": (c_default, (2, 2), 1 + PULSE_FRAMES),
-    "pointer": (c_pointer, (2, 2), 1 + PULSE_FRAMES),
-    "text": (c_text, (16, 16), 1 + PULSE_FRAMES),
+    "default": (c_default, (2, 2), PULSE_FRAMES),
+    "pointer": (c_pointer, (2, 2), PULSE_FRAMES),
+    "text": (c_text, (16, 16), PULSE_FRAMES),
     "vertical-text": (c_vertical_text, (16, 16), 1),
     "crosshair": (c_crosshair, (16, 16), 1),
     "cell": (c_cell, (16, 16), 1),
@@ -345,7 +346,7 @@ def render(name):
             pen = Pen(size)
             draw(pen, f)
             img = pen.done()
-            delay = (pulse_delay(f) if frames == 1 + PULSE_FRAMES else 150) if frames > 1 else 0
+            delay = (PULSE_STEP if frames == PULSE_FRAMES else 150) if frames > 1 else 0
             images.append((size, img, round(hx * size / 32), round(hy * size / 32), delay))
     return images
 

@@ -43,30 +43,31 @@ ShellRoot {
         }
     }
 
-    // Quickshell doesn't always update a workspace's fullscreen state when an app leaves fullscreen by itself (F11):
-    // re-read the workspaces on every fullscreen or window event, and once more just after.
+    // Quickshell doesn't always update a workspace's fullscreen state when an app leaves fullscreen by itself (F11),
+    // nor window classes and titles: re-read them after the matching Hyprland events.
     Connections {
         target: Hyprland
 
         function onRawEvent(event) {
-            if (["fullscreen", "openwindow", "closewindow", "movewindowv2", "workspacev2"].includes(event.name)) {
-                Hyprland.refreshWorkspaces();
-                refreshAgain.restart();
-            }
             if (event.name === "submap")
                 UiState.resizing = event.data === "resize";
-            // Window classes and titles (the workspace tile names the app, and counts its windows).
+            // Re-read only when something we show changed, and once things settle (debounced): re-reading on
+            // every workspace event while SUPER+scroll creates and destroys workspaces crashed Quickshell.
+            if (event.name === "fullscreen")
+                refreshWorkspaces.restart();
             if (["openwindow", "closewindow", "windowtitlev2", "movewindowv2"].includes(event.name))
-                Hyprland.refreshToplevels();
+                refreshToplevels.restart();
         }
     }
     Timer {
-        id: refreshAgain
-        interval: 150
-        onTriggered: {
-            Hyprland.refreshWorkspaces();
-            Hyprland.refreshToplevels();
-        }
+        id: refreshWorkspaces
+        interval: 120
+        onTriggered: Hyprland.refreshWorkspaces()
+    }
+    Timer {
+        id: refreshToplevels
+        interval: 120
+        onTriggered: Hyprland.refreshToplevels()
     }
 
     Variants {
@@ -98,7 +99,11 @@ ShellRoot {
                 UiState.openScreen = root.focusedScreen();
             } else {
                 root.lastSuperTap = now;
-                root.toggleFocused("tl");
+                // A tap while the overview is open closes it; otherwise it toggles the launcher.
+                if (UiState.openPanel === "tw")
+                    UiState.close();
+                else
+                    root.toggleFocused("tl");
             }
         }
     }

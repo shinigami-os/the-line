@@ -263,8 +263,8 @@ for i = 1, 10 do
     hl.bind("SUPER+SHIFT+code:" .. code, hl.dsp.window.move({ workspace = i, follow = true }), { desc = "Send to workspace " .. i .. " and follow" })
 end
 -- Next / previous workspace: one step per scroll notch or key press.
-hl.bind("SUPER+mouse_down", hl.dsp.focus({ workspace = "r+1" }), { desc = "Next workspace" })
-hl.bind("SUPER+mouse_up", hl.dsp.focus({ workspace = "r-1" }), { desc = "Previous workspace" })
+hl.bind("SUPER+mouse_up", hl.dsp.focus({ workspace = "r+1" }), { desc = "Next workspace" })
+hl.bind("SUPER+mouse_down", hl.dsp.focus({ workspace = "r-1" }), { desc = "Previous workspace" })
 for _, key in ipairs({ "Right", "K" }) do
     hl.bind("SUPER+ALT+" .. key, hl.dsp.focus({ workspace = "r+1" }), { desc = "Next workspace" })
 end
