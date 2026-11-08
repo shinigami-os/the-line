@@ -60,6 +60,15 @@ end
 
 hl.env("QT_QPA_PLATFORM", "wayland")
 hl.env("QT_STYLE_OVERRIDE", "kvantum")
+-- qt6ct, when installed, gives Qt apps the icon theme (Settings > Appearance writes qt6ct.conf)
+for _, lib in ipairs({ "/usr/lib/qt6", "/usr/lib64/qt6", "/usr/lib/x86_64-linux-gnu/qt6" }) do
+    local f = io.open(lib .. "/plugins/platformthemes/libqt6ct.so")
+    if f then
+        f:close()
+        hl.env("QT_QPA_PLATFORMTHEME", "qt6ct")
+        break
+    end
+end
 hl.env("XDG_SESSION_TYPE", "wayland")
 hl.env("GDK_BACKEND", "wayland,x11")
 hl.env("SDL_VIDEODRIVER", "wayland")
@@ -254,10 +263,10 @@ bind("SUPER+A", hl.dsp.global("the-line:quicksettings"), { desc = "The Line: qui
 bind("SUPER+P", hl.dsp.global("the-line:performance"), { desc = "The Line: performance" })
 -- the-line-shell starts it again; without it running (a session from before it existed), start it
 bind("SUPER+End", hl.dsp.exec_cmd("pkill -f '^qs -p " .. SHELL .. "$'; pgrep -f '^/bin/sh .*/session/the-line-shell$' >/dev/null || " .. SHELL .. "/session/the-line-shell"), { desc = "The Line: restart the shell" })
--- SUPER+T is reserved for the shell's own wallpaper picker (not built yet: Settings > Appearance has it).
 bind("SUPER+F1", hl.dsp.global("the-line:cheatsheet"), { desc = "The Line: every shortcut, in one sheet" })
 bind("SUPER+V", hl.dsp.global("the-line:clipboard"), { desc = "The Line: clipboard history" })
 bind("SUPER+T", hl.dsp.global("the-line:wallpapers"), { desc = "The Line: wallpaper picker" })
+bind("SUPER+M", hl.dsp.global("the-line:visualiser"), { desc = "The Line: music visualiser on the line (again to stop)" })
 bind("SUPER+semicolon", hl.dsp.global("the-line:emoji"), { desc = "The Line: emoji picker" })
 bind("SUPER+I", hl.dsp.exec_cmd(SHELL .. "/session/the-line-settings"), { desc = "The Line: settings" })
 bind("CTRL+ALT+Delete", hl.dsp.global("the-line:power"), { desc = "The Line: power menu" })

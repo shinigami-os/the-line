@@ -14,7 +14,7 @@ Singleton {
         { id: "sound", name: "Sound", keywords: "audio volume speakers microphone output input", plan: "Output and input devices, per-app volume" },
         { id: "displays", name: "Displays", keywords: "monitor screen resolution scale refresh primary", plan: "Resolution, scale, position, primary screen" },
         { id: "input", name: "Input", keywords: "keyboard layout touchpad mouse tap natural scroll", plan: "Keyboard layout, touchpad speed, tap, natural scroll" },
-        { id: "appearance", name: "Appearance", keywords: "theme look colour color accent wallpaper motion animation", plan: "Wallpaper picker, accent from the wallpaper" },
+        { id: "appearance", name: "Appearance", keywords: "theme look colour color accent wallpaper motion animation icons", plan: "Wallpaper, accent, icon theme, motion" },
         { id: "workspaces", name: "Workspaces", keywords: "workspace app rule floating", plan: "Bind an app to a workspace, remembered floating apps" },
         { id: "shortcuts", name: "Shortcuts", keywords: "keys keybinds bindings hotkeys", plan: "Every shortcut, edit app keys, rebind The Line's keys" },
         { id: "power", name: "Power & idle", keywords: "idle dim lock suspend sleep battery charge power button", plan: "Dim, lock and suspend times, power button, battery charge limit" },
@@ -37,5 +37,14 @@ Singleton {
             const all = (s.name + " " + s.keywords).toLowerCase().split(/[\s\-]+/);
             return words.every(w => all.some(a => a.startsWith(w)));
         });
+    }
+
+    // The launcher's "/" prefix: from the first letter, every section when nothing is typed (nine at most).
+    function find(query) {
+        const words = query.trim().toLowerCase().split(/\s+/).filter(w => w !== "");
+        return list.filter(s => {
+            const all = (s.name + " " + s.keywords).toLowerCase().split(/[\s\-]+/);
+            return words.every(w => all.some(a => a.startsWith(w)));
+        }).slice(0, 9);
     }
 }

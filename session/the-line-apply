@@ -8,7 +8,7 @@
 #   accent      the accent outside the shell: window borders (live), and the cursor, rebuilt in that colour into
 #               ~/.local/share/icons/TheLine (cursor/build.py, needs python3 + Pillow), then reloaded
 #   theme       other apps in The Line's colours: ~/.config/gtk-{3,4}.0/gtk.css and the Kvantum theme TheLine
-#               (also part of accent)
+#               (also part of accent), and the icon theme (iconTheme) for GTK and Qt (qt6ct)
 #   readme      ~/.config/the-line/README.md: which file holds what, and who writes it
 # The generated files are rewritten from config.json each time: change these settings in Settings, not in them.
 
@@ -140,7 +140,8 @@ accent() {
 # Other apps in The Line's colours: GTK (gtk.css) and Qt (a Kvantum theme). Apps pick it up when they start again.
 theme() {
     hex=$(jq -r '.accent // "#9A5CFF"' "$cfg" 2>/dev/null)
-    python3 "${THE_LINE_DIR:-/usr/share/the-line}/session/the-line-app-theme" "$hex" >/dev/null 2>&1
+    icons=$(jq -r '.iconTheme // ""' "$cfg" 2>/dev/null)
+    python3 "${THE_LINE_DIR:-/usr/share/the-line}/session/the-line-app-theme" "$hex" "$icons" >/dev/null 2>&1
 }
 
 readme() {

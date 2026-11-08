@@ -166,6 +166,16 @@ ShellRoot {
         onPressed: root.toggleDialog("clipScreen")
     }
     Shortcut {
+        name: "wallpapers"
+        description: "Wallpaper picker"
+        onPressed: root.toggleDialog("wallScreen")
+    }
+    Shortcut {
+        name: "visualiser"
+        description: "Music visualiser on the line"
+        onPressed: Visualiser.toggle()
+    }
+    Shortcut {
         name: "emoji"
         description: "Emoji picker"
         onPressed: root.toggleDialog("emojiScreen")
@@ -279,6 +289,14 @@ ShellRoot {
 
         function emoji(): void {
             root.toggleDialog("emojiScreen");
+        }
+
+        function visualiser(): void {
+            Visualiser.toggle();
+        }
+
+        function wallpapers(): void {
+            root.toggleDialog("wallScreen");
         }
 
         // Float / tile the focused window (SUPER+ALT+Space), remembering floated apps (FloatMemory).

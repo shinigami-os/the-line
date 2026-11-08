@@ -32,6 +32,10 @@ Column {
         return Math.ceil(((t - y0) / 86400000 + 1) / 7);
     }
 
+    function dayOfYear(d) {
+        return Math.round((new Date(d.getFullYear(), d.getMonth(), d.getDate()) - new Date(d.getFullYear(), 0, 1)) / 86400000) + 1;
+    }
+
     function sameDay(a, b) {
         return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
     }
@@ -176,18 +180,29 @@ Column {
             Repeater {
                 model: 6
 
+                // Easter egg: a click on a week number turns the column into each week's day of the year, today's
+                // week showing today's in binary (Eggs.dayOfYear). Again to go back.
                 Text {
+                    id: weekNo
+
                     required property int index
+                    readonly property var week: cal.days.slice(index * 7, index * 7 + 7)
+                    readonly property var todayIn: week.find(d => cal.sameDay(d, cal.today)) ?? null
 
                     y: 16 + index * 26
                     width: cal.cellW
                     height: 26
                     verticalAlignment: Text.AlignVCenter
                     horizontalAlignment: Text.AlignHCenter
-                    text: cal.isoWeek(cal.days[index * 7])
+                    text: !Eggs.dayOfYear ? cal.isoWeek(week[0])
+                        : todayIn ? cal.dayOfYear(todayIn).toString(2) : cal.dayOfYear(week[0])
                     font.family: Theme.fontMono
-                    font.pixelSize: 10
-                    color: Theme.borderStrong
+                    font.pixelSize: Eggs.dayOfYear && todayIn ? 7 : 10
+                    color: Eggs.dayOfYear && todayIn ? Theme.accent : Theme.borderStrong
+
+                    TapHandler {
+                        onTapped: Eggs.dayOfYear = !Eggs.dayOfYear
+                    }
                 }
             }
 

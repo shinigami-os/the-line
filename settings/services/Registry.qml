@@ -28,7 +28,8 @@ Singleton {
         text: "TextSetting.qml", timezone: "ZonePicker.qml", datetime: "DateTimeSetting.qml", faces: "FaceModels.qml",
         chargeLimit: "ChargeLimit.qml", appKeys: "AppKeys.qml", lineKeys: "LineKeys.qml", displayMap: "DisplayMap.qml",
         displayModes: "DisplayModes.qml", kbLayout: "LayoutPicker.qml", aboutCard: "AboutCard.qml",
-        disks: "DiskList.qml", homeUsage: "HomeUsage.qml", defaultApp: "DefaultApp.qml", mutedApps: "MutedApps.qml"
+        disks: "DiskList.qml", homeUsage: "HomeUsage.qml", defaultApp: "DefaultApp.qml", mutedApps: "MutedApps.qml",
+        iconTheme: "IconThemePicker.qml"
     })
 
     function isCustom(setting) {
@@ -75,6 +76,8 @@ Singleton {
         { section: "apps", group: "Media and documents", key: "pdf", app: "pdf", kind: "defaultApp", label: "PDF",
           sub: "Documents", keywords: "pdf document reader viewer" },
 
+        { section: "notifications", group: "Where they show", key: "pulseFocusedOnly", kind: "toggle", label: "On the focused screen only",
+          sub: "The pulse and the toast skip the other screens", keywords: "pulse toast screen monitor multi focused" },
         { section: "notifications", group: "Do not disturb", key: "dndScheduled", kind: "toggle", label: "Every day, on a schedule",
           sub: "No toast and no pulse in those hours (the button works too)", keywords: "dnd do not disturb quiet night schedule silence" },
         { section: "notifications", group: "Do not disturb", key: "dndFrom", kind: "stops", label: "From",
@@ -233,6 +236,9 @@ Singleton {
               { value: "#E8B04B", label: "Amber" }, { value: "#EF7A5E", label: "Coral" },
               { value: "#E86FA5", label: "Pink" }, { value: "#ECE8E1", label: "Bone" }
           ] },
+        { section: "appearance", group: "Other apps", key: "iconTheme", kind: "iconTheme", label: "Icon theme",
+          sub: "Apps' icons, and the launcher's · ← → · Qt apps need qt6ct · apps change when they start again",
+          keywords: "icons papirus gtk qt qt6ct theme apps" },
         { section: "appearance", group: "Motion", key: "reduceMotion", kind: "toggle", label: "Reduce motion",
           sub: "Everything appears at once", keywords: "animation accessibility" },
         { section: "appearance", group: "Motion", key: "motionScale", kind: "speed", label: "Motion speed",
@@ -318,6 +324,8 @@ Singleton {
             return String(v);
         if (setting.kind === "text" || setting.kind === "timezone")
             return String(v);
+        if (setting.kind === "iconTheme")
+            return IconThemes.choices.find(c => c.value === v)?.label ?? (v || "automatic");
         if (setting.kind === "chargeLimit")
             return Sys.chargeSupported ? v + " %" : "not offered";
         if (isCustom(setting))

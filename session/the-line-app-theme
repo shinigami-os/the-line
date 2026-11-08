@@ -1,12 +1,15 @@
 #!/usr/bin/env python3
-"""The Line's colours for other apps (colours only): GTK 3 / 4 and Qt through Kvantum.
+"""The Line's colours for other apps (colours only): GTK 3 / 4 and Qt through Kvantum, and the icon theme.
 
-    the-line-app-theme '#9A5CFF'
+    the-line-app-theme '#9A5CFF' [icon theme]
 
   GTK   ~/.config/gtk-3.0/gtk.css and ~/.config/gtk-4.0/gtk.css: libadwaita's named colours (GTK 4 apps, and GTK 3
         apps with the adw-gtk3 theme). Prefers dark.
   Qt    ~/.config/Kvantum/TheLine: Kvantum's KvGnomeDark recoloured (greys onto The Line's greys by lightness, its
         blue onto the accent), and made the Kvantum theme in use.
+  Icons the icon theme (no name: the first installed of ICON_THEMES) for GTK (settings.ini, gsettings) and Qt
+        (qt6ct.conf / qt5ct.conf, read once the session sets QT_QPA_PLATFORMTHEME=qt6ct, which it does when qt6ct
+        is installed). Only their icon_theme, style and custom_palette keys are written; the rest stays yours.
 A file that was there before The Line wrote it is kept once as <file>.before-the-line. Run by session/the-line-apply
 (theme), at each accent change. Shapes stay the base themes' own: only colours change.
 """
@@ -29,6 +32,9 @@ ACCENT_TEXT = "#0F0D12"
 OK = "#6CC495"
 ERROR = "#EF7A5E"
 WARNING = "#E8B45A"
+
+# Picked in this order when none is set.
+ICON_THEMES = ["Papirus-Dark", "Papirus", "breeze-dark", "Adwaita"]
 
 HOME = os.path.expanduser("~")
 CONFIG = os.environ.get("XDG_CONFIG_HOME", os.path.join(HOME, ".config"))
@@ -166,6 +172,76 @@ def kvantum(accent):
           "# %s: The Line's colours for Qt apps (session/the-line-app-theme).\n[General]\ntheme=TheLine\n" % MARK)
 
 
+def icon_dirs():
+    data = os.environ.get("XDG_DATA_DIRS", "/usr/local/share:/usr/share").split(":")
+    return [os.path.join(HOME, ".icons"), os.path.join(HOME, ".local/share/icons")] + [os.path.join(d, "icons") for d in data]
+
+
+def installed(name):
+    return any(os.path.exists(os.path.join(d, name, "index.theme")) for d in icon_dirs())
+
+
+def set_keys(path, section, values, sep="="):
+    """`values` under [section] of an ini file, every other line kept as it was."""
+    lines = open(path, errors="replace").read().split("\n") if os.path.exists(path) else []
+    out, here, done = [], False, set()
+
+    def rest():
+        for k, v in values.items():
+            if k not in done:
+                out.append("%s%s%s" % (k, sep, v))
+                done.add(k)
+
+    for line in lines:
+        head = re.fullmatch(r"\s*\[(.+)\]\s*", line)
+        if head:
+            if here:
+                rest()
+            here = head.group(1) == section
+        elif here:
+            key = line.split("=", 1)[0].strip()
+            if key in values:
+                out.append("%s%s%s" % (key, sep, values[key]))
+                done.add(key)
+                continue
+        out.append(line)
+    if here:
+        rest()
+    if len(done) < len(values):
+        while out and out[-1] == "":
+            out.pop()
+        if out:
+            out.append("")
+        out.append("[%s]" % section)
+        rest()
+    keep_original(path)
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path + ".new", "w") as f:
+        f.write("\n".join(out).rstrip("\n") + "\n")
+    os.replace(path + ".new", path)
+
+
+def icons(name):
+    if not name or not installed(name):
+        name = next((t for t in ICON_THEMES if installed(t)), "")
+    if not name:
+        return
+    gtk3 = {"gtk-icon-theme-name": name, "gtk-application-prefer-dark-theme": "1"}
+    # GTK 3 apps read the colours of gtk.css only through adw-gtk3
+    if any(os.path.exists(os.path.join(d, "adw-gtk3-dark")) for d in ("/usr/share/themes", os.path.join(HOME, ".themes"),
+                                                                        os.path.join(HOME, ".local/share/themes"))):
+        gtk3["gtk-theme-name"] = "adw-gtk3-dark"
+    set_keys(os.path.join(CONFIG, "gtk-3.0", "settings.ini"), "Settings", gtk3)
+    set_keys(os.path.join(CONFIG, "gtk-4.0", "settings.ini"), "Settings", {"gtk-icon-theme-name": name})
+    if shutil.which("gsettings"):
+        subprocess.run(["gsettings", "set", "org.gnome.desktop.interface", "icon-theme", name],
+                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    # style: Kvantum draws the widgets (in the TheLine theme); custom_palette off, or qt6ct's palette covers its colours
+    for ct in ("qt6ct", "qt5ct"):
+        set_keys(os.path.join(CONFIG, ct, ct + ".conf"), "Appearance",
+                 {"icon_theme": name, "style": "kvantum", "custom_palette": "false"})
+
+
 def main():
     accent = sys.argv[1] if len(sys.argv) > 1 else "#9A5CFF"
     if not re.fullmatch(r"#?[0-9a-fA-F]{6}", accent):
@@ -173,6 +249,7 @@ def main():
     accent = "#" + accent.lstrip("#").lower()
     gtk(accent)
     kvantum(accent)
+    icons(sys.argv[2] if len(sys.argv) > 2 else "")
 
 
 if __name__ == "__main__":

@@ -17,7 +17,7 @@ Tile {
         target: Notifs
 
         function onToastChanged() {
-            tile.toastHere = Notifs.toast !== null && !tile.fullscreen;
+            tile.toastHere = Notifs.toast !== null && !tile.fullscreen && LineState.pulseOn(tile.screenName);
         }
     }
 
@@ -46,7 +46,7 @@ Tile {
         return Math.min(toastH, Math.max(restH, r - (toastW / 2 - 56.5) + 1));
     }
 
-    driven: LineState.pulseActive && LineState.pulseAround && mode !== "open" && !fullscreen
+    driven: LineState.pulseActive && LineState.pulseAround && mode !== "open" && !fullscreen && LineState.pulseOn(screenName)
     drivenW: frameW(LineState.pulseMs)
     drivenH: frameH(LineState.pulseMs)
     drivenFillW: frameW(LineState.pulseMs - Anim.fillLag)

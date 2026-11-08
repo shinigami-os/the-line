@@ -20,6 +20,24 @@ Scope {
     // A dialog from the line (polkit) is open on this screen: it takes the keyboard and every click.
     readonly property bool dialogHere: (Polkit.active && Polkit.screen === screenName) || UiState.sheetScreen === screenName
         || UiState.powerScreen === screenName || UiState.clipScreen === screenName || UiState.emojiScreen === screenName
+        || UiState.wallScreen === screenName
+    // This screen's surface wants the keyboard (a panel or a dialog open here); keysTaken follows it a moment later.
+    readonly property bool keysHere: panelHere || dialogHere
+    property bool keysTaken: false
+
+    onKeysHereChanged: {
+        // one screen: no other surface to wait for
+        keysTaken = keysHere && Quickshell.screens.length === 1;
+        if (keysHere && !keysTaken)
+            takeKeys.restart();
+    }
+
+    Timer {
+        id: takeKeys
+        interval: 60
+        onTriggered: root.keysTaken = true
+    }
+
     // A fullscreen window on this screen's workspace. Going fullscreen runs in stages, one after the other:
     //   1. the music part leaves the workspace tile,  2. the three tiles fold up into the line,
     //   3. the line withdraws into the screen edges.
@@ -36,10 +54,19 @@ Scope {
     readonly property int lineDraw: Math.round(Anim.panel * 1.6)
     property int stage: 3
     property bool introDone: false
-    readonly property bool hidden: fullscreen || !introDone
+    // Where the stages head: 3 (withdrawn) in fullscreen and before the intro, 2 (the tiles folded into the line) while
+    // the music visualiser plays on it, 0 otherwise. Two ways to get the tiles back meanwhile:
+    //   edgePeek  fullscreen: the pointer pushed against the top edge for 400 ms, until it leaves the tiles' band
+    //             (read from Pointer: over a fullscreen window the surface gets clicks but no pointer motion)
+    //   reveal    visualiser: the pointer over the tiles' band
+    property bool edgePeek: false
+    property bool reveal: false
+    readonly property int target: !introDone || (fullscreen && !edgePeek) ? 3
+        : Visualiser.on && !edgePeek && !reveal && !panelHere ? 2 : 0
 
-    // React to `hidden` itself: a handler on fullscreen or introDone can run before `hidden` has caught up.
-    onHiddenChanged: scheduleStage()
+    // React to `target` itself: a handler on what it reads can run before it has caught up.
+    onTargetChanged: scheduleStage()
+
 
     // Intro: a moment after this screen's wallpaper is shown (or right away without one).
     Timer {
@@ -50,18 +77,18 @@ Scope {
     }
 
     // While the line is withdrawn, a notification or a level change draws it back for the event (peek).
-    readonly property bool lineEvent: LineState.pulseActive || LineState.gaugeKind !== ""
+    readonly property bool lineEvent: (LineState.pulseActive && LineState.pulseOn(screenName)) || LineState.gaugeKind !== ""
     readonly property bool peek: stage >= 3 && (lineEvent || peekLinger.running)
 
     // How long the current stage's animation needs before the next one starts.
     function stageDelay() {
-        if (hidden)
+        if (stage < target)
             return [0, Media.active ? Anim.closeLead + Anim.panel : 0, Anim.closeLead + Anim.panel][stage];
         return [0, Anim.panel + Anim.fillLag, root.lineDraw, 0][stage];
     }
 
     function scheduleStage() {
-        if ((hidden && stage < 3) || (!hidden && stage > 0)) {
+        if (stage !== target) {
             stageTimer.interval = Math.max(1, stageDelay());
             stageTimer.restart();
         } else {
@@ -69,7 +96,42 @@ Scope {
         }
     }
 
-    onFullscreenChanged: if (fullscreen && UiState.openScreen === screenName) UiState.close()
+    onFullscreenChanged: {
+        if (fullscreen && UiState.openScreen === screenName)
+            UiState.close();
+        edgePeek = false;
+    }
+
+    readonly property bool pointerHere: Pointer.x >= modelData.x && Pointer.x < modelData.x + modelData.width
+        && Pointer.y >= modelData.y && Pointer.y < modelData.y + modelData.height
+    readonly property bool pointerAtEdge: pointerHere && Pointer.y - modelData.y < 2
+    readonly property bool pointerInBand: pointerHere && Pointer.y - modelData.y < 10 + Theme.tileHeight + 16
+
+    Timer {
+        id: edgeHold
+        interval: 400
+        running: root.fullscreen && !root.edgePeek && root.pointerAtEdge
+        onTriggered: root.edgePeek = true
+    }
+    // The pointer is in the tiles' band. A click in it takes the hover away until the pointer moves again (Qt), so
+    // the band also counts as held for a moment after a press: clicking play and keeping still doesn't fold the tiles.
+    readonly property bool inBand: bandHover.hovered || bandPress.active || clickHold.running
+
+    // The peek ends once the pointer has left the band a moment (not while a panel opened from it is open).
+    Timer {
+        interval: 500
+        running: root.edgePeek && !root.inBand && !root.pointerInBand && !root.panelHere
+        onTriggered: root.edgePeek = false
+    }
+    Timer {
+        interval: root.reveal ? 500 : 120
+        running: Visualiser.on && root.reveal !== root.inBand
+        onTriggered: root.reveal = root.inBand
+    }
+    Timer {
+        id: clickHold
+        interval: 3000
+    }
     onStageChanged: {
         scheduleStage();
         LineState.setWithdrawn(screenName, stage >= 3);
@@ -78,7 +140,7 @@ Scope {
 
     Timer {
         id: stageTimer
-        onTriggered: root.stage += root.hidden ? 1 : -1
+        onTriggered: root.stage += root.stage < root.target ? 1 : -1
     }
 
     // Keeps the line out a moment after the event, so the gauge fades before the line withdraws.
@@ -111,7 +173,7 @@ Scope {
     // Kira's voice on an empty workspace, behind the windows. It steps aside while a one-off line plays here.
     DesktopVoice {
         screen: root.modelData
-        active: Config.kiraVoice && root.desktopEmpty && root.stage === 0 && !(Voice.eventActive && Voice.eventScreen === root.screenName)
+        active: Config.kiraVoice && root.desktopEmpty && root.stage < 3 && !root.fullscreen && !(Voice.eventActive && Voice.eventScreen === root.screenName)
     }
 
     // Reserves the top of the screen (line at 10 + tile height) so tiled windows start under the tiles.
@@ -144,7 +206,11 @@ Scope {
         WlrLayershell.namespace: "the-line"
         // Hyprland draws fullscreen windows over the top layer, so the line moves to the overlay layer meanwhile.
         WlrLayershell.layer: root.fullscreen || root.stage > 0 ? WlrLayer.Overlay : WlrLayer.Top
-        WlrLayershell.keyboardFocus: root.panelHere || root.dialogHere ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
+        // While a surface holds the keyboard (exclusive), Hyprland sends clicks to such surfaces only: with a panel open,
+        // every screen's surface takes the keyboard, so a click on another screen still reaches its close area. The
+        // panel's own screen takes it a moment later (keysTaken), as Hyprland gives the keys to the last one.
+        WlrLayershell.keyboardFocus: (root.keysHere && root.keysTaken) || (root.panelAnywhere && !root.keysHere)
+            ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 
         IdleInhibitor {
             window: win
@@ -152,8 +218,14 @@ Scope {
         }
 
         // Input only where something is: the tiles, or the whole surface while a panel is open on any screen
-        // (so a click outside closes it without reaching the window below).
-        mask: root.panelAnywhere || root.dialogHere ? fullMask : (root.fullscreen || root.stage > 0 ? noMask : tilesMask)
+        // (so a click outside closes it without reaching the window below). While peeking or visualising, the
+        // tiles' whole band (to know when the pointer leaves it).
+        mask: root.panelAnywhere || root.dialogHere ? fullMask
+            : root.edgePeek || (Visualiser.on && !root.fullscreen) ? bandMask
+            : root.stage > 0 ? noMask : tilesMask
+        // A new input region reaches Hyprland with the next frame: on a still screen there may be none for a long
+        // while, so one is drawn.
+        onMaskChanged: nudge.opacity = nudge.opacity > 0 ? 0 : 0.01
 
         Region {
             id: fullMask
@@ -161,6 +233,10 @@ Scope {
         }
         Region {
             id: noMask
+        }
+        Region {
+            id: bandMask
+            item: band
         }
         Region {
             id: tilesMask
@@ -171,12 +247,25 @@ Scope {
             ]
         }
 
+        Rectangle {
+            id: nudge
+            width: 1
+            height: 1
+            color: "black"
+            opacity: 0
+        }
+
         Item {
             id: content
             anchors.fill: parent
             focus: true
 
             Keys.onEscapePressed: UiState.close()
+            // Keys typed while the launcher's screen is still taking the keyboard land here: they go on to it.
+            Keys.onPressed: event => {
+                if (!root.panelHere && UiState.openPanel === "tl" && event.text !== "" && event.text.charCodeAt(0) >= 32)
+                    UiState.launcherQuery += event.text;
+            }
 
             MouseArea {
                 anchors.fill: parent
@@ -184,12 +273,20 @@ Scope {
                 onClicked: UiState.close()
             }
 
+            // The wallpaper picker's preview: behind the line and the tiles.
+            WallpaperPreview {
+                anchors.fill: parent
+                open: wallStrip.open
+                path: wallStrip.picked
+            }
+
             // Kira's voice on top of the windows, for one-off lines (power plugged / unplugged).
             KiraVoice {
                 x: 16
                 y: parent.height - 22 - height
                 text: Voice.eventText
-                shown: Voice.eventActive && Voice.eventScreen === root.screenName && root.stage === 0
+                decode: Voice.eventDecode
+                shown: Voice.eventActive && Voice.eventScreen === root.screenName && root.stage < 3 && !root.fullscreen
             }
 
             // The three tiles. In fullscreen they fold up into the line (stage 2).
@@ -228,10 +325,13 @@ Scope {
 
             Line {
                 anchors.fill: parent
+                screenName: root.screenName
+                quietDesktop: root.desktopEmpty
                 workspace: root.workspace
                 musicShown: root.stage < 1
                 markerShown: root.stage < 2
                 tileShown: root.stage < 2
+                spectrumShown: root.stage === 2
                 reach: root.stage >= 3 && !root.peek ? 0 : 1
 
                 Behavior on reach {
@@ -256,6 +356,31 @@ Scope {
             }
 
             EmojiDialog {
+                anchors.fill: parent
+                screenName: root.screenName
+            }
+
+            // The tiles' band (the strut's height; a little more while peeking over a fullscreen window, so the
+            // pointer can wander under the tiles). Over everything, so nothing appearing under a still pointer takes
+            // its hover.
+            Item {
+                id: band
+                width: parent.width
+                height: 10 + Theme.tileHeight + (root.edgePeek ? 16 : 0)
+
+                HoverHandler {
+                    id: bandHover
+                }
+                // sees presses on the tiles too (a passive grab), without taking them
+                PointHandler {
+                    id: bandPress
+                    acceptedButtons: Qt.AllButtons
+                    onActiveChanged: if (!active) clickHold.restart()
+                }
+            }
+
+            WallpaperStrip {
+                id: wallStrip
                 anchors.fill: parent
                 screenName: root.screenName
             }

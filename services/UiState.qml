@@ -13,6 +13,8 @@ Singleton {
     // The screens the clipboard history and the emoji picker are open on ("" for closed).
     property string clipScreen: ""
     property string emojiScreen: ""
+    // The screen the wallpaper picker (SUPER+T) is open on.
+    property string wallScreen: ""
 
     // The screen the power menu is open on ("" for closed), and the action it opens on.
     property string powerScreen: ""

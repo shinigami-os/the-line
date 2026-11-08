@@ -50,6 +50,7 @@ PanelWindow {
         x: 16
         y: parent.height - 22 - height
         text: Voice.text
+        decode: Voice.currentDecode
         shown: win.active && !win.resting
     }
 }

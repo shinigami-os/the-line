@@ -1,6 +1,5 @@
 import QtQuick
 import Quickshell
-import Quickshell.Io
 import qs.services
 
 // Settings > Appearance > Wallpaper: thumbnails of The Line's wallpapers (assets/wallpapers), Kira's, and yours
@@ -12,7 +11,7 @@ Item {
 
     property bool active: false
     property int cursor: 0
-    property var files: []
+    readonly property var files: Wallpapers.files
     property string screen: ""     // "" = every screen
     readonly property var screens: [""].concat(Quickshell.screens.map(s => s.name))
     readonly property string shownPath: screen === "" ? Config.wallpaper : Config.wallpaperFor(screen)
@@ -65,18 +64,13 @@ Item {
         return false;
     }
 
-    Process {
-        running: true
-        command: ["sh", "-c", "for d in \"$1/assets/wallpapers\" /usr/share/kira/wallpapers \"$HOME/Pictures/Wallpapers\" \"$HOME/.local/share/wallpapers\"; do "
-            + "find \"$d\" -maxdepth 1 -type f \\( -iname '*.png' -o -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.webp' -o -iname '*.gif' "
-            + "-o -iname '*.mp4' -o -iname '*.webm' -o -iname '*.mkv' -o -iname '*.mov' \\) 2>/dev/null | sort; done",
-            "sh", Quickshell.shellDir.replace(/\/settings\/?$/, "")]
-        stdout: StdioCollector {
-            onStreamFinished: {
-                picker.files = text.split("\n").filter(f => f !== "");
-                picker.cursor = Math.max(0, picker.files.indexOf(picker.shownPath));
-                Frames.make(picker.files.filter(f => Config.wallpaperKind(f) === "video"));
-            }
+    Component.onCompleted: Wallpapers.refresh()
+
+    Connections {
+        target: Wallpapers
+
+        function onFilesChanged() {
+            picker.cursor = Math.max(0, picker.files.indexOf(picker.shownPath));
         }
     }
 

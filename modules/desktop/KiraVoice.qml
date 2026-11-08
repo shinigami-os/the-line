@@ -9,9 +9,65 @@ Item {
 
     property string text
     property bool shown: false
+    // Easter egg: the line types itself in binary first, then resolves into its text, letter by letter.
+    property bool decode: false
+
+    property int typed: 0
+    property int resolved: 0
+    property int noise: 0   // bumped each step, so the unresolved bits flicker
+    readonly property string drawn: {
+        if (!decode)
+            return text;
+        noise;
+        let out = "";
+        for (let i = 0; i < Math.min(typed, text.length); i++) {
+            const c = text[i];
+            out += i < resolved || c === " " ? c : (Math.random() < 0.5 ? "0" : "1");
+        }
+        return out;
+    }
+
+    function startDecode() {
+        typed = 0;
+        resolved = 0;
+        if (decode && shown)
+            decodeStart.restart();
+    }
+
+    onShownChanged: startDecode()
+    onTextChanged: startDecode()
+    onDecodeChanged: startDecode()
+
+    Timer {
+        id: decodeStart
+        interval: Anim.d(230)
+        onTriggered: decodeStep.start()
+    }
+    Timer {
+        id: decodeStep
+        interval: 32
+        repeat: true
+        onTriggered: {
+            voice.noise++;
+            if (voice.typed < voice.text.length)
+                voice.typed++;
+            else if (voice.noise % 2 === 0 && voice.resolved < voice.text.length)
+                voice.resolved++;
+            else if (voice.resolved >= voice.text.length)
+                stop();
+        }
+    }
 
     width: col.implicitWidth
     height: col.implicitHeight
+
+    // The full text's width, for the line under a quote that is still being decoded.
+    Text {
+        id: lineMeasure
+        visible: false
+        text: voice.text
+        font: quote.font
+    }
 
     Column {
         id: col
@@ -19,7 +75,7 @@ Item {
 
         Text {
             id: quote
-            text: voice.text
+            text: voice.drawn
             font.family: Theme.fontUi
             font.pixelSize: 22
             font.italic: true
@@ -47,7 +103,7 @@ Item {
         }
 
         Rectangle {
-            width: quote.implicitWidth
+            width: voice.decode ? lineMeasure.implicitWidth : quote.implicitWidth
             height: 1
             color: Theme.borderStrong
 

@@ -12,11 +12,13 @@ Runs on Hyprland (FHT comes later). Done so far:
 - top-centre tile: clock, notification toast, notifications panel and calendar
 - top-right tile: performance summary, Wi-Fi, volume, battery. The summary opens the performance dashboard, the icons open quick settings (Wi-Fi, Bluetooth, night light, keep awake, sliders, reduce motion, power)
 
-- top-left tile grows into the launcher: apps (most launched first), a calculator (qalc, on anything with an operator, a function or "to"; "=" forces it) and run in terminal; the panel height follows the results
+- top-left tile grows into the launcher: apps (most launched first), a calculator (qalc, on anything with an operator, a function or "to"), run in terminal, the settings' sections and The Line's shortcuts (wallpapers, clipboard, visualiser, screenshot, do not disturb…, with their keys or an on / off); the panel height follows the results. A first character narrows it: `=` calculate, `>` run, `:` shortcuts, `/` settings, `?` lists them
 
 - music part of the top-left tile (MPRIS) with its progress on the line; it grows into the music panel (cover, track ruler with seek, controls, player picker)
 
-- fullscreen, in stages: the music part leaves, the tiles fold up into the line, the line withdraws into the screen edges. A notification or a level change draws the line back for the event, then it withdraws again
+- fullscreen, in stages: the music part leaves, the tiles fold up into the line, the line withdraws into the screen edges. A notification or a level change draws the line back for the event, then it withdraws again. Pushing the pointer against the top edge for 400 ms brings the tiles back until it leaves them
+- music visualiser (SUPER+M, or the button in the music panel; needs cava): the tiles fold into the line and the frequencies hang from it as ticks, one every 6 px on any screen; hovering the top brings the tiles back. Off at each login
+- wallpaper picker (SUPER+T): a line across the bottom of the screen with the wallpapers hanging from it; the screen shows the picked one behind the line before it is set; every screen or one
 
 - Kira's voice on an empty workspace, behind the windows, from `assets/quotes.txt` plus `~/.config/the-line/quotes.txt`, with live `{placeholders}`
 
@@ -38,11 +40,13 @@ Runs on Hyprland (FHT comes later). Done so far:
 - files: yazi in foot (SUPER+E), the default file manager (SUPER+SHIFT+E)
 - screenshots with Flameshot on the focused screen; The Line's defaults for foot (black glass, VS Code-style keys) and Flameshot are installed on first login
 
-- other apps in The Line's colours (colours only): GTK 3 / 4 through `gtk.css` (GTK 3 apps need the adw-gtk3 theme) and Qt through a Kvantum theme recoloured from KvGnomeDark; rewritten at each accent change (`session/the-line-app-theme`)
+- other apps in The Line's colours (colours only): GTK 3 / 4 through `gtk.css` (GTK 3 apps need the adw-gtk3 theme) and Qt through a Kvantum theme recoloured from KvGnomeDark; rewritten at each accent change (`session/the-line-app-theme`). Their icon theme too (Settings > Appearance; Qt apps through qt6ct, which the session uses when it is installed)
 - the launcher finds the settings: "wifi", "keyboard", "night" offer "Settings › <section>"
+- a click on another screen closes an open panel; with several screens, the notification pulse can stay on the focused one (Settings > Notifications)
+- easter eggs: `EASTER_EGGS.md`
 - settings app (SUPER+I, `settings/`): its own window, a spine of sections and a search over every setting; done so far: network, Bluetooth, sound, displays (arrangement on a snapping map, resolution, scale, rotation, main screen, on / off; changes are only drawn until Apply, then go back after 15 s unless kept), input (layout, Caps Lock, key repeat; mouse and touchpad apart), appearance (wallpaper picker per screen, accent, accent from the main screen's wallpaper, motion), workspaces (apps on their workspace, remembered floating apps, ruler), shortcuts (your app keys, The Line's keys moved or turned off, conflicts refused), power and idle (with the battery limit), notifications (do not disturb on a schedule, urgent ones through, muted apps), night light (warmth, schedule; needs hyprsunset), storage (disks, what fills your home), default apps (xdg-mime, and The Line's terminal), sign-in (howdy faces with a name, fingerprint), system (name, time, time zone, specifications), The Line's own settings, about
 
-Next: lock screen and login screen, the welcome screen (first run, replayable), the launcher's shortcuts section, SUPER+T's wallpaper picker, easter eggs from the backlog.
+Next: lock screen and login screen, the welcome screen (first run, replayable).
 
 ## Session
 
@@ -92,6 +96,8 @@ qs -p . ipc call line toggle eDP-1 tc    # notifications (tl: launcher, tm: musi
 qs -p . ipc call line close
 qs -p . ipc call line clockFace         # the clock easter egg
 qs -p . ipc call line search fire        # open the launcher with a search typed in
+qs -p . ipc call line wallpapers         # the wallpaper picker on the focused screen
+qs -p . ipc call line visualiser         # the music visualiser on / off
 qs -p . ipc call line say "hello"        # Kira says a line on top of the windows
 qs -p . ipc call line overview           # the workspace overview
 qs -p . ipc call line cheatsheet         # every shortcut (cheatsheetTab <n> opens a given tab)
@@ -146,6 +152,6 @@ hl.bind("SUPER+P", hl.dsp.global("the-line:performance"))
 
 ## Needs
 
-Quickshell 0.3 with Hyprland, PipeWire, MPRIS, UPower and Bluetooth support, Qt Multimedia (ffmpeg backend) for video wallpapers, mpv for their thumbnails, python3 (+ Pillow for the cursor), Kvantum and adw-gtk3 for other apps' colours, Hyprland, NetworkManager (nmcli), brightnessctl, procps-ng top, hyprlock, loginctl, and optionally hyprsunset for night light. Fonts: Raleway and IBM Plex Mono (JetBrains Mono is the fallback).
+Quickshell 0.3 with Hyprland, PipeWire, MPRIS, UPower and Bluetooth support, Qt Multimedia (ffmpeg backend) for video wallpapers, mpv for their thumbnails, python3 (+ Pillow for the cursor), Kvantum, adw-gtk3 and qt6ct for other apps' colours and icons, cava for the music visualiser, Hyprland, NetworkManager (nmcli), brightnessctl, procps-ng top, hyprlock, loginctl, and optionally hyprsunset for night light. Fonts: Raleway and IBM Plex Mono (JetBrains Mono is the fallback).
 
 Hyprland layer rule to avoid its own fade on the surface: `noanim` for the `the-line` namespace. The surface sits on the top layer, and on the overlay layer while its screen shows a fullscreen window.

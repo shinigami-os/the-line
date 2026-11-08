@@ -55,6 +55,8 @@ Singleton {
     readonly property bool nightScheduled: adapter.nightScheduled
     readonly property string nightFrom: adapter.nightFrom
     readonly property string nightTo: adapter.nightTo
+    readonly property string iconTheme: adapter.iconTheme
+    readonly property bool pulseFocusedOnly: adapter.pulseFocusedOnly
 
     // "22:00" to "08:00" holds `now` (a Date), across midnight too.
     function within(from, to, now) {
@@ -92,6 +94,11 @@ Singleton {
         id: applyAccent
         interval: 700   // swatches stepped through: one cursor build for the last one
         onTriggered: Quickshell.execDetached([root.session("the-line-apply"), "accent"])
+    }
+    Timer {
+        id: applyTheme
+        interval: 500   // icon themes stepped through: one rewrite for the last one
+        onTriggered: Quickshell.execDetached([root.session("the-line-apply"), "theme"])
     }
     Timer {
         id: applyKeys
@@ -150,6 +157,8 @@ Singleton {
             applyAccent.restart();
         else if (key === "keys")
             applyKeys.restart();
+        else if (key === "iconTheme")
+            applyTheme.restart();
         else if (inputKeys.indexOf(key) >= 0)
             applyInput.restart();
     }
@@ -208,11 +217,13 @@ Singleton {
             property bool dndScheduled: false               // do not disturb from dndFrom to dndTo, every day
             property string dndFrom: "22:00"
             property string dndTo: "08:00"
+            property bool pulseFocusedOnly: false           // the notification pulse and toast on the focused screen only
             property bool dndUrgent: true                   // urgent notifications still show during do not disturb
             property int nightTemp: 4000                    // night light warmth, in kelvin (lower is warmer)
             property bool nightScheduled: false             // night light on from nightFrom to nightTo
             property string nightFrom: "21:00"
             property string nightTo: "07:00"
+            property string iconTheme: ""                   // other apps' icons; "" = Papirus-Dark, Papirus, … (session/the-line-app-theme)
         }
     }
 }

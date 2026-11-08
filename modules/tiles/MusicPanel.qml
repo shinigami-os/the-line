@@ -339,6 +339,13 @@ Column {
             anchors.right: parent.right
             spacing: 6
 
+            // The frequencies on the line, while the tiles fold away (SUPER+M).
+            Button {
+                visible: Visualiser.installed
+                label: "visualiser"
+                on: Visualiser.on
+                onClicked: Visualiser.toggle()
+            }
             Button {
                 visible: Media.player?.shuffleSupported ?? false
                 label: "shuffle"

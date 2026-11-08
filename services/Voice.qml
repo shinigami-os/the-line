@@ -20,11 +20,15 @@ Singleton {
     // A one-off line said on top of the windows, on one screen, for a few seconds (easter eggs).
     property string eventText: ""
     property string eventScreen: ""
+    property bool eventDecode: false   // typed in binary first (easter eggs)
+    // This quote decodes itself from binary as it appears: a rare one (easter egg).
+    property bool currentDecode: false
     readonly property bool eventActive: eventTimer.running
 
-    function say(line, screen) {
+    function say(line, screen, decode) {
         if (!Config.kiraVoice)
             return;
+        eventDecode = decode ?? false;
         eventText = render(line);
         eventScreen = screen;
         eventTimer.restart();
@@ -73,6 +77,7 @@ Singleton {
         let q = current;
         for (let i = 0; i < 8 && q === current; i++)
             q = quotes[Math.floor(Math.random() * quotes.length)];
+        currentDecode = Math.random() < 1 / 25;
         current = q;
         if (!counter.running)
             counter.running = true;

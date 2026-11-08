@@ -2,6 +2,7 @@ pragma Singleton
 
 import QtQuick
 import Quickshell
+import Quickshell.Hyprland
 
 // Events that play out on the line: the level gauge and the notification pulse.
 Singleton {
@@ -36,6 +37,13 @@ Singleton {
         withdrawn = on ? rest.concat(screen) : rest;
     }
 
+    // The screen that was focused when the pulse started: with "pulseFocusedOnly", the only one that shows it.
+    property string pulseScreen: ""
+
+    function pulseOn(screen) {
+        return !Config.pulseFocusedOnly || pulseScreen === "" || pulseScreen === screen;
+    }
+
     property bool pulseAround: false
     property real pulseMs: 0
 
@@ -48,6 +56,7 @@ Singleton {
     function pulse(toTile) {
         pulseAnim.stop();
         pulseAround = toTile;
+        pulseScreen = Hyprland.focusedMonitor?.name ?? "";
         pulseAnim.from = -lead;
         pulseMs = -lead;
         pulseAnim.to = Anim.pulse + (toTile ? Anim.pulseWrap : 0);
