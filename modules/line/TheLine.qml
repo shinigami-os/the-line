@@ -22,7 +22,14 @@ Scope {
     //   3. the line withdraws into the screen edges.
     // Leaving fullscreen runs them backwards. `stage` is where the screen is now (0 = everything shown).
     // The shell also starts hidden (stage 3) and plays the way back in as its intro, once the wallpaper is up.
-    readonly property bool fullscreen: Hyprland.monitorFor(modelData)?.activeWorkspace?.hasFullscreen ?? false
+    // Only a real fullscreen (mode 2): Hyprland also counts a maximized window (mode 1) as "fullscreen", and Electron
+    // apps leave F11 maximized; a maximized window fits under the line, so the line stays.
+    readonly property bool fullscreen: {
+        const ws = Hyprland.monitorFor(modelData)?.activeWorkspace;
+        if (!ws?.hasFullscreen)
+            return false;
+        return ws.toplevels.values.some(t => (t.lastIpcObject?.fullscreen ?? 2) === 2);
+    }
     readonly property int lineDraw: Math.round(Anim.panel * 1.6)
     property int stage: 3
     property bool introDone: false

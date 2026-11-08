@@ -56,6 +56,7 @@ ShellRoot {
             if (event.name === "fullscreen") {
                 refreshWorkspaces.restart();
                 refreshWorkspacesLate.restart();
+                refreshToplevels.restart();   // the mode: real fullscreen or maximized (TheLine.fullscreen)
             }
             if (["openwindow", "closewindow", "windowtitlev2", "movewindowv2"].includes(event.name))
                 refreshToplevels.restart();
@@ -70,7 +71,10 @@ ShellRoot {
     Timer {
         id: refreshWorkspacesLate
         interval: 700
-        onTriggered: Hyprland.refreshWorkspaces()
+        onTriggered: {
+            Hyprland.refreshWorkspaces();
+            Hyprland.refreshToplevels();
+        }
     }
     // And while a workspace counts as fullscreen, keep checking: a stale "fullscreen" would keep the line hidden
     // until the next toggle. It heals within 2.5 s whatever missed the change.
@@ -78,7 +82,10 @@ ShellRoot {
         running: Hyprland.workspaces.values.some(w => w.hasFullscreen)
         repeat: true
         interval: 2500
-        onTriggered: Hyprland.refreshWorkspaces()
+        onTriggered: {
+            Hyprland.refreshWorkspaces();
+            Hyprland.refreshToplevels();   // maximized or really fullscreen
+        }
     }
     Timer {
         id: refreshToplevels
