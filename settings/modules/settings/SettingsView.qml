@@ -84,6 +84,13 @@ Item {
     onTargetChanged: swap.restart()
     Component.onCompleted: swap.restart()
 
+    // Wi-Fi scans only while the Network section is on screen.
+    Binding {
+        target: Net
+        property: "scanning"
+        value: view.shown >= 0 && Registry.sections[view.shown].id === "network"
+    }
+
     SequentialAnimation {
         id: swap
 
@@ -111,8 +118,8 @@ Item {
                 return;
             }
             const setting = view.rows[view.rowIndex];
-            const custom = setting && ["wallpaper", "workspaceApps", "floatingApps"].indexOf(setting.kind) >= 0;
-            const stepper = setting && setting.kind !== "toggle" && !custom;
+            const custom = setting && Registry.isCustom(setting);
+            const stepper = setting && setting.kind !== "toggle" && setting.kind !== "info" && !custom;
             if (view.area === "spine") {
                 if (k === Qt.Key_Up || k === Qt.Key_Down) {
                     view.sectionIndex = Math.max(0, Math.min(Registry.sections.length - 1, view.sectionIndex + (k === Qt.Key_Up ? -1 : 1)));
@@ -137,7 +144,7 @@ Item {
                     view.rowIndex = Math.max(0, Math.min(view.rows.length - 1, view.rowIndex + (k === Qt.Key_Up ? -1 : 1)));
                 } else if ((k === Qt.Key_Left || k === Qt.Key_Right) && stepper) {
                     Registry.step(setting, k === Qt.Key_Left ? -1 : 1);
-                } else if ((k === Qt.Key_Return || k === Qt.Key_Enter || k === Qt.Key_Space) && !custom) {
+                } else if ((k === Qt.Key_Return || k === Qt.Key_Enter || k === Qt.Key_Space) && !custom && setting.kind !== "info") {
                     Registry.step(setting, 1);
                 } else if (k === Qt.Key_Left || k === Qt.Key_Escape || k === Qt.Key_Backspace || k === Qt.Key_Backtab) {
                     view.area = "spine";

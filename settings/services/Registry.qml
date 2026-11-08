@@ -11,7 +11,9 @@ import Quickshell
 //   color    choices: [{ value, label }] drawn as swatches
 //   stops    stops: [{ value, label }] on a line slider (idle times)
 //   speed    motionScale shown as a speed, 0.5× to 2× (a slider, 1× in the middle, log scale)
-//   wallpaper, workspaceApps, floatingApps: rows with their own component, which takes the keyboard while selected
+//   info     a value to read, nothing to change
+//   wallpaper, workspaceApps, ...: rows with their own component (`customs`), which takes the keyboard while selected
+// A setting with a `source` ("net", "bt", "sound") reads and writes that backend instead of config.json.
 // A section without settings yet shows what is planned for it (`plan`).
 Singleton {
     id: root
@@ -35,7 +37,54 @@ Singleton {
         { id: "line", name: "The Line", keywords: "shell bar line", plan: "" }
     ]
 
+    // Row kinds drawn by their own component (in modules/settings).
+    readonly property var customs: ({
+        wallpaper: "WallpaperPicker.qml", workspaceApps: "WorkspaceRules.qml", floatingApps: "FloatingApps.qml",
+        wifiNetworks: "WifiNetworks.qml", btDevices: "BtDevices.qml", audioDevices: "AudioDevices.qml", audioStreams: "AudioStreams.qml"
+    })
+
+    function isCustom(setting) {
+        return customs[setting.kind] !== undefined;
+    }
+
+    function backend(setting) {
+        return setting.source === "net" ? Net : setting.source === "bt" ? Bt : setting.source === "sound" ? Sound : null;
+    }
+
     readonly property var settings: [
+        { section: "network", group: "Wi-Fi", source: "net", key: "wifiEnabled", kind: "toggle", label: "Wi-Fi",
+          sub: "Wireless networking", keywords: "wireless radio airplane" },
+        { section: "network", group: "Wi-Fi", source: "net", key: "networks", kind: "wifiNetworks", label: "Networks around",
+          sub: "Enter connects or disconnects · Delete forgets a saved one", keywords: "ssid connect password join forget scan" },
+        { section: "network", group: "Wired", source: "net", key: "wired", kind: "info", label: "Ethernet",
+          sub: "A network cable", keywords: "cable lan wired" },
+        { section: "network", group: "This computer", source: "net", key: "address", kind: "info", label: "IP address",
+          sub: "On the local network", keywords: "ip address local lan" },
+
+        { section: "bluetooth", group: "Bluetooth", source: "bt", key: "enabled", kind: "toggle", label: "Bluetooth",
+          sub: "The adapter's power", keywords: "on off radio" },
+        { section: "bluetooth", group: "Bluetooth", source: "bt", key: "discovering", kind: "toggle", label: "Look for devices",
+          sub: "Devices nearby appear in the list while on", keywords: "scan search discover new pair" },
+        { section: "bluetooth", group: "Bluetooth", source: "bt", key: "discoverable", kind: "toggle", label: "Visible to other devices",
+          sub: "Lets a phone or another computer find this one", keywords: "discoverable visible" },
+        { section: "bluetooth", group: "Devices", source: "bt", key: "devices", kind: "btDevices", label: "Devices",
+          sub: "Enter connects or disconnects (pairs a new one first) · Delete forgets", keywords: "headphones mouse keyboard controller pair connect forget" },
+
+        { section: "sound", group: "Output", source: "sound", key: "outputs", kind: "audioDevices", label: "Plays on",
+          sub: "Enter picks the output", keywords: "speakers headphones hdmi output device" },
+        { section: "sound", group: "Output", source: "sound", key: "outputVolume", kind: "slider", min: 0, max: 100, step: 2, unit: "%",
+          label: "Volume", sub: "The output's own volume", keywords: "loud sound level" },
+        { section: "sound", group: "Output", source: "sound", key: "outputMuted", kind: "toggle", label: "Mute",
+          sub: "Silences the output", keywords: "silence quiet" },
+        { section: "sound", group: "Input", source: "sound", key: "inputs", kind: "audioDevices", label: "Listens on",
+          sub: "Enter picks the microphone", keywords: "microphone mic input device record" },
+        { section: "sound", group: "Input", source: "sound", key: "inputVolume", kind: "slider", min: 0, max: 100, step: 2, unit: "%",
+          label: "Input level", sub: "How loud the microphone is", keywords: "microphone gain level" },
+        { section: "sound", group: "Input", source: "sound", key: "inputMuted", kind: "toggle", label: "Mute the microphone",
+          sub: "Nothing is recorded", keywords: "microphone silence privacy" },
+        { section: "sound", group: "Apps", source: "sound", key: "streams", kind: "audioStreams", label: "Apps playing",
+          sub: "Each app's own volume · ← → changes it", keywords: "app application volume mixer per-app" },
+
         { section: "appearance", group: "Wallpaper", key: "wallpaper", kind: "wallpaper", label: "Wallpaper",
           sub: "← → to look, Enter to set it", keywords: "background image picture" },
         { section: "appearance", group: "Accent", key: "accentFromWallpaper", kind: "toggle", label: "Accent from the wallpaper",
@@ -108,7 +157,8 @@ Singleton {
     }
 
     function value(setting) {
-        return Config[setting.key];
+        const b = backend(setting);
+        return b ? b[setting.key] : Config[setting.key];
     }
 
     // The value shown in a row or a search result.
@@ -124,6 +174,10 @@ Singleton {
             return String(v).split("/").pop();
         if (setting.kind === "workspaceApps")
             return (v ?? []).length + " apps";
+        if (setting.kind === "info")
+            return String(v);
+        if (isCustom(setting))
+            return "›";
         const c = (setting.choices ?? setting.stops ?? []).find(c => same(c.value, v));
         return c ? c.label : String(v);
     }
@@ -134,6 +188,11 @@ Singleton {
 
     // Sets a setting. Picking an accent by hand stops taking it from the wallpaper.
     function set(setting, v) {
+        const b = backend(setting);
+        if (b) {
+            b.set(setting.key, v);
+            return;
+        }
         Config.set(setting.key, v);
         if (setting.key === "accent" && Config.accentFromWallpaper)
             Config.set("accentFromWallpaper", false);
@@ -143,14 +202,14 @@ Singleton {
     function step(setting, dir) {
         const v = value(setting);
         if (setting.kind === "toggle") {
-            Config.set(setting.key, !v);
+            set(setting, !v);
         } else if (setting.kind === "slider") {
-            Config.set(setting.key, Math.max(setting.min, Math.min(setting.max, v + dir * setting.step)));
+            set(setting, Math.max(setting.min, Math.min(setting.max, v + dir * setting.step)));
         } else if (setting.kind === "speed") {
             setSpeed(Math.round((speed(v) + dir * 0.05) * 100) / 100);
         } else if (setting.kind === "stops") {
             const i = setting.stops.findIndex(c => same(c.value, v));
-            Config.set(setting.key, setting.stops[Math.max(0, Math.min(setting.stops.length - 1, (i < 0 ? 0 : i) + dir))].value);
+            set(setting, setting.stops[Math.max(0, Math.min(setting.stops.length - 1, (i < 0 ? 0 : i) + dir))].value);
         } else if (setting.choices) {
             const list = setting.choices;
             const i = list.findIndex(c => same(c.value, v));

@@ -12,7 +12,7 @@ Rectangle {
     required property var setting
     property bool selected: false
     readonly property var value: Registry.value(setting)
-    readonly property bool custom: ["wallpaper", "workspaceApps", "floatingApps"].indexOf(setting.kind) >= 0
+    readonly property bool custom: Registry.isCustom(setting)
 
     signal picked      // clicked or hovered: becomes the selected row
     signal refocus     // a custom row is done with its own text field: the keyboard goes back to the view
@@ -81,10 +81,10 @@ Rectangle {
         y: 52
         width: row.width - 36
         active: row.custom
-        source: row.setting.kind === "wallpaper" ? "WallpaperPicker.qml"
-            : row.setting.kind === "workspaceApps" ? "WorkspaceRules.qml"
-            : row.setting.kind === "floatingApps" ? "FloatingApps.qml" : ""
+        source: row.custom ? Registry.customs[row.setting.kind] : ""
         onLoaded: {
+            if (item.hasOwnProperty("setting"))
+                item.setting = row.setting;
             item.active = Qt.binding(() => row.selected);
             if (item.refocus)
                 item.refocus.connect(row.refocus);
@@ -101,8 +101,20 @@ Rectangle {
         y: 26 - height / 2
         visible: !row.custom
         width: row.setting.kind === "slider" || row.setting.kind === "stops" || row.setting.kind === "speed" ? 300
-            : row.setting.kind === "toggle" ? 70 : choices.width
+            : row.setting.kind === "toggle" ? 70 : row.setting.kind === "info" ? infoText.implicitWidth : choices.width
         height: row.setting.kind === "speed" ? 34 : 20
+
+        // Info: just the value.
+        Text {
+            id: infoText
+            visible: row.setting.kind === "info"
+            anchors.right: parent.right
+            anchors.verticalCenter: parent.verticalCenter
+            text: visible ? Registry.valueText(row.setting) : ""
+            font.family: Theme.fontMono
+            font.pixelSize: 11
+            color: Theme.text
+        }
 
         // Toggle: a short line with the knob at its end, "on" lit in the accent.
         Item {
@@ -168,9 +180,9 @@ Rectangle {
                     const s = row.setting;
                     row.picked();
                     if (s.kind === "slider") {
-                        Config.set(s.key, Math.round((s.min + v * (s.max - s.min)) / s.step) * s.step);
+                        Registry.set(s, Math.round((s.min + v * (s.max - s.min)) / s.step) * s.step);
                     } else if (s.kind === "stops") {
-                        Config.set(s.key, parent.stops[Math.round(v * (parent.stops.length - 1))].value);
+                        Registry.set(s, parent.stops[Math.round(v * (parent.stops.length - 1))].value);
                     } else {
                         // precise to 0.01×, with a little pull towards 1×
                         let speed = Math.round(Math.pow(2, 2 * v - 1) * 100) / 100;

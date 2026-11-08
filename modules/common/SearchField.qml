@@ -6,6 +6,7 @@ Rectangle {
     id: field
 
     property alias text: input.text
+    property alias echoMode: input.echoMode   // TextInput.Password for a password
     property string placeholder: "Search"
     signal moved(int dx, int dy)
     signal accepted
