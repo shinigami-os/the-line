@@ -112,6 +112,20 @@ Item {
         Keys.onPressed: event => {
             Registry.keyAt = Date.now();
             const k = event.key;
+            // A screen change waits to be kept: Enter keeps it, Esc goes back, wherever the keyboard is.
+            if (Displays.pending && (k === Qt.Key_Return || k === Qt.Key_Enter || k === Qt.Key_Escape)) {
+                if (k === Qt.Key_Escape)
+                    Displays.revert();
+                else
+                    Displays.keep();
+                event.accepted = true;
+                return;
+            }
+            if (Binds.capturing && view.currentRow) {
+                view.currentRow.key(event);
+                event.accepted = true;
+                return;
+            }
             if (event.modifiers & Qt.ControlModifier) {
                 if (k === Qt.Key_Q || k === Qt.Key_W)
                     Qt.quit();
@@ -468,6 +482,44 @@ Item {
                 color: Sys.busy !== "" ? Theme.accent : Theme.error
             }
 
+            // Displays: a change waiting to be kept, or why one was refused.
+            Row {
+                visible: page.sec.id === "displays" && (Displays.pending || Displays.error !== "")
+                x: 28
+                y: 60
+                spacing: 18
+
+                Text {
+                    text: Displays.pending ? "Keep these settings? Going back in " + Displays.countdown + " s" : Displays.error
+                    font.family: Theme.fontMono
+                    font.pixelSize: 11
+                    color: Displays.pending ? Theme.accent : Theme.error
+                }
+                Text {
+                    visible: Displays.pending
+                    text: "↵ keep"
+                    font.family: Theme.fontMono
+                    font.pixelSize: 11
+                    font.weight: Font.DemiBold
+                    color: Theme.text
+
+                    TapHandler {
+                        onTapped: Displays.keep()
+                    }
+                }
+                Text {
+                    visible: Displays.pending
+                    text: "Esc go back"
+                    font.family: Theme.fontMono
+                    font.pixelSize: 11
+                    color: Theme.muted
+
+                    TapHandler {
+                        onTapped: Displays.revert()
+                    }
+                }
+            }
+
             // Not built yet: what is coming.
             PanelItem {
                 visible: page.settings.length === 0
@@ -508,8 +560,13 @@ Item {
                 clip: true
                 boundsBehavior: Flickable.StopAtBounds
 
-                // Keeps the selected row in view.
+                // Keeps the selected row in view; a row taller than the view keeps its own cursor's line in view.
                 function reveal(item) {
+                    const row = view.currentRow;
+                    if (item.height > height - 40 && row && row.cursorY >= 0) {
+                        follow();
+                        return;
+                    }
                     const top = item.y;
                     const bottom = item.y + item.height;
                     if (top < contentY)
@@ -520,6 +577,26 @@ Item {
 
                 Behavior on contentY {
                     NumberAnimation { duration: Anim.base; easing.type: Anim.easing }
+                }
+
+                // Inside a tall row: its own cursor's line stays in view.
+                function follow() {
+                    const row = view.currentRow;
+                    if (!row || row.cursorY < 0)
+                        return;
+                    const top = row.mapToItem(list, 0, row.cursorY).y;
+                    if (top < contentY + 20)
+                        contentY = Math.max(0, top - 40);
+                    else if (top + row.cursorH > contentY + height - 8)
+                        contentY = Math.min(list.implicitHeight - height, top + row.cursorH - height + 40);
+                }
+
+                Connections {
+                    target: view.currentRow
+
+                    function onCursorYChanged() {
+                        flick.follow();
+                    }
                 }
 
                 Column {

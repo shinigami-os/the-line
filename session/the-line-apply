@@ -3,6 +3,8 @@
 # setting changes, and at login (idle, readme):
 #   idle        ~/.config/the-line/hypridle.conf, then (re)starts hypridle with it
 #   workspaces  ~/.config/the-line/hypr/workspaces.lua (apps that open on their workspace), then reloads Hyprland
+#   keys        ~/.config/the-line/hypr/keys.lua (The Line's keys moved or turned off), then reloads Hyprland
+#   input       ~/.config/the-line/hypr/input.lua (keyboard, mouse, touchpad), then reloads Hyprland
 #   accent      the accent outside the shell: window borders (live), and the cursor, rebuilt in that colour into
 #               ~/.local/share/icons/TheLine (cursor/build.py, needs python3 + Pillow), then reloaded
 #   readme      ~/.config/the-line/README.md: which file holds what, and who writes it
@@ -59,6 +61,55 @@ workspaces() {
     hyprctl reload >/dev/null 2>&1
 }
 
+keys() {
+    out="$dir/hypr/keys.lua"
+    {
+        echo "-- Written by The Line from config.json (Settings > Shortcuts): The Line's keys you moved (\"\" = off)."
+        echo "-- Edits here are replaced: change them in Settings. Your app keys are in apps.lua."
+        echo "the_line_keys = {"
+        # only key names (letters, digits, _ : +): nothing else reaches the Lua
+        jq -r '.keys // {} | to_entries[] | "\(.key)\u001f\(.value.to // "")\u001f\(.value.desc // "" | gsub("[\\n\\\\]"; " "))"' "$cfg" 2>/dev/null |
+        # a separator that isn't white space: an empty "to" (turned off) stays a field
+        while IFS="$(printf '\037')" read -r from to desc; do
+            printf '%s' "$from" | grep -Eq '^[A-Za-z0-9_:+]+$' || continue
+            [ -z "$to" ] || printf '%s' "$to" | grep -Eq '^[A-Za-z0-9_:+]+$' || continue
+            printf '    ["%s"] = "%s",   -- %s\n' "$from" "$to" "$desc"
+        done
+        echo "}"
+    } > "$out.new" && mv "$out.new" "$out"
+    hyprctl reload >/dev/null 2>&1
+}
+
+# Settings > Input. Its defaults are the session's own (session/hyprland.lua); an empty layout keeps the console's.
+input() {
+    out="$dir/hypr/input.lua"
+    {
+        echo "-- Written by The Line from config.json (Settings > Input). Edits here are replaced: change them in"
+        echo "-- Settings, or put your own in custom.lua (loaded after this file)."
+        jq -r '
+            def str($k; $re): if (.[$k] | type) == "string" and (.[$k] | test($re)) then .[$k] else empty end;
+            def num($k): if (.[$k] | type) == "number" then .[$k] else empty end;
+            def bool($k): if (.[$k] | type) == "boolean" then .[$k] else empty end;
+            [
+              (str("kbLayout"; "^[a-z0-9_,()-]+$") | "kb_layout = \"\(.)\""),
+              (if has("kbLayout") then (.kbVariant // "" | select(test("^[A-Za-z0-9_,()-]*$")) | "kb_variant = \"\(.)\"") else empty end),
+              (if has("kbOptions") then (.kbOptions // "" | select(test("^[a-z0-9_,:-]*$")) | "kb_options = \"\(.)\"") else empty end),
+              (num("repeatDelay") | "repeat_delay = \(.)"),
+              (num("repeatRate") | "repeat_rate = \(.)"),
+              (bool("numlock") | "numlock_by_default = \(.)"),
+              (num("pointerSpeed") | "sensitivity = \(.)"),
+              (str("pointerAccel"; "^(flat|adaptive)$") | "accel_profile = \"\(.)\""),
+              ([ (bool("naturalScroll") | "natural_scroll = \(.)"),
+                 (bool("tapToClick") | "tap_to_click = \(.)"),
+                 (bool("disableWhileTyping") | "disable_while_typing = \(.)"),
+                 (num("touchpadScroll") | "scroll_factor = \(.)") ]
+               | select(length > 0) | "touchpad = { " + join(", ") + " }")
+            ] | select(length > 0) | "hl.config({ input = {\n        " + join(",\n        ") + "\n} })"
+        ' "$cfg" 2>/dev/null
+    } > "$out.new" && mv "$out.new" "$out"
+    hyprctl reload >/dev/null 2>&1
+}
+
 accent() {
     hex=$(jq -r '.accent // "#9A5CFF"' "$cfg" 2>/dev/null | tr -d '#' | tr 'A-F' 'a-f')
     case "$hex" in [0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]) ;; *) hex=9a5cff ;; esac
@@ -87,8 +138,10 @@ The Line itself lives in /usr/share/the-line, which every update replaces: don't
 | quotes.txt | your own lines for Kira's voice (one per line), if you make it | you |
 | hypridle.conf | idle times (dim, lock, suspend) | generated from config.json: edits are replaced |
 | hypr/custom.lua | your own Hyprland settings, loaded last | you, never overwritten |
-| hypr/apps.lua | your app keys | you, never overwritten |
-| hypr/monitors.lua | your screens | you (later: Settings > Displays) |
+| hypr/apps.lua | your app keys | you, and Settings > Shortcuts (it changes only its lines) |
+| hypr/monitors.lua | your screens | Settings > Displays, and you: a screen's line is rewritten when you change it there |
+| hypr/input.lua | keyboard, mouse, touchpad | generated from config.json (Settings > Input): edits are replaced |
+| hypr/keys.lua | The Line's keys you moved or turned off | generated from config.json (Settings > Shortcuts): edits are replaced |
 | hypr/floating.lua | the apps you float, with their size and place | generated by the shell: edits are replaced |
 | hypr/workspaces.lua | apps that open on their workspace | generated from config.json: edits are replaced |
 
@@ -100,7 +153,9 @@ EOF
 case "$1" in
     idle) idle ;;
     workspaces) workspaces ;;
+    keys) keys ;;
+    input) input ;;
     accent) accent ;;
     readme) readme ;;
-    *) echo "usage: the-line-apply idle|workspaces|accent|readme" >&2; exit 1 ;;
+    *) echo "usage: the-line-apply idle|workspaces|keys|input|accent|readme" >&2; exit 1 ;;
 esac

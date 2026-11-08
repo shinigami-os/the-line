@@ -42,7 +42,8 @@ Singleton {
         wallpaper: "WallpaperPicker.qml", workspaceApps: "WorkspaceRules.qml", floatingApps: "FloatingApps.qml",
         wifiNetworks: "WifiNetworks.qml", btDevices: "BtDevices.qml", audioDevices: "AudioDevices.qml", audioStreams: "AudioStreams.qml",
         text: "TextSetting.qml", timezone: "ZonePicker.qml", datetime: "DateTimeSetting.qml", faces: "FaceModels.qml",
-        chargeLimit: "ChargeLimit.qml"
+        chargeLimit: "ChargeLimit.qml", appKeys: "AppKeys.qml", lineKeys: "LineKeys.qml", displayMap: "DisplayMap.qml",
+        displayModes: "DisplayModes.qml", kbLayout: "LayoutPicker.qml"
     })
 
     function isCustom(setting) {
@@ -51,10 +52,57 @@ Singleton {
 
     function backend(setting) {
         return setting.source === "net" ? Net : setting.source === "bt" ? Bt : setting.source === "sound" ? Sound
-            : setting.source === "sys" ? Sys : null;
+            : setting.source === "sys" ? Sys : setting.source === "displays" ? Displays : null;
     }
 
     readonly property var settings: [
+        { section: "displays", group: "Your screens", key: "displayMap", kind: "displayMap", label: "Arrangement",
+          sub: "← → pick a screen · Shift+arrows move it · or drag it", keywords: "position arrange layout left right above monitor" },
+        { section: "displays", group: "The picked screen", source: "displays", key: "mode", kind: "displayModes", label: "Resolution and refresh rate",
+          sub: "Enter switches to it · you then have 15 s to keep it", keywords: "resolution refresh rate hz mode pixels" },
+        { section: "displays", group: "The picked screen", source: "displays", key: "scale", kind: "choice", label: "Scale",
+          sub: "Bigger text and windows on a sharp screen", keywords: "scale zoom size hidpi dpi",
+          choices: [{ value: 1, label: "100%" }, { value: 1.25, label: "125%" }, { value: 1.5, label: "150%" }, { value: 1.75, label: "175%" }, { value: 2, label: "200%" }] },
+        { section: "displays", group: "The picked screen", source: "displays", key: "transform", kind: "choice", label: "Rotation",
+          sub: "For a screen turned on its side", keywords: "rotate portrait vertical turn transform",
+          choices: [{ value: 0, label: "none" }, { value: 1, label: "90°" }, { value: 2, label: "180°" }, { value: 3, label: "270°" }] },
+        { section: "displays", group: "The picked screen", source: "displays", key: "primary", kind: "toggle", label: "Main screen",
+          sub: "Gets workspace 1, and gives the accent its wallpaper", keywords: "primary main first default" },
+        { section: "displays", group: "The picked screen", source: "displays", key: "enabled", kind: "toggle", label: "Use this screen",
+          sub: "Off: nothing is shown on it", keywords: "disable turn off enable" },
+
+        { section: "input", group: "Keyboard", key: "kbLayout", kind: "kbLayout", label: "Layout",
+          sub: "Enter, then type a language", keywords: "keyboard layout azerty qwerty language bepo dvorak xkb" },
+        { section: "input", group: "Keyboard", key: "kbOptions", kind: "choice", label: "Caps Lock key",
+          sub: "What the key does", keywords: "caps lock escape ctrl capslock",
+          choices: [{ value: "", label: "Caps Lock" }, { value: "caps:escape", label: "Esc" }, { value: "ctrl:nocaps", label: "Ctrl" }, { value: "caps:none", label: "nothing" }] },
+        { section: "input", group: "Keyboard", key: "repeatDelay", kind: "slider", min: 150, max: 800, step: 25, unit: "ms",
+          label: "Repeat after", sub: "How long a key is held before it repeats", keywords: "repeat delay hold" },
+        { section: "input", group: "Keyboard", key: "repeatRate", kind: "slider", min: 10, max: 60, step: 1, unit: "/ s",
+          label: "Repeat speed", sub: "Letters per second, once it repeats", keywords: "repeat rate speed" },
+        { section: "input", group: "Keyboard", key: "numlock", kind: "toggle", label: "Num Lock on at login",
+          sub: "The number pad types numbers", keywords: "numlock numpad numbers" },
+        { section: "input", group: "Mouse and touchpad", key: "pointerSpeed", kind: "slider", min: -1, max: 1, step: 0.05, decimals: 2, unit: "",
+          label: "Pointer speed", sub: "0 is the device's own speed", keywords: "mouse speed sensitivity cursor pointer" },
+        { section: "input", group: "Mouse and touchpad", key: "pointerAccel", kind: "choice", label: "Acceleration",
+          sub: "Flat: the pointer moves as far as your hand", keywords: "mouse acceleration accel flat adaptive gaming",
+          choices: [{ value: "", label: "device's" }, { value: "adaptive", label: "adaptive" }, { value: "flat", label: "flat" }] },
+        { section: "input", group: "Mouse and touchpad", key: "tapToClick", kind: "toggle", label: "Tap to click",
+          sub: "A tap on the touchpad clicks", keywords: "touchpad tap click trackpad" },
+        { section: "input", group: "Mouse and touchpad", key: "naturalScroll", kind: "toggle", label: "Natural scrolling",
+          sub: "On the touchpad, the page follows your fingers", keywords: "touchpad scroll reverse natural direction trackpad" },
+        { section: "input", group: "Mouse and touchpad", key: "touchpadScroll", kind: "slider", min: 0.1, max: 2, step: 0.05, decimals: 2, unit: "×",
+          label: "Touchpad scroll speed", sub: "How far two fingers scroll", keywords: "touchpad scroll speed factor trackpad" },
+        { section: "input", group: "Mouse and touchpad", key: "disableWhileTyping", kind: "toggle", label: "Touchpad off while typing",
+          sub: "No stray clicks from your palms", keywords: "touchpad typing palm disable trackpad" },
+
+        { section: "shortcuts", group: "Your apps", key: "appKeys", kind: "appKeys", label: "Your app keys",
+          sub: "Enter gives new keys · Delete removes one · kept in hypr/apps.lua", keywords: "app launch keys bind hotkey terminal browser" },
+        { section: "shortcuts", group: "The Line's", key: "lineKeys", kind: "lineKeys", label: "The Line's keys",
+          sub: "Enter gives new keys · Delete turns one off · R puts it back", keywords: "rebind keys bind hotkey shortcut launcher lock screenshot window workspace" },
+        { section: "shortcuts", group: "The Line's", key: "cheatsheet", kind: "info", label: "Every shortcut at once",
+          sub: "The cheat sheet, anywhere", keywords: "cheat sheet help list", value: "Super + F1" },
+
         { section: "system", group: "This computer", source: "sys", key: "hostname", kind: "text", label: "Name of this computer",
           sub: "How other devices on the network see it", keywords: "hostname name computer network",
           placeholder: "letters, digits and dashes", validate: "^[A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?$" },
@@ -115,9 +163,11 @@ Singleton {
           sub: "Each app's own volume · ← → changes it", keywords: "app application volume mixer per-app" },
 
         { section: "appearance", group: "Wallpaper", key: "wallpaper", kind: "wallpaper", label: "Wallpaper",
-          sub: "← → to look, Enter to set it", keywords: "background image picture" },
+          sub: "← → to look, Enter to set it · Tab: which screen", keywords: "background image picture screen monitor animated video gif live" },
+        { section: "appearance", group: "Wallpaper", key: "wallpaperStillOnBattery", kind: "toggle", label: "Still on battery",
+          sub: "Animated wallpapers stop moving off the charger", keywords: "animated video gif power battery" },
         { section: "appearance", group: "Accent", key: "accentFromWallpaper", kind: "toggle", label: "Accent from the wallpaper",
-          sub: "Picks the accent in the wallpaper each time you change it", keywords: "color colour matugen auto" },
+          sub: "Picks it in the primary screen's wallpaper each time it changes", keywords: "color colour matugen auto" },
         { section: "appearance", group: "Accent", key: "accent", kind: "color", label: "Accent colour",
           sub: "The workspace marker, toggles, selections", keywords: "color colour highlight",
           choices: [
@@ -188,6 +238,8 @@ Singleton {
     }
 
     function value(setting) {
+        if (setting.value !== undefined)
+            return setting.value;   // a fixed fact (an info row)
         const b = backend(setting);
         return b ? b[setting.key] : Config[setting.key];
     }
@@ -198,7 +250,7 @@ Singleton {
         if (setting.kind === "toggle")
             return v ? "on" : "off";
         if (setting.kind === "slider")
-            return v + (setting.unit ? " " + setting.unit : "");
+            return (setting.decimals ? Number(v).toFixed(setting.decimals) : v) + (setting.unit ? " " + setting.unit : "");
         if (setting.kind === "speed")
             return speed(v).toFixed(2) + "×";
         if (setting.kind === "wallpaper")
@@ -239,7 +291,7 @@ Singleton {
         if (setting.kind === "toggle") {
             set(setting, !v);
         } else if (setting.kind === "slider") {
-            set(setting, Math.max(setting.min, Math.min(setting.max, v + dir * setting.step)));
+            set(setting, snap(setting, v + dir * setting.step));
         } else if (setting.kind === "speed") {
             setSpeed(Math.round((speed(v) + dir * 0.05) * 100) / 100);
         } else if (setting.kind === "stops") {
@@ -250,6 +302,12 @@ Singleton {
             const i = list.findIndex(c => same(c.value, v));
             set(setting, list[((i < 0 ? 0 : i + dir) + list.length) % list.length].value);
         }
+    }
+
+    // A slider's value on its steps and within its ends, without float dust (0.1 + 0.2).
+    function snap(setting, v) {
+        const n = Math.round((v - setting.min) / setting.step) * setting.step + setting.min;
+        return Number(Math.max(setting.min, Math.min(setting.max, n)).toFixed(4));
     }
 
     // Motion speed: config.json keeps motionScale, a duration factor (speed 2× = durations × 0.5).

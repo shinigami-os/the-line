@@ -6,7 +6,7 @@
 #   ntp on|off                    chronyd: started and enabled, or stopped and kept down (runit's down file)
 #   time "YYYY-MM-DD HH:MM[:SS]"  the clock, then the hardware clock (only with ntp off)
 #   charge-limit 50..100          the battery stops charging there; kept across reboots by a udev rule
-#   face add|remove ID|clear      the calling user's howdy face models
+#   face add NAME|remove ID|clear the calling user's howdy face models (NAME: 24 characters, no comma)
 #   face-pam hyprlock|greetd on|off   face sign-in for unlocking the screen, or for the login screen
 set -u
 
@@ -79,14 +79,19 @@ face)
     user=$(caller)
     [ -n "$user" ] || die "Who is asking?"
     case "${2:-}" in
-    add) howdy -U "$user" -y add ;;
+    add)
+        label="${3:-}"
+        case "$label" in ''|*,*|*[[:cntrl:]]*) die "A name, without commas" ;; esac
+        [ "${#label}" -le 24 ] || die "24 characters at most"
+        howdy -U "$user" -y add "$label"
+        ;;
     remove)
         id="${3:-}"
         case "$id" in ''|*[!0-9]*) die "A model number" ;; esac
         howdy -U "$user" -y remove "$id"
         ;;
     clear) howdy -U "$user" -y clear ;;
-    *) die "face add|remove ID|clear" ;;
+    *) die "face add NAME|remove ID|clear" ;;
     esac
     ;;
 face-pam)

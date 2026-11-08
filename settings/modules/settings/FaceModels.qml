@@ -1,27 +1,39 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
+import qs.modules.common
 import qs.services
 
 // Settings > Sign-in > Your face: the faces howdy knows for you (read from /etc/howdy/models/<you>.dat), and
-// "+ add a face" last: it records one through the camera (the helper runs howdy, after the password).
-// Keyboard: ↑↓ lines · Enter on "+ add a face" records · Delete removes the face under the cursor.
+// "+ add a face" last: it asks a name for it, then records it through the camera (the helper runs howdy, after the
+// password). Keyboard: ↑↓ lines · Enter on "+ add a face" names it, Enter again records · Delete removes one.
 Item {
     id: faces
 
     property var setting
     property bool active: false
     property int cursor: 0
+    property bool naming: false
 
     signal picked
+    signal refocus
 
     readonly property var list: Sys.faces
-    implicitHeight: (list.length + 1) * 34
+    implicitHeight: (list.length + 1) * 34 + (naming ? 44 : 0)
 
     onListChanged: cursor = Math.min(cursor, list.length)
 
-    function add() {
-        Sys.run(["face", "add"], "Look at the camera…");
+    // The name howdy keeps for it (24 characters, no comma): where or how, "Desk lamp", "With glasses".
+    function name() {
+        naming = true;
+        nameField.text = list.length === 0 ? "Me" : "";
+        nameField.focusInput();
+    }
+
+    function add(label) {
+        naming = false;
+        refocus();
+        Sys.run(["face", "add", label.replace(/,/g, "").trim().slice(0, 24) || "Face " + (list.length + 1)], "Look at the camera…");
     }
 
     function remove(face) {
@@ -39,7 +51,7 @@ Item {
             return true;
         }
         if (cursor === list.length && (k === Qt.Key_Return || k === Qt.Key_Enter || k === Qt.Key_Space)) {
-            add();
+            name();
             return true;
         }
         if (cursor < list.length && (k === Qt.Key_Delete || k === Qt.Key_Backspace)) {
@@ -81,7 +93,26 @@ Item {
             onClicked: {
                 faces.picked();
                 faces.cursor = faces.list.length;
-                faces.add();
+                faces.name();
+            }
+        }
+
+        // Its name, before the camera.
+        Item {
+            width: faces.width
+            height: 44
+            visible: faces.naming
+
+            SearchField {
+                id: nameField
+                y: 4
+                width: parent.width
+                placeholder: "A name for this face: where, or how (\"desk lamp\", \"glasses\")   ↵ record"
+                onAccepted: faces.add(text)
+                onCancelled: {
+                    faces.naming = false;
+                    faces.refocus();
+                }
             }
         }
     }

@@ -21,6 +21,11 @@ Rectangle {
         return custom && body.item ? body.item.key(event) : false;
     }
 
+    // A tall custom row with its own cursor (a long list) says where it is (`cursorY`, in the component, and `cursorH`
+    // when its lines aren't 34 px): the view keeps that line in view. -1: nothing to follow.
+    readonly property real cursorY: custom && body.item && body.item.cursorY !== undefined && body.item.cursorY >= 0 ? body.y + body.item.cursorY : -1
+    readonly property real cursorH: custom && body.item && body.item.cursorH !== undefined ? body.item.cursorH : 34
+
     height: custom ? 52 + (body.item ? body.item.implicitHeight : 0) + 16 : 52
     color: selected ? Theme.surface2 : "transparent"
 
@@ -180,7 +185,7 @@ Rectangle {
                     const s = row.setting;
                     row.picked();
                     if (s.kind === "slider") {
-                        Registry.set(s, Math.round((s.min + v * (s.max - s.min)) / s.step) * s.step);
+                        Registry.set(s, Registry.snap(s, s.min + v * (s.max - s.min)));
                     } else if (s.kind === "stops") {
                         Registry.set(s, parent.stops[Math.round(v * (parent.stops.length - 1))].value);
                     } else {

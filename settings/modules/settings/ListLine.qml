@@ -50,7 +50,7 @@ Item {
     Text {
         anchors.left: nameText.right
         anchors.leftMargin: 10
-        anchors.right: rightText.left
+        anchors.right: slot.children.length > 0 ? slot.left : rightText.left
         anchors.rightMargin: 10
         anchors.verticalCenter: parent.verticalCenter
         elide: Text.ElideRight

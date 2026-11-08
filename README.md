@@ -20,7 +20,7 @@ Runs on Hyprland (FHT comes later). Done so far:
 
 - Kira's voice on an empty workspace, behind the windows, from `assets/quotes.txt` plus `~/.config/the-line/quotes.txt`, with live `{placeholders}`
 
-- notification daemon (org.freedesktop.Notifications) and the wallpaper
+- notification daemon (org.freedesktop.Notifications) and the wallpaper: one for every screen or one per screen, a picture, an animated GIF or a video (mp4, webm, mkv, mov: looped, silent, played by Qt's ffmpeg); moving ones stop under a fullscreen window and, by default, on battery
 - double tap Super: the workspace overview (ten small screens with live window thumbnails), grown from the same tile as the launcher; drag a window to another workspace to move it, click one to focus it
 - optional app icons on the workspace ruler (`workspaceIcons` in the config)
 - intro: each screen starts hidden and draws itself in once its wallpaper is shown
@@ -38,7 +38,7 @@ Runs on Hyprland (FHT comes later). Done so far:
 - files: yazi in foot (SUPER+E), the default file manager (SUPER+SHIFT+E)
 - screenshots with Flameshot on the focused screen; The Line's defaults for foot (black glass, VS Code-style keys) and Flameshot are installed on first login
 
-- settings app (SUPER+I, `settings/`): its own window, a spine of sections and a search over every setting; done so far: network, Bluetooth, sound, appearance (wallpaper picker, accent, accent from the wallpaper, motion), workspaces (apps on their workspace, remembered floating apps, ruler), power and idle (with the battery limit), sign-in (howdy, fingerprint), system (name, time, time zone, about), The Line's own settings
+- settings app (SUPER+I, `settings/`): its own window, a spine of sections and a search over every setting; done so far: network, Bluetooth, sound, displays (arrangement, resolution, scale, rotation, main screen, on / off; each change goes back after 15 s unless kept), input (layout, Caps Lock, key repeat, pointer, touchpad), appearance (wallpaper picker per screen, accent, accent from the main screen's wallpaper, motion), workspaces (apps on their workspace, remembered floating apps, ruler), shortcuts (your app keys, The Line's keys moved or turned off, conflicts refused), power and idle (with the battery limit), sign-in (howdy faces with a name, fingerprint), system (name, time, time zone, about), The Line's own settings
 
 Next: the other settings sections, welcome screen, first-run welcome, launcher shortcuts section, easter eggs from the backlog.
 
@@ -55,14 +55,16 @@ Next: the other settings sections, welcome screen, first-run welcome, launcher s
 - `the-line-shell`: runs the shell and starts it again if it crashes
 - `apps.lua`: the default app keys (just the terminal), copied to `~/.config/the-line/hypr/` on first login
 
-The shell is expected in `/usr/share/the-line` (or wherever `THE_LINE_DIR` points). Workspaces are shared out evenly between screens, left to right (2 screens: 1 and 5; 3 screens: 1, 4, 7; `primary_monitor = "<name>"` in `custom.lua` puts a screen first). Your own Hyprland bits go in `~/.config/the-line/hypr/` (`monitors.lua`, `apps.lua`, `custom.lua`; The Line writes `floating.lua`); coming from Sleex, its monitors, app keys and custom general settings are copied there on the first login.
+The shell is expected in `/usr/share/the-line` (or wherever `THE_LINE_DIR` points). Workspaces are shared out evenly between screens, left to right (2 screens: 1 and 5; 3 screens: 1, 4, 7; the main screen goes first: Settings > Displays, or `primary_monitor = "<name>"` in `custom.lua`). Your own Hyprland bits go in `~/.config/the-line/hypr/` (`monitors.lua`, `apps.lua`, `custom.lua`; The Line writes `floating.lua`); coming from Sleex, its monitors, app keys and custom general settings are copied there on the first login.
 
 ### Where your settings live
 
 Everything you set lives in `~/.config/the-line/` (and state like launch counts in `~/.local/state/the-line/`); updates
 only replace `/usr/share/the-line`. Each file says in its first lines whether it is yours or generated, and
 `~/.config/the-line/README.md` (written at each login) lists them all. `config.json` is the source: the generated files
-(`hypridle.conf`, `hypr/workspaces.lua`, `hypr/floating.lua`) are rewritten from it.
+(`hypridle.conf`, `hypr/workspaces.lua`, `hypr/input.lua`, `hypr/keys.lua`, `hypr/floating.lua`) are rewritten from it.
+Settings also edits two files that stay yours: in `hypr/apps.lua` it changes only the app-key lines it shows, in
+`hypr/monitors.lua` only the line of a screen you change there.
 
 To try it from a checkout before it is packaged:
 
@@ -134,13 +136,14 @@ hl.bind("SUPER+P", hl.dsp.global("the-line:performance"))
 
 ```json
 { "accent": "#9A5CFF", "reduceMotion": false, "motionScale": 1.0, "screens": [], "terminal": "foot",
-  "wallpaper": "/usr/share/kira/wallpapers/default.png", "workspaceIcons": false,
+  "wallpaper": "/usr/share/kira/wallpapers/default.png", "wallpapers": { "DP-2": "/path/to/its/own.mp4" },
+  "wallpaperStillOnBattery": true, "primaryScreen": "", "workspaceIcons": false,
   "kiraVoice": true, "workspaceScrollInverted": false, "levelStep": 2,
   "clipboardMax": 200, "clipboardImages": true, "clipboardWipeOnLogin": false }
 ```
 
 ## Needs
 
-Quickshell 0.3 with Hyprland, PipeWire, MPRIS, UPower and Bluetooth support, Hyprland, NetworkManager (nmcli), brightnessctl, procps-ng top, hyprlock, loginctl, and optionally hyprsunset for night light. Fonts: Raleway and IBM Plex Mono (JetBrains Mono is the fallback).
+Quickshell 0.3 with Hyprland, PipeWire, MPRIS, UPower and Bluetooth support, Qt Multimedia (ffmpeg backend) for video wallpapers, mpv for their thumbnails, Hyprland, NetworkManager (nmcli), brightnessctl, procps-ng top, hyprlock, loginctl, and optionally hyprsunset for night light. Fonts: Raleway and IBM Plex Mono (JetBrains Mono is the fallback).
 
 Hyprland layer rule to avoid its own fade on the surface: `noanim` for the `the-line` namespace. The surface sits on the top layer, and on the overlay layer while its screen shows a fullscreen window.

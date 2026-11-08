@@ -16,6 +16,10 @@ Singleton {
     readonly property real motionScale: adapter.motionScale
     readonly property string terminal: adapter.terminal
     readonly property string wallpaper: adapter.wallpaper
+    readonly property var wallpapers: adapter.wallpapers
+    readonly property bool wallpaperStillOnBattery: adapter.wallpaperStillOnBattery
+    // The screen the accent comes from (its wallpaper): the one set in Settings > Displays, or the first.
+    readonly property string primaryScreen: adapter.primaryScreen !== "" ? adapter.primaryScreen : (Quickshell.screens[0]?.name ?? "")
     readonly property bool workspaceIcons: adapter.workspaceIcons
     readonly property bool kiraVoice: adapter.kiraVoice
     readonly property real levelStep: adapter.levelStep
@@ -28,6 +32,21 @@ Singleton {
     readonly property int idleSuspend: adapter.idleSuspend
     readonly property string powerButton: adapter.powerButton
     readonly property var workspaceApps: adapter.workspaceApps
+    readonly property var keys: adapter.keys
+    readonly property string kbLayout: adapter.kbLayout
+    readonly property string kbVariant: adapter.kbVariant
+    readonly property string kbOptions: adapter.kbOptions
+    readonly property int repeatDelay: adapter.repeatDelay
+    readonly property int repeatRate: adapter.repeatRate
+    readonly property bool numlock: adapter.numlock
+    readonly property real pointerSpeed: adapter.pointerSpeed
+    readonly property string pointerAccel: adapter.pointerAccel
+    readonly property bool naturalScroll: adapter.naturalScroll
+    readonly property bool tapToClick: adapter.tapToClick
+    readonly property bool disableWhileTyping: adapter.disableWhileTyping
+    readonly property real touchpadScroll: adapter.touchpadScroll
+    readonly property var inputKeys: ["kbLayout", "kbVariant", "kbOptions", "repeatDelay", "repeatRate", "numlock", "pointerSpeed",
+        "pointerAccel", "naturalScroll", "tapToClick", "disableWhileTyping", "touchpadScroll"]
 
     // A script of session/: the shell runs from the repo root, the settings app from its settings/ folder.
     function session(script) {
@@ -50,6 +69,16 @@ Singleton {
         onTriggered: Quickshell.execDetached([root.session("the-line-apply"), "accent"])
     }
     Timer {
+        id: applyKeys
+        interval: 300
+        onTriggered: Quickshell.execDetached([root.session("the-line-apply"), "keys"])
+    }
+    Timer {
+        id: applyInput
+        interval: 700   // a dragged slider: one Hyprland reload at the end
+        onTriggered: Quickshell.execDetached([root.session("the-line-apply"), "input"])
+    }
+    Timer {
         id: applyWorkspaces
         interval: 800   // ←→ held on a workspace: one Hyprland reload at the end
         onTriggered: Quickshell.execDetached([root.session("the-line-apply"), "workspaces"])
@@ -66,6 +95,20 @@ Singleton {
         return env ? env.split(",") : adapter.screens;
     }
 
+    // A screen's wallpaper: its own, or the one of every screen.
+    function wallpaperFor(screen) {
+        return wallpapers?.[screen] ?? wallpaper;
+    }
+
+    // "still", "gif" (animated), or "video".
+    function wallpaperKind(path) {
+        if (/\.(mp4|webm|mkv|mov)$/i.test(path))
+            return "video";
+        if (/\.gif$/i.test(path))
+            return "gif";
+        return "still";
+    }
+
     function setReduceMotion(value) {
         set("reduceMotion", value);
     }
@@ -80,6 +123,10 @@ Singleton {
             applyWorkspaces.restart();
         else if (key === "accent")
             applyAccent.restart();
+        else if (key === "keys")
+            applyKeys.restart();
+        else if (inputKeys.indexOf(key) >= 0)
+            applyInput.restart();
     }
 
     // FileView does not create the directory.
@@ -107,6 +154,9 @@ Singleton {
             property bool kiraVoice: true                  // Kira's quotes on an empty workspace, and her one-off lines
             property bool workspaceScrollInverted: false   // SUPER+scroll: scroll down for the next workspace
             property string wallpaper: "/usr/share/kira/wallpapers/default.png"   // "" = leave it to another tool
+            property var wallpapers: ({})                   // { "DP-2": path }: a screen's own, over `wallpaper`
+            property bool wallpaperStillOnBattery: true      // animated wallpapers stop on battery
+            property string primaryScreen: ""               // "" = the first screen
             property list<string> screens: []
             property bool accentFromWallpaper: false        // the settings app picks the accent when the wallpaper changes
             property int idleDim: 10                        // minutes, 0 = never (all three)
@@ -114,6 +164,20 @@ Singleton {
             property int idleSuspend: 60
             property string powerButton: "menu"            // menu, suspend, lock, nothing
             property var workspaceApps: []                  // [{ class, name, workspace }]: the app always opens there
+            property var keys: ({})                         // The Line's keys moved: { "SUPER+P": { to: "SUPER+ALT+P" ("" = off), desc } }
+            // Settings > Input (hypr/input.lua): the session's defaults; "" layout = the console's (/etc/vconsole.conf)
+            property string kbLayout: ""
+            property string kbVariant: ""
+            property string kbOptions: ""
+            property int repeatDelay: 250                   // ms before a held key repeats
+            property int repeatRate: 35                     // repeats per second
+            property bool numlock: true
+            property real pointerSpeed: 0                   // -1 .. 1
+            property string pointerAccel: ""                // "", "flat", "adaptive"
+            property bool naturalScroll: false
+            property bool tapToClick: true
+            property bool disableWhileTyping: true
+            property real touchpadScroll: 0.5
         }
     }
 }

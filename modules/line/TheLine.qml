@@ -2,6 +2,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Wayland
 import Quickshell.Hyprland
+import Quickshell.Services.UPower
 import qs.modules.desktop
 import qs.modules.tiles
 import qs.services
@@ -42,7 +43,7 @@ Scope {
     Timer {
         id: introTimer
         interval: 700
-        running: !root.introDone && (Config.wallpaper === "" || (wallpaper.item?.ready ?? false))
+        running: !root.introDone && (Config.wallpaperFor(root.screenName) === "" || (wallpaper.item?.ready ?? false))
         onTriggered: root.introDone = true
     }
 
@@ -94,9 +95,10 @@ Scope {
 
     Loader {
         id: wallpaper
-        active: Config.wallpaper !== ""
+        active: Config.wallpaperFor(root.screenName) !== ""
         sourceComponent: Wallpaper {
             screen: root.modelData
+            paused: root.fullscreen || (Config.wallpaperStillOnBattery && UPower.onBattery)
         }
     }
 
