@@ -9,6 +9,8 @@ import Quickshell.Services.Pam
 // can start from what was on it, then the session lock is taken. PAM runs as soon as it is up: with face sign-in on, howdy tries
 // first and says so; then it asks for the password, typed on the line.
 //   phase  ""  →  "locking" (the line glides down)  →  "locked"  →  "unlocking" (accent fills the line)  →  ""
+// A face or a fingerprint first (Config.unlockBiometrics, a button on the lock screen): the lock then asks PAM with the
+// stack "the-line" (session/the-line-pam), three runs at most per lock, after that "the-line-password": the password only.
 // While locked, $XDG_RUNTIME_DIR/the-line/locked exists: a shell that starts again after a crash locks again at once
 // (Hyprland keeps the session locked meanwhile: misc:allow_session_lock_restore).
 Singleton {
@@ -26,6 +28,20 @@ Singleton {
     // Seconds before a test lock opens by itself (lockTest); 0 = a real lock.
     property int testSeconds: 0
 
+    // Face / fingerprint. bioKinds: what the stack can try (["face"], ["fingerprint"], both), read from
+    // session/the-line-pam; bioTries: runs this lock that tried it; the third is the last.
+    readonly property string pamDir: Quickshell.env("HOME") + "/.config/the-line/pam"
+    readonly property int bioMax: 3
+    property var bioKinds: []
+    property int bioTries: 0
+    property bool restarting: false
+    property bool bioRun: false      // the run going now tries it
+    readonly property bool bioAvailable: bioKinds.length > 0
+    readonly property bool bioOn: Config.unlockBiometrics && bioAvailable
+    // the three tries are used up (the third one, while it runs, still counts as a try)
+    readonly property bool bioSpent: bioOn && bioTries >= bioMax && !bioRun
+    readonly property string bioName: bioKinds.join(" or ")
+
     readonly property string stateDir: (Quickshell.env("XDG_RUNTIME_DIR") || "/tmp") + "/the-line"
     readonly property string marker: stateDir + "/locked"
     readonly property string captureDir: stateDir + "/lock-capture"
@@ -40,6 +56,7 @@ Singleton {
     function lock() {
         if (locked || capture.running)
             return;
+        probe();   // the next lock sees what is set up by then
         testSeconds = 0;
         capture.screens = Quickshell.screens.map(s => s.name);
         capture.running = true;
@@ -60,6 +77,7 @@ Singleton {
         message = "";
         messageIsError = false;
         failures = 0;
+        bioTries = 0;
         waiting = false;
         phase = "locking";
         locked = true;
@@ -135,10 +153,47 @@ Singleton {
         }
     }
 
+    // The button on the lock screen (and Tab): face / fingerprint on or off, from now on. The run that is going is ended
+    // and a new one started with the other stack. Turning it on gives the three tries back.
+    function toggleBiometrics() {
+        if (!bioAvailable || waiting || phase === "unlocking")
+            return;
+        Config.set("unlockBiometrics", !Config.unlockBiometrics);
+        bioTries = 0;
+        message = "";
+        messageIsError = false;
+        restart();
+    }
+
+    function restart() {
+        if (!locked)
+            return;
+        restarting = true;
+        if (pam.active)
+            pam.abort();
+        startPam.interval = 150;
+        startPam.restart();
+    }
+
     Timer {
         id: startPam
         interval: 50
-        onTriggered: if (root.locked && !pam.active) pam.start()
+        onTriggered: {
+            startPam.interval = 50;
+            root.restarting = false;
+            if (!root.locked || pam.active)
+                return;
+            // the stack is picked here, once, not bound: counting this run must not change what it runs with
+            const withBio = root.bioOn && root.bioTries < root.bioMax;
+            root.bioRun = withBio;
+            pam.config = withBio ? "the-line" : "the-line-password";
+            if (withBio) {
+                root.bioTries++;
+                root.message = root.bioName + " · try " + root.bioTries + " of " + root.bioMax;
+                root.messageIsError = false;
+            }
+            pam.start();
+        }
     }
 
     Timer {
@@ -151,8 +206,9 @@ Singleton {
     PamContext {
         id: pam
 
-        // /etc/pam.d/hyprlock for now: the face toggle in Settings > Sign-in edits that one
-        config: "hyprlock"
+        // the stacks of session/the-line-pam, in the user's own folder (set at each start, see startPam)
+        configDirectory: root.pamDir
+        config: "the-line-password"
 
         onPamMessage: {
             if (responseRequired) {
@@ -165,6 +221,8 @@ Singleton {
             root.messageIsError = messageIsError;
         }
         onCompleted: result => {
+            if (root.restarting)
+                return;
             if (result === PamResult.Success) {
                 root.succeed();
                 return;
@@ -172,13 +230,16 @@ Singleton {
             root.waiting = false;
             root.failures++;
             root.buffer = "";
-            root.message = "not this one";
+            root.bioRun = false;
+            root.message = root.bioSpent ? "not this one · password only from here" : "not this one";
             root.messageIsError = true;
             root.refused++;
             if (root.locked)
                 startPam.restart();
         }
         onError: err => {
+            if (root.restarting)
+                return;
             root.waiting = false;
             root.message = "something went wrong, try again";
             root.messageIsError = true;
@@ -208,6 +269,30 @@ Singleton {
         onTriggered: {
             root.captured = {};
             root.engage();
+        }
+    }
+
+    // Writes the PAM stacks (session/the-line-pam) and reads what the biometric one can try: its `# the-line: face` lines.
+    function probe() {
+        if (!probeProc.running)
+            probeProc.running = true;
+    }
+
+    Component.onCompleted: probe()
+
+    Process {
+        id: probeProc
+        command: [Config.session("the-line-pam")]
+        stdout: StdioCollector {
+            onStreamFinished: {
+                const kinds = [];
+                for (const line of text.split("\n")) {
+                    const m = line.match(/^#\s*the-line:\s*(\w+)/);
+                    if (m && kinds.indexOf(m[1]) < 0)
+                        kinds.push(m[1]);
+                }
+                root.bioKinds = kinds;
+            }
         }
     }
 

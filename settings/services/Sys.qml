@@ -32,7 +32,6 @@ Singleton {
     property string hyprsunset: "—"     // night light's tool: "installed" or "not installed"
 
     property var faces: []                 // [{ id, label, time }] from /etc/howdy/models/<user>.dat
-    property bool faceHyprlock: false      // face sign-in turned on for unlocking the screen
     property bool faceGreetd: false        // ... for the login screen
     property string fingerprint: "—"
 
@@ -61,8 +60,6 @@ Singleton {
             run(["ntp", value ? "on" : "off"]);
         else if (key === "time")
             run(["time", value], "Setting the clock…");
-        else if (key === "faceHyprlock")
-            run(["face-pam", "hyprlock", value ? "on" : "off"]);
         else if (key === "faceGreetd")
             run(["face-pam", "greetd", value ? "on" : "off"]);
         else if (key === "chargeLimit")
@@ -102,7 +99,6 @@ Singleton {
             "echo cpu=$(grep -m1 'model name' /proc/cpuinfo | cut -d: -f2-)",
             "echo memory=$(awk '/MemTotal/ { printf \"%.0f GB\", $2 / 1048576 }' /proc/meminfo)",
             "echo uptime=$(awk '{ d = int($1 / 86400); h = int($1 % 86400 / 3600); m = int($1 % 3600 / 60); if (d) printf \"%d d \", d; printf \"%d h %02d min\", h, m }' /proc/uptime)",
-            "grep -q 'pam_howdy.so  # the-line' /etc/pam.d/hyprlock 2>/dev/null && echo facehyprlock=1",
             "grep -q 'pam_howdy.so  # the-line' /etc/pam.d/greetd 2>/dev/null && echo facegreetd=1",
             "b=$(ls -d /sys/class/power_supply/BAT* 2>/dev/null | head -n1); [ -n \"$b\" ] && [ -f \"$b/charge_control_end_threshold\" ] && echo charge=$(cat \"$b/charge_control_end_threshold\")",
             "echo model=$(cat /sys/class/dmi/id/sys_vendor /sys/class/dmi/id/product_name 2>/dev/null | tr '\\n' ' ')",
@@ -138,7 +134,6 @@ Singleton {
                 }).join(" · ") || "—";
                 root.hyprsunset = v.sunset || "—";
                 root.os = (v.os || "—") + (v.release ? " " + v.release : "");
-                root.faceHyprlock = v.facehyprlock === "1";
                 root.faceGreetd = v.facegreetd === "1";
                 root.chargeSupported = v.charge !== undefined;
                 root.chargeLimit = Number(v.charge) || 100;

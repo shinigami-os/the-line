@@ -109,7 +109,13 @@ Item {
         focus: true
 
         Keys.onPressed: event => {
-            if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter)
+            // the numpad with NumLock off still types its digits
+            const pad = Keypad.digit(event);
+            if (pad !== "")
+                Lock.type(pad);
+            else if (event.key === Qt.Key_Tab)
+                Lock.toggleBiometrics();
+            else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter)
                 Lock.submit();
             else if (event.key === Qt.Key_Backspace)
                 Lock.erase(event.modifiers & Qt.ControlModifier);
@@ -278,7 +284,7 @@ Item {
         }
         Text {
             anchors.horizontalCenter: parent.horizontalCenter
-            text: Lock.testSeconds > 0 ? "test lock · opens by itself" : Lock.message.toLowerCase()
+            text: Lock.message !== "" ? Lock.message.toLowerCase() : Lock.testSeconds > 0 ? "test lock · opens by itself" : ""
             font.family: Theme.fontMono
             font.pixelSize: 11
             color: Lock.messageIsError ? Theme.error : Theme.muted
@@ -286,6 +292,49 @@ Item {
 
             Behavior on opacity {
                 NumberAnimation { duration: Anim.base }
+            }
+        }
+
+        // Face / fingerprint on or off (three tries a lock, then only the password). Only when one is set up.
+        Item {
+            id: bio
+
+            readonly property string state: !Config.unlockBiometrics ? "off" : Lock.bioSpent ? "password only" : "on"
+
+            visible: Lock.bioAvailable
+            anchors.horizontalCenter: parent.horizontalCenter
+            width: bioText.implicitWidth + 16
+            height: 24
+
+            Text {
+                id: bioText
+                anchors.centerIn: parent
+                text: Lock.bioName + "  ·  " + bio.state + "   tab"
+                font.family: Theme.fontMono
+                font.pixelSize: 11
+                color: bioHover.hovered ? Theme.text : bio.state === "on" ? Theme.accent : Theme.muted
+
+                Behavior on color {
+                    ColorAnimation { duration: Anim.hover }
+                }
+            }
+            Rectangle {
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.bottom: parent.bottom
+                width: bioHover.hovered ? bioText.implicitWidth : 0
+                height: 1
+                color: Theme.accent
+
+                Behavior on width {
+                    NumberAnimation { duration: Anim.base; easing.type: Anim.easing }
+                }
+            }
+            HoverHandler {
+                id: bioHover
+                cursorShape: Qt.PointingHandCursor
+            }
+            TapHandler {
+                onTapped: Lock.toggleBiometrics()
             }
         }
     }

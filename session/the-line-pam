@@ -1,0 +1,52 @@
+#!/bin/sh
+# The lock screen's PAM stacks (services/Lock.qml), in ~/.config/the-line/pam/ (no password needed to change them):
+#   the-line-password   the password only
+#   the-line            a face (howdy) and / or a fingerprint (fprintd) first, "sufficient": if they don't know you the
+#                       password is still asked; only what is installed and set up for you is in it
+# Written again at each login and each lock. A file you edit yourself (the "Written by The Line" line removed) is kept as
+# it is; its `# the-line: face` / `# the-line: fingerprint` comments say what the lock screen offers as a toggle.
+# Prints the biometric stack for the lock screen to read.
+dir="${THE_LINE_PAM_DIR:-${XDG_CONFIG_HOME:-$HOME/.config}/the-line/pam}"
+mark="Written by The Line"
+user=$(id -un)
+mkdir -p "$dir"
+
+# PAM finds a module by its name in its own folder; this asks whether the folder has it
+have_module() {
+    for d in /usr/lib/security /usr/lib64/security /lib/security /lib64/security /usr/lib/x86_64-linux-gnu/security \
+        /lib/x86_64-linux-gnu/security /usr/lib/aarch64-linux-gnu/security; do
+        [ -e "$d/$1" ] && return 0
+    done
+    return 1
+}
+
+mine() {   # 0 when The Line may (re)write $1: absent, or still ours
+    [ ! -e "$1" ] || grep -q "$mark" "$1"
+}
+
+if mine "$dir/the-line-password"; then
+    {
+        echo "# $mark (session/the-line-pam). The lock screen's stack when it only takes the password."
+        echo "auth     required  pam_unix.so"
+        echo "account  required  pam_unix.so"
+    } > "$dir/the-line-password.new" && mv "$dir/the-line-password.new" "$dir/the-line-password"
+fi
+
+if mine "$dir/the-line"; then
+    face=
+    finger=
+    have_module pam_howdy.so && [ -s "/etc/howdy/models/$user.dat" ] && face=1
+    have_module pam_fprintd.so && command -v fprintd-list >/dev/null 2>&1 \
+        && fprintd-list "$user" 2>/dev/null | grep -q ' - #[0-9]' && finger=1
+    {
+        echo "# $mark (session/the-line-pam). The lock screen's stack with a face and / or a fingerprint first."
+        [ -n "$face" ] && echo "# the-line: face"
+        [ -n "$finger" ] && echo "# the-line: fingerprint"
+        [ -n "$face" ] && echo "auth     sufficient  pam_howdy.so"
+        [ -n "$finger" ] && echo "auth     sufficient  pam_fprintd.so"
+        echo "auth     required    pam_unix.so"
+        echo "account  required    pam_unix.so"
+    } > "$dir/the-line.new" && mv "$dir/the-line.new" "$dir/the-line"
+fi
+
+cat "$dir/the-line"
