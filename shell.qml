@@ -116,6 +116,7 @@ ShellRoot {
         }
     }
     // The power menu: on Log out from CTRL+ALT+Delete, on Power off from the power button. Again to close.
+    property real lastPowerButton: 0
     function togglePower(selected) {
         const here = root.focusedScreen();
         UiState.powerSelected = selected;
@@ -230,7 +231,12 @@ ShellRoot {
 
         // The power button, from acpid (session/ has no part in it: a dispatched global arrives as a key
         // release, so Shortcut.onPressed never fires).
+        // The button often comes in twice per press (two ACPI devices report it): the second one is dropped.
         function powerButton(): void {
+            const now = Date.now();
+            if (now - root.lastPowerButton < 800)
+                return;
+            root.lastPowerButton = now;
             root.togglePower(3);
         }
 
