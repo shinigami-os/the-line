@@ -28,7 +28,7 @@ Runs on Hyprland (FHT comes later). Done so far:
 - volume, brightness and keyboard backlight keys step by `levelStep`; the clock tile shows which level the line is showing, and its value
 - polkit agent: an app asking for an admin password gets The Line's dialog (the line drawn across the screen, the box opening on it)
 
-- cheat sheet (SUPER+F1): every shortcut, read live (Hyprland's binds and their "Group: what it does" descriptions, the touchpad gestures, foot's and zsh's own bindings), in tabs
+- cheat sheet (SUPER+F1): every shortcut, read live (Hyprland's binds and their "Group: what it does" descriptions, the touchpad gestures, foot's and zsh's own bindings, yazi's keymap from its binary and your keymap.toml), in tabs
 
 - power menu (CTRL+ALT+Delete, the power button): the line runs through it, hold to confirm
 

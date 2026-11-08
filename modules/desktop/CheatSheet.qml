@@ -223,13 +223,15 @@ CenterDialog {
                                                         Repeater {
                                                             model: combo.modelData
 
+                                                            // "›" between the steps of a chord (yazi's g › g) is a mark, not a key
                                                             Rectangle {
                                                                 required property string modelData
+                                                                readonly property bool then: modelData === "›"
 
-                                                                width: capText.implicitWidth + 10
+                                                                width: capText.implicitWidth + (then ? 2 : 10)
                                                                 height: 17
                                                                 color: "transparent"
-                                                                border.width: 1
+                                                                border.width: then ? 0 : 1
                                                                 border.color: Theme.borderStrong
 
                                                                 Text {
@@ -238,7 +240,7 @@ CenterDialog {
                                                                     text: parent.modelData
                                                                     font.family: Theme.fontMono
                                                                     font.pixelSize: 10
-                                                                    color: Theme.text
+                                                                    color: parent.then ? Theme.muted : Theme.text
                                                                 }
                                                             }
                                                         }
