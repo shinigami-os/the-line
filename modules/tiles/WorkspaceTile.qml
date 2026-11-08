@@ -133,7 +133,11 @@ Tile {
             UiState.launcherQuery = r.prefix.p === "?" ? "" : r.prefix.p;
             return;
         }
+        // closing empties the search (and the calculator's answer): read what it says first
         const here = screenName;
+        const command = rest;
+        if (r.kind === "calc")
+            Calc.copy();
         UiState.close();
         if (r.kind === "app")
             Apps.launch(r.app);
@@ -143,10 +147,8 @@ Tile {
             r.tool.run(here);
         else if (r.kind === "egg")
             Eggs.run(r.egg, here);
-        else if (r.kind === "calc")
-            Calc.copy();
-        else
-            Apps.runInTerminal(rest);
+        else if (r.kind === "run")
+            Apps.runInTerminal(command);
     }
 
     function complete() {

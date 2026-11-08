@@ -26,7 +26,10 @@ Item {
     onPathChanged: settle.restart()
     onOpenChanged: {
         if (open) {
+            // the last picture shown, from the time before, must not come back for a frame
             settle.stop();
+            a.source = "";
+            b.source = "";
             show();
         }
     }
