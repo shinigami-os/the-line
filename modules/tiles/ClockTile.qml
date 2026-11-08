@@ -491,8 +491,8 @@ Tile {
                         width: (rightHalf.inner - 8) / 2
                         height: 36
                         border.width: 1
-                        border.color: Notifs.dnd ? Theme.accent : (dndHover.hovered ? Theme.borderStrong : Theme.border)
-                        color: Notifs.dnd ? Theme.accentTint : "transparent"
+                        border.color: Notifs.quiet ? Theme.accent : (dndHover.hovered ? Theme.borderStrong : Theme.border)
+                        color: Notifs.quiet ? Theme.accentTint : "transparent"
 
                         Behavior on border.color {
                             ColorAnimation { duration: Anim.base }
@@ -503,7 +503,8 @@ Tile {
 
                         Text {
                             anchors.centerIn: parent
-                            text: Notifs.dnd ? "Do not disturb · on" : "Do not disturb"
+                            // on by the button, or by the schedule (Settings > Notifications) until its end
+                            text: Notifs.dnd ? "Do not disturb · on" : Notifs.quiet ? "Do not disturb · until " + Config.dndTo : "Do not disturb"
                             font.family: Theme.fontUi
                             font.pixelSize: 12
                             font.weight: Font.Medium

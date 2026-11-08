@@ -46,6 +46,27 @@ Singleton {
     readonly property bool disableWhileTyping: adapter.disableWhileTyping
     readonly property real touchpadScroll: adapter.touchpadScroll
     readonly property real touchpadSpeed: adapter.touchpadSpeed
+    readonly property var notifMuted: adapter.notifMuted
+    readonly property bool dndScheduled: adapter.dndScheduled
+    readonly property string dndFrom: adapter.dndFrom
+    readonly property string dndTo: adapter.dndTo
+    readonly property bool dndUrgent: adapter.dndUrgent
+    readonly property int nightTemp: adapter.nightTemp
+    readonly property bool nightScheduled: adapter.nightScheduled
+    readonly property string nightFrom: adapter.nightFrom
+    readonly property string nightTo: adapter.nightTo
+
+    // "22:00" to "08:00" holds `now` (a Date), across midnight too.
+    function within(from, to, now) {
+        const m = t => {
+            const p = String(t).split(":");
+            return Number(p[0]) * 60 + Number(p[1] ?? 0);
+        };
+        const n = now.getHours() * 60 + now.getMinutes();
+        const a = m(from);
+        const b = m(to);
+        return a <= b ? n >= a && n < b : n >= a || n < b;
+    }
     readonly property var inputKeys: ["kbLayout", "kbVariant", "kbOptions", "repeatDelay", "repeatRate", "numlock", "pointerSpeed",
         "pointerAccel", "naturalScroll", "tapToClick", "disableWhileTyping", "touchpadScroll", "touchpadSpeed"]
 
@@ -180,6 +201,15 @@ Singleton {
             property bool disableWhileTyping: true
             property real touchpadScroll: 0.5
             property real touchpadSpeed: 0                  // -1 .. 1, set on each touchpad (hl.device), apart from the mouse
+            property var notifMuted: []                     // app names: their notifications go to the list, silently
+            property bool dndScheduled: false               // do not disturb from dndFrom to dndTo, every day
+            property string dndFrom: "22:00"
+            property string dndTo: "08:00"
+            property bool dndUrgent: true                   // urgent notifications still show during do not disturb
+            property int nightTemp: 4000                    // night light warmth, in kelvin (lower is warmer)
+            property bool nightScheduled: false             // night light on from nightFrom to nightTo
+            property string nightFrom: "21:00"
+            property string nightTo: "07:00"
         }
     }
 }

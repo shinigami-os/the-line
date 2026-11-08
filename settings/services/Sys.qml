@@ -29,6 +29,7 @@ Singleton {
     property string hyprland: "—"
     property string quickshell: "—"
     property string line: "—"
+    property string hyprsunset: "—"     // night light's tool: "installed" or "not installed"
 
     property var faces: []                 // [{ id, label, time }] from /etc/howdy/models/<user>.dat
     property bool faceHyprlock: false      // face sign-in turned on for unlocking the screen
@@ -107,6 +108,7 @@ Singleton {
             "echo model=$(cat /sys/class/dmi/id/sys_vendor /sys/class/dmi/id/product_name 2>/dev/null | tr '\\n' ' ')",
             "echo gpu=$(lspci 2>/dev/null | grep -Ei 'vga|3d|display' | paste -sd '|')",
             "echo os=$(. /etc/os-release; echo $PRETTY_NAME)",
+            "command -v hyprsunset >/dev/null && echo sunset=installed || echo sunset=not installed",
             "echo fingerprint=$(fprintd-list \"$USER\" 2>&1 | head -n1)",
             "echo faces=$(cat /etc/howdy/models/$USER.dat 2>/dev/null | tr -d '\\n')"
         ].join("; ")]
@@ -134,6 +136,7 @@ Singleton {
                     const name = d.match(/\[([^\]]+)\]\s*$/);
                     return name ? vendor + " " + name[1] : d;
                 }).join(" · ") || "—";
+                root.hyprsunset = v.sunset || "—";
                 root.os = (v.os || "—") + (v.release ? " " + v.release : "");
                 root.faceHyprlock = v.facehyprlock === "1";
                 root.faceGreetd = v.facegreetd === "1";

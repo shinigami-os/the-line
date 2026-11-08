@@ -3,6 +3,7 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import Quickshell
+import Quickshell.Io
 import Quickshell.Services.Notifications
 
 // The notification daemon (org.freedesktop.Notifications), the store and the toast timing.
@@ -15,6 +16,8 @@ Singleton {
     property var toast: null        // the notification shown in the clock tile, or null
     property var lastToast: null    // kept so the toast text can fade out
     property bool dnd: false
+    // Do not disturb: the button, or the schedule (Settings > Notifications).
+    readonly property bool quiet: dnd || (Config.dndScheduled && Config.within(Config.dndFrom, Config.dndTo, Time.now))
     property var _pending: null
     property int _seq: 0
 
@@ -33,11 +36,34 @@ Singleton {
             ref: ref ?? null
         };
         list = [n].concat(list).slice(0, 20);
-        const toastable = n.urgency > 0 && !dnd && UiState.openPanel !== "tc";
+        remember(app);
+        // muted apps go to the list silently; urgent ones get through do not disturb unless that is turned off
+        const muted = (Config.notifMuted ?? []).indexOf(app) >= 0;
+        const hushed = quiet && !(n.urgency === 2 && Config.dndUrgent);
+        const toastable = n.urgency > 0 && !muted && !hushed && UiState.openPanel !== "tc";
         _pending = toastable ? n : null;
         LineState.pulse(toastable && toast === null);
         if (toastable)
             showDelay.restart();
+    }
+
+    // Every app that ever sent a notification, for Settings > Notifications to mute
+    // (~/.local/state/the-line/notif-apps.json).
+    function remember(app) {
+        let known = [];
+        try {
+            known = JSON.parse(seen.text() || "[]");
+        } catch (e) {}
+        if (app === "" || known.indexOf(app) >= 0)
+            return;
+        seen.setText(JSON.stringify(known.concat([app]).sort()));
+    }
+
+    FileView {
+        id: seen
+        path: Quickshell.env("HOME") + "/.local/state/the-line/notif-apps.json"
+        blockLoading: true
+        printErrors: false
     }
 
     function markAllRead() {
@@ -100,7 +126,7 @@ Singleton {
         id: showDelay
         interval: LineState.tileDelay
         onTriggered: {
-            if (root.dnd || UiState.openPanel === "tc" || !root._pending)
+            if (UiState.openPanel === "tc" || !root._pending)
                 return;
             root.toast = root._pending;
             root.lastToast = root._pending;

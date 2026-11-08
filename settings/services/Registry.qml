@@ -44,7 +44,8 @@ Singleton {
         wifiNetworks: "WifiNetworks.qml", btDevices: "BtDevices.qml", audioDevices: "AudioDevices.qml", audioStreams: "AudioStreams.qml",
         text: "TextSetting.qml", timezone: "ZonePicker.qml", datetime: "DateTimeSetting.qml", faces: "FaceModels.qml",
         chargeLimit: "ChargeLimit.qml", appKeys: "AppKeys.qml", lineKeys: "LineKeys.qml", displayMap: "DisplayMap.qml",
-        displayModes: "DisplayModes.qml", kbLayout: "LayoutPicker.qml", aboutCard: "AboutCard.qml"
+        displayModes: "DisplayModes.qml", kbLayout: "LayoutPicker.qml", aboutCard: "AboutCard.qml",
+        disks: "DiskList.qml", homeUsage: "HomeUsage.qml", defaultApp: "DefaultApp.qml", mutedApps: "MutedApps.qml"
     })
 
     function isCustom(setting) {
@@ -56,7 +57,63 @@ Singleton {
             : setting.source === "sys" ? Sys : setting.source === "displays" ? Displays : null;
     }
 
+    // Times of day every half hour, for the schedules: { value: "21:30", label: "21:30" }.
+    readonly property var halfHours: {
+        const out = [];
+        for (let i = 0; i < 48; i++) {
+            const t = String(Math.floor(i / 2)).padStart(2, "0") + ":" + (i % 2 ? "30" : "00");
+            out.push({ value: t, label: t });
+        }
+        return out;
+    }
+
     readonly property var settings: [
+        { section: "storage", group: "Disks", key: "disks", kind: "disks", label: "Disks",
+          sub: "How full each mounted partition is", keywords: "disk drive partition space free usage ssd nvme usb" },
+        { section: "storage", group: "Your home", key: "homeUsage", kind: "homeUsage", label: "What fills your home",
+          sub: "Enter measures · Enter on a folder opens it", keywords: "home folder size du space big files" },
+
+        { section: "apps", group: "Links and files", key: "browser", app: "browser", kind: "defaultApp", label: "Web browser",
+          sub: "Opens links", keywords: "browser web internet http links firefox chromium" },
+        { section: "apps", group: "Links and files", key: "files", app: "files", kind: "defaultApp", label: "File manager",
+          sub: "Opens folders", keywords: "files folders file manager explorer dolphin nautilus thunar" },
+        { section: "apps", group: "Links and files", key: "mail", app: "mail", kind: "defaultApp", label: "Mail",
+          sub: "Opens mailto: links", keywords: "mail email mailto thunderbird" },
+        { section: "apps", group: "Links and files", key: "terminal", app: "terminal", kind: "defaultApp", label: "Terminal",
+          sub: "The Line's terminal (launcher, apps that run in one)", keywords: "terminal console shell foot kitty alacritty" },
+        { section: "apps", group: "Media and documents", key: "images", app: "images", kind: "defaultApp", label: "Images",
+          sub: "PNG, JPEG, GIF, WebP…", keywords: "image picture photo viewer png jpg" },
+        { section: "apps", group: "Media and documents", key: "video", app: "video", kind: "defaultApp", label: "Videos",
+          sub: "MP4, MKV, WebM…", keywords: "video movie player mpv vlc mp4" },
+        { section: "apps", group: "Media and documents", key: "music", app: "music", kind: "defaultApp", label: "Music",
+          sub: "MP3, FLAC, Ogg…", keywords: "music audio player mp3 flac" },
+        { section: "apps", group: "Media and documents", key: "text", app: "text", kind: "defaultApp", label: "Text",
+          sub: "Plain text files", keywords: "text editor txt notes" },
+        { section: "apps", group: "Media and documents", key: "pdf", app: "pdf", kind: "defaultApp", label: "PDF",
+          sub: "Documents", keywords: "pdf document reader viewer" },
+
+        { section: "notifications", group: "Do not disturb", key: "dndScheduled", kind: "toggle", label: "Every day, on a schedule",
+          sub: "No toast and no pulse in those hours (the button works too)", keywords: "dnd do not disturb quiet night schedule silence" },
+        { section: "notifications", group: "Do not disturb", key: "dndFrom", kind: "stops", label: "From",
+          sub: "When it starts", keywords: "dnd start quiet hours", stops: root.halfHours },
+        { section: "notifications", group: "Do not disturb", key: "dndTo", kind: "stops", label: "Until",
+          sub: "When it ends, the next morning if earlier", keywords: "dnd end quiet hours", stops: root.halfHours },
+        { section: "notifications", group: "Do not disturb", key: "dndUrgent", kind: "toggle", label: "Urgent ones still show",
+          sub: "Critical notifications (battery, calls) get through", keywords: "urgent critical dnd" },
+        { section: "notifications", group: "Apps", key: "mutedApps", kind: "mutedApps", label: "Apps",
+          sub: "Enter mutes or unmutes · a muted app goes to the list silently", keywords: "mute app silence notifications" },
+
+        { section: "nightlight", group: "Warmth", key: "nightTemp", kind: "slider", min: 2500, max: 6000, step: 100, unit: "K",
+          label: "Warmth", sub: "Lower is warmer and easier on the eyes at night", keywords: "temperature kelvin warm color colour blue light" },
+        { section: "nightlight", group: "Schedule", key: "nightScheduled", kind: "toggle", label: "Every evening, on a schedule",
+          sub: "On at the start, off at the end (the button works too)", keywords: "schedule automatic evening night" },
+        { section: "nightlight", group: "Schedule", key: "nightFrom", kind: "stops", label: "From",
+          sub: "When it turns on", keywords: "night light start evening", stops: root.halfHours },
+        { section: "nightlight", group: "Schedule", key: "nightTo", kind: "stops", label: "Until",
+          sub: "When it turns off, the next morning", keywords: "night light end morning", stops: root.halfHours },
+        { section: "nightlight", group: "Schedule", source: "sys", key: "hyprsunset", kind: "info", label: "hyprsunset",
+          sub: "What tints the screens", keywords: "hyprsunset install" },
+
         { section: "displays", group: "Your screens", key: "displayMap", kind: "displayMap", label: "Arrangement",
           sub: "← → pick a screen · Shift+arrows move it · or drag it", keywords: "position arrange layout left right above monitor" },
         { section: "displays", group: "The picked screen", source: "displays", key: "mode", kind: "displayModes", label: "Resolution and refresh rate",
