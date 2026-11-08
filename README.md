@@ -46,7 +46,10 @@ Runs on Hyprland (FHT comes later). Done so far:
 - easter eggs: `EASTER_EGGS.md`
 - settings app (SUPER+I, `settings/`): its own window, a spine of sections and a search over every setting; done so far: network, Bluetooth, sound, displays (arrangement on a snapping map, resolution, scale, rotation, main screen, on / off; changes are only drawn until Apply, then go back after 15 s unless kept), input (layout, Caps Lock, key repeat; mouse and touchpad apart), appearance (wallpaper picker per screen, accent, accent from the main screen's wallpaper, motion), workspaces (apps on their workspace, remembered floating apps, ruler), shortcuts (your app keys, The Line's keys moved or turned off, conflicts refused), power and idle (with the battery limit), notifications (do not disturb on a schedule, urgent ones through, muted apps), night light (warmth, schedule; needs hyprsunset), storage (disks, what fills your home), default apps (xdg-mime, and The Line's terminal), sign-in (howdy faces with a name, fingerprint), system (name, time, time zone, specifications), The Line's own settings, about
 
-Next: lock screen and login screen, the welcome screen (first run, replayable).
+- lock screen (SUPER+L, idle, before sleep; `modules/lock`, `services/Lock.qml`): the line glides down to the middle pulling the night over the screen, the time above it, the password typed as ticks on it; unlocking runs the accent along it and it rises back to the top, wiping the darkness up. Face sign-in (howdy) through `/etc/pam.d/hyprlock`. Locked when the shell went down: it locks again as it comes back
+- login screen (`greeter/`, run by greetd under cage): two dials of ticks turning off the left edge, read on the line; signing in winds them up until they shed their ticks onto the line, which runs out to both edges before the session starts. `qs -p greeter` with `QS_TESTING=1 QS_SCREEN=<screen>` shows it inside a session ("test" signs in)
+
+Next: the welcome screen (first run, replayable).
 
 ## Session
 
@@ -98,6 +101,7 @@ qs -p . ipc call line clockFace         # the clock easter egg
 qs -p . ipc call line search fire        # open the launcher with a search typed in
 qs -p . ipc call line wallpapers         # the wallpaper picker on the focused screen
 qs -p . ipc call line visualiser         # the music visualiser on / off
+qs -p . ipc call line lockTest 15        # a lock that opens by itself after 15 s, for trying it out
 qs -p . ipc call line say "hello"        # Kira says a line on top of the windows
 qs -p . ipc call line overview           # the workspace overview
 qs -p . ipc call line cheatsheet         # every shortcut (cheatsheetTab <n> opens a given tab)
