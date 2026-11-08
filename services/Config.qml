@@ -28,15 +28,22 @@ Singleton {
     readonly property bool workspaceScrollInverted: adapter.workspaceScrollInverted
 
     // Hyprland reads workspaceScrollInverted from this file itself: reload it when the setting changes.
+    // The settings app shares this file; only the shell reloads, or Hyprland would reload twice.
     property bool loadedOnce: false
-    onWorkspaceScrollInvertedChanged: if (loadedOnce) Quickshell.execDetached(["hyprctl", "reload"])
+    readonly property bool inShell: Quickshell.appId !== "the-line-settings"
+    onWorkspaceScrollInvertedChanged: if (loadedOnce && inShell) Quickshell.execDetached(["hyprctl", "reload"])
     readonly property var screenFilter: {
         const env = Quickshell.env("THE_LINE_SCREENS");
         return env ? env.split(",") : adapter.screens;
     }
 
     function setReduceMotion(value) {
-        adapter.reduceMotion = value;
+        set("reduceMotion", value);
+    }
+
+    // Any key of the file (the settings app writes through this).
+    function set(key, value) {
+        adapter[key] = value;
         file.writeAdapter();
     }
 

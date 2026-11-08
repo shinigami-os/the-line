@@ -1,0 +1,6 @@
+#!/bin/sh
+# Opens The Line's settings, or brings the open window forward. An optional argument opens a section:
+#   the-line-settings [network|bluetooth|sound|displays|input|appearance|workspaces|shortcuts|power|...]
+dir="${THE_LINE_DIR:-/usr/share/the-line}/settings"
+qs -p "$dir" ipc call settings open "${1:-}" 2>/dev/null && exit 0
+THE_LINE_SETTINGS_SECTION="${1:-}" exec qs -p "$dir"

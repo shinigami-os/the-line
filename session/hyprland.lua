@@ -211,7 +211,7 @@ hl.bind("SUPER+F1", hl.dsp.global("the-line:cheatsheet"), { desc = "The Line: ev
 hl.bind("SUPER+V", hl.dsp.global("the-line:clipboard"), { desc = "The Line: clipboard history" })
 hl.bind("SUPER+T", hl.dsp.global("the-line:wallpapers"), { desc = "The Line: wallpaper picker" })
 hl.bind("SUPER+semicolon", hl.dsp.global("the-line:emoji"), { desc = "The Line: emoji picker" })
-hl.bind("SUPER+I", hl.dsp.global("the-line:settings"), { desc = "The Line: settings" })
+hl.bind("SUPER+I", hl.dsp.exec_cmd(SHELL .. "/session/the-line-settings"), { desc = "The Line: settings" })
 hl.bind("CTRL+ALT+Delete", hl.dsp.global("the-line:power"), { desc = "The Line: power menu" })
 hl.bind("XF86PowerOff", hl.dsp.global("the-line:powerButton"), { locked = true, desc = "The Line: power menu (asks first)" })
 
@@ -302,5 +302,7 @@ hl.gesture({ fingers = 4, direction = "vertical", action = "fullscreen" })
 
 load_user("monitors")
 load_user("apps")
+-- The settings app floats at the size it is drawn for, centred.
+hl.window_rule({ match = { class = "^(the-line-settings)$" }, float = true, size = "1120 740" })
 load_user("floating")   -- written by The Line: the apps you float, where you left them
 load_user("custom")
