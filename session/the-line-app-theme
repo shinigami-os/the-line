@@ -1,0 +1,179 @@
+#!/usr/bin/env python3
+"""The Line's colours for other apps (colours only): GTK 3 / 4 and Qt through Kvantum.
+
+    the-line-app-theme '#9A5CFF'
+
+  GTK   ~/.config/gtk-3.0/gtk.css and ~/.config/gtk-4.0/gtk.css: libadwaita's named colours (GTK 4 apps, and GTK 3
+        apps with the adw-gtk3 theme). Prefers dark.
+  Qt    ~/.config/Kvantum/TheLine: Kvantum's KvGnomeDark recoloured (greys onto The Line's greys by lightness, its
+        blue onto the accent), and made the Kvantum theme in use.
+A file that was there before The Line wrote it is kept once as <file>.before-the-line. Run by session/the-line-apply
+(theme), at each accent change. Shapes stay the base themes' own: only colours change.
+"""
+import colorsys
+import os
+import re
+import shutil
+import subprocess
+import sys
+
+# The shell's tokens (services/Theme.qml).
+BG = "#000000"
+SURFACE = "#1B1A18"
+SURFACE2 = "#24221F"
+BORDER = "#3A3631"
+BORDER_STRONG = "#5A544C"
+TEXT = "#ECE8E1"
+MUTED = "#9C968C"
+ACCENT_TEXT = "#0F0D12"
+OK = "#6CC495"
+ERROR = "#EF7A5E"
+WARNING = "#E8B45A"
+
+HOME = os.path.expanduser("~")
+CONFIG = os.environ.get("XDG_CONFIG_HOME", os.path.join(HOME, ".config"))
+MARK = "Written by The Line"
+
+
+def rgb(hex_):
+    hex_ = hex_.lstrip("#")
+    return tuple(int(hex_[i:i + 2], 16) / 255 for i in (0, 2, 4))
+
+
+def hexof(r, g, b):
+    return "#%02x%02x%02x" % tuple(max(0, min(255, round(c * 255))) for c in (r, g, b))
+
+
+def mix(a, b, t):
+    ra, rb = rgb(a), rgb(b)
+    return hexof(*(x + (y - x) * t for x, y in zip(ra, rb)))
+
+
+def keep_original(path):
+    """The file as it was before The Line first wrote it, kept once."""
+    if os.path.exists(path):
+        with open(path, errors="replace") as f:
+            if MARK in f.read(400):
+                return
+        backup = path + ".before-the-line"
+        if not os.path.exists(backup):
+            shutil.copy2(path, backup)
+
+
+def write(path, text):
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    keep_original(path)
+    with open(path + ".new", "w") as f:
+        f.write(text)
+    os.replace(path + ".new", path)
+
+
+def gtk(accent):
+    colours = {
+        "accent_color": accent, "accent_bg_color": accent, "accent_fg_color": ACCENT_TEXT,
+        "destructive_color": ERROR, "destructive_bg_color": ERROR, "destructive_fg_color": ACCENT_TEXT,
+        "success_color": OK, "success_bg_color": OK, "success_fg_color": ACCENT_TEXT,
+        "warning_color": WARNING, "warning_bg_color": WARNING, "warning_fg_color": ACCENT_TEXT,
+        "error_color": ERROR, "error_bg_color": ERROR, "error_fg_color": ACCENT_TEXT,
+        "window_bg_color": SURFACE, "window_fg_color": TEXT,
+        "view_bg_color": BG, "view_fg_color": TEXT,
+        "headerbar_bg_color": SURFACE, "headerbar_fg_color": TEXT, "headerbar_border_color": BORDER,
+        "headerbar_backdrop_color": SURFACE, "headerbar_shade_color": BG,
+        "sidebar_bg_color": SURFACE, "sidebar_fg_color": TEXT, "sidebar_backdrop_color": SURFACE,
+        "sidebar_shade_color": BG, "secondary_sidebar_bg_color": SURFACE, "secondary_sidebar_fg_color": TEXT,
+        "card_bg_color": SURFACE2, "card_fg_color": TEXT, "card_shade_color": BG,
+        "dialog_bg_color": SURFACE, "dialog_fg_color": TEXT,
+        "popover_bg_color": SURFACE2, "popover_fg_color": TEXT, "popover_shade_color": BG,
+        "thumbnail_bg_color": SURFACE2, "thumbnail_fg_color": TEXT,
+        "shade_color": "rgba(0, 0, 0, 0.36)", "scrollbar_outline_color": BG,
+        "borders": BORDER,
+    }
+    text = "/* %s (session/the-line-app-theme) from its colours and your accent. Edits here are replaced:\n" \
+           " * add your own rules to a file of your own and @import it from another app's css instead. */\n\n" % MARK
+    text += "".join("@define-color %s %s;\n" % kv for kv in colours.items())
+    for version in ("gtk-3.0", "gtk-4.0"):
+        write(os.path.join(CONFIG, version, "gtk.css"), text)
+    if shutil.which("gsettings"):
+        subprocess.run(["gsettings", "set", "org.gnome.desktop.interface", "color-scheme", "prefer-dark"],
+                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+
+def kvantum_base():
+    for root in ("/usr/share/Kvantum", "/usr/local/share/Kvantum", os.path.join(HOME, ".local/share/Kvantum")):
+        d = os.path.join(root, "KvGnomeDark")
+        if os.path.exists(os.path.join(d, "KvGnomeDark.svg")):
+            return d
+    return None
+
+
+def kvantum(accent):
+    base = kvantum_base()
+    if not base:
+        return
+    # Greys onto The Line's ramp by lightness; coloured parts (the base's blue highlight) onto the accent, at their
+    # own lightness relative to the base's highlight.
+    ramp = [BG, SURFACE, SURFACE2, BORDER, BORDER_STRONG, MUTED, TEXT]
+    ramp_l = [colorsys.rgb_to_hls(*rgb(c))[1] for c in ramp]
+    acc_h, acc_l, acc_s = colorsys.rgb_to_hls(*rgb(accent))
+
+    def recolour(m):
+        r, g, b = rgb(m.group(0))
+        h, l, s = colorsys.rgb_to_hls(r, g, b)
+        if s > 0.35 and max(r, g, b) - min(r, g, b) > 0.15:
+            return hexof(*colorsys.hls_to_rgb(acc_h, max(0.0, min(1.0, acc_l + (l - 0.5) * 0.5)), acc_s))
+        # base theme's lightness 0.08 .. 0.85 spread over the ramp
+        t = max(0.0, min(1.0, (l - 0.08) / 0.77))
+        i = t * (len(ramp) - 1)
+        lo = int(i)
+        hi = min(lo + 1, len(ramp) - 1)
+        return mix(ramp[lo], ramp[hi], i - lo)
+
+    with open(os.path.join(base, "KvGnomeDark.svg")) as f:
+        svg = re.sub(r"#[0-9a-fA-F]{6}\b", recolour, f.read())
+    with open(os.path.join(base, "KvGnomeDark.kvconfig")) as f:
+        conf = f.read()
+
+    general = {
+        "window.color": SURFACE, "base.color": BG, "alt.base.color": SURFACE2, "button.color": SURFACE2,
+        "light.color": BORDER_STRONG, "mid.light.color": BORDER, "dark.color": BG, "mid.color": BORDER,
+        "highlight.color": accent, "inactive.highlight.color": mix(accent, SURFACE, 0.5),
+        "text.color": TEXT, "window.text.color": TEXT, "button.text.color": TEXT, "disabled.text.color": MUTED,
+        "tooltip.text.color": TEXT, "highlight.text.color": ACCENT_TEXT, "link.color": accent,
+        "link.visited.color": mix(accent, TEXT, 0.35), "progress.indicator.text.color": TEXT,
+    }
+
+    def section(m):
+        lines = m.group(0).split("\n")
+        out = [lines[0]]
+        for line in lines[1:]:
+            key = line.split("=", 1)[0].strip()
+            if key in general:
+                continue
+            out.append(line)
+        while out and out[-1] == "":
+            out.pop()
+        return "\n".join(out + ["%s=%s" % kv for kv in general.items()]) + "\n\n"
+
+    # per-widget text colours follow the same mapping; the general palette is The Line's own
+    conf = re.sub(r"#[0-9a-fA-F]{6}\b", recolour, conf)
+    conf = re.sub(r"\[GeneralColors\][^\[]*", section, conf, count=1)
+    conf = "# %s (session/the-line-app-theme): Kvantum's KvGnomeDark in The Line's colours. Edits here are replaced.\n" % MARK + conf
+
+    target = os.path.join(CONFIG, "Kvantum", "TheLine")
+    write(os.path.join(target, "TheLine.svg"), svg)
+    write(os.path.join(target, "TheLine.kvconfig"), conf)
+    write(os.path.join(CONFIG, "Kvantum", "kvantum.kvconfig"),
+          "# %s: The Line's colours for Qt apps (session/the-line-app-theme).\n[General]\ntheme=TheLine\n" % MARK)
+
+
+def main():
+    accent = sys.argv[1] if len(sys.argv) > 1 else "#9A5CFF"
+    if not re.fullmatch(r"#?[0-9a-fA-F]{6}", accent):
+        accent = "#9A5CFF"
+    accent = "#" + accent.lstrip("#").lower()
+    gtk(accent)
+    kvantum(accent)
+
+
+if __name__ == "__main__":
+    main()

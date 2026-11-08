@@ -49,9 +49,12 @@ Tile {
     property int selected: 0
     readonly property int maxRows: 6
     readonly property bool showCalc: kind === "tl" && Calc.result !== ""
-    readonly property var apps: Apps.search(query, showCalc ? maxRows - 1 : maxRows)
-    readonly property bool showRun: query.trim() !== "" && apps.length === 0 && !showCalc
+    // "wifi", "keyboard", "night": the settings app's sections, after the apps (two at most).
+    readonly property var sections: kind === "tl" ? SettingsSections.search(query).slice(0, 2) : []
+    readonly property var apps: Apps.search(query, maxRows - (showCalc ? 1 : 0) - sections.length)
+    readonly property bool showRun: query.trim() !== "" && apps.length === 0 && sections.length === 0 && !showCalc
     readonly property var results: (showCalc ? [{ kind: "calc" }] : []).concat(showRun ? [{ kind: "run" }] : apps.map(a => ({ kind: "app", app: a })))
+        .concat(sections.map(sec => ({ kind: "settings", section: sec })))
 
     function occupied(n) {
         const ws = Hyprland.workspaces.values.find(w => w.id === n);
@@ -69,6 +72,8 @@ Tile {
             return;
         if (r.kind === "app")
             Apps.launch(r.app);
+        else if (r.kind === "settings")
+            Quickshell.execDetached([Config.session("the-line-settings"), r.section.id]);
         else if (r.kind === "calc")
             Calc.copy();
         else
@@ -507,7 +512,8 @@ Tile {
                 height: 24
 
                 Section {
-                    text: tile.showCalc ? (tile.apps.length > 0 ? "CALC · APPS" : "CALC") : tile.showRun ? "RUN" : "APPS"
+                    text: [tile.showCalc ? "CALC" : "", tile.showRun ? "RUN" : tile.apps.length > 0 || tile.sections.length === 0 ? "APPS" : "",
+                        tile.sections.length > 0 ? "SETTINGS" : ""].filter(t => t !== "").join(" · ")
                 }
             }
 
@@ -532,11 +538,13 @@ Tile {
                         selected: tile.selected === appSlot.index
                         readonly property string kind: appSlot.result?.kind ?? ""
 
-                        glyph: kind === "run" ? "$" : kind === "calc" ? "=" : Apps.glyph(appSlot.result?.app?.name ?? "")
+                        glyph: kind === "run" ? "$" : kind === "calc" ? "=" : kind === "settings" ? "›" : Apps.glyph(appSlot.result?.app?.name ?? "")
                         icon: appSlot.result?.kind === "app" && (appSlot.result.app.icon ?? "") !== "" ? Quickshell.iconPath(appSlot.result.app.icon, true) : ""
-                        name: kind === "run" ? tile.query.trim() : kind === "calc" ? Calc.result : (appSlot.result?.app?.name ?? "")
+                        name: kind === "run" ? tile.query.trim() : kind === "calc" ? Calc.result
+                            : kind === "settings" ? "Settings › " + appSlot.result.section.name : (appSlot.result?.app?.name ?? "")
                         monoName: kind === "run" || kind === "calc"
-                        description: kind === "run" ? "run in terminal" : kind === "calc" ? "copy · Tab to keep going" : (appSlot.result?.app?.genericName || appSlot.result?.app?.comment || "")
+                        description: kind === "run" ? "run in terminal" : kind === "calc" ? "copy · Tab to keep going"
+                            : kind === "settings" ? appSlot.result.section.plan : (appSlot.result?.app?.genericName || appSlot.result?.app?.comment || "")
                         keycap: tile.selected === appSlot.index ? "↵" : ""
                         onHovered: tile.selected = appSlot.index
                         onActivated: tile.activate(appSlot.index)

@@ -38,9 +38,11 @@ Runs on Hyprland (FHT comes later). Done so far:
 - files: yazi in foot (SUPER+E), the default file manager (SUPER+SHIFT+E)
 - screenshots with Flameshot on the focused screen; The Line's defaults for foot (black glass, VS Code-style keys) and Flameshot are installed on first login
 
+- other apps in The Line's colours (colours only): GTK 3 / 4 through `gtk.css` (GTK 3 apps need the adw-gtk3 theme) and Qt through a Kvantum theme recoloured from KvGnomeDark; rewritten at each accent change (`session/the-line-app-theme`)
+- the launcher finds the settings: "wifi", "keyboard", "night" offer "Settings › <section>"
 - settings app (SUPER+I, `settings/`): its own window, a spine of sections and a search over every setting; done so far: network, Bluetooth, sound, displays (arrangement on a snapping map, resolution, scale, rotation, main screen, on / off; changes are only drawn until Apply, then go back after 15 s unless kept), input (layout, Caps Lock, key repeat; mouse and touchpad apart), appearance (wallpaper picker per screen, accent, accent from the main screen's wallpaper, motion), workspaces (apps on their workspace, remembered floating apps, ruler), shortcuts (your app keys, The Line's keys moved or turned off, conflicts refused), power and idle (with the battery limit), notifications (do not disturb on a schedule, urgent ones through, muted apps), night light (warmth, schedule; needs hyprsunset), storage (disks, what fills your home), default apps (xdg-mime, and The Line's terminal), sign-in (howdy faces with a name, fingerprint), system (name, time, time zone, specifications), The Line's own settings, about
 
-Next: welcome screen, first-run welcome, launcher shortcuts section, easter eggs from the backlog.
+Next: lock screen and login screen, the welcome screen (first run, replayable), the launcher's shortcuts section, SUPER+T's wallpaper picker, easter eggs from the backlog.
 
 ## Session
 
@@ -144,6 +146,6 @@ hl.bind("SUPER+P", hl.dsp.global("the-line:performance"))
 
 ## Needs
 
-Quickshell 0.3 with Hyprland, PipeWire, MPRIS, UPower and Bluetooth support, Qt Multimedia (ffmpeg backend) for video wallpapers, mpv for their thumbnails, Hyprland, NetworkManager (nmcli), brightnessctl, procps-ng top, hyprlock, loginctl, and optionally hyprsunset for night light. Fonts: Raleway and IBM Plex Mono (JetBrains Mono is the fallback).
+Quickshell 0.3 with Hyprland, PipeWire, MPRIS, UPower and Bluetooth support, Qt Multimedia (ffmpeg backend) for video wallpapers, mpv for their thumbnails, python3 (+ Pillow for the cursor), Kvantum and adw-gtk3 for other apps' colours, Hyprland, NetworkManager (nmcli), brightnessctl, procps-ng top, hyprlock, loginctl, and optionally hyprsunset for night light. Fonts: Raleway and IBM Plex Mono (JetBrains Mono is the fallback).
 
 Hyprland layer rule to avoid its own fade on the surface: `noanim` for the `the-line` namespace. The surface sits on the top layer, and on the overlay layer while its screen shows a fullscreen window.

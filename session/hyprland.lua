@@ -254,7 +254,7 @@ bind("SUPER+A", hl.dsp.global("the-line:quicksettings"), { desc = "The Line: qui
 bind("SUPER+P", hl.dsp.global("the-line:performance"), { desc = "The Line: performance" })
 -- the-line-shell starts it again; without it running (a session from before it existed), start it
 bind("SUPER+End", hl.dsp.exec_cmd("pkill -f '^qs -p " .. SHELL .. "$'; pgrep -f '^/bin/sh .*/session/the-line-shell$' >/dev/null || " .. SHELL .. "/session/the-line-shell"), { desc = "The Line: restart the shell" })
--- Coming with their features (the keys are reserved already):
+-- SUPER+T is reserved for the shell's own wallpaper picker (not built yet: Settings > Appearance has it).
 bind("SUPER+F1", hl.dsp.global("the-line:cheatsheet"), { desc = "The Line: every shortcut, in one sheet" })
 bind("SUPER+V", hl.dsp.global("the-line:clipboard"), { desc = "The Line: clipboard history" })
 bind("SUPER+T", hl.dsp.global("the-line:wallpapers"), { desc = "The Line: wallpaper picker" })

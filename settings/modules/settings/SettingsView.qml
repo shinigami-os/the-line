@@ -374,8 +374,6 @@ Item {
                     NumberAnimation { duration: Anim.panel; easing.type: Anim.easing }
                 }
 
-                opacity: (tick.modelData.plan !== "" && Registry.settingsOf(tick.modelData.id).length === 0) && !tick.current ? 0.6 : 1
-
                 Behavior on color {
                     ColorAnimation { duration: Anim.hover }
                 }
@@ -602,35 +600,6 @@ Item {
 
                     TapHandler {
                         onTapped: Displays.revert()
-                    }
-                }
-            }
-
-            // Not built yet: what is coming.
-            PanelItem {
-                visible: page.settings.length === 0
-                order: 1
-                shown: view.contentShown
-                x: 28
-                y: 78
-                width: parent.width - 56
-                height: 60
-
-                Column {
-                    spacing: 6
-
-                    Text {
-                        text: "Coming next"
-                        font.family: Theme.fontMono
-                        font.pixelSize: 11
-                        color: Theme.accent
-                    }
-                    Text {
-                        text: page.sec.plan
-                        font.family: Theme.fontUi
-                        font.pixelSize: 13
-                        font.weight: Font.Medium
-                        color: Theme.muted
                     }
                 }
             }
