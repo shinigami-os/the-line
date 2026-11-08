@@ -480,10 +480,11 @@ Item {
             NumberAnimation { duration: Anim.d(260) }
         }
 
-        // the hour, standing on the line inside the dials (the minutes and the seconds are the dials themselves)
+        // the hour, standing on the line inside the dials, centred between the screen's edge and the minute dial (the
+        // minutes and the seconds are the dials themselves)
         Text {
             id: hour
-            x: greeter.cx + greeter.minR - 76 * greeter.s - width
+            x: (greeter.cx + greeter.minR) / 2 - width / 2
             y: greeter.cy - height + 10 * greeter.s
             text: Qt.formatTime(Time.now, "HH")
             font.family: Theme.fontUi
