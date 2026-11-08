@@ -70,9 +70,12 @@ Singleton {
     readonly property var inputKeys: ["kbLayout", "kbVariant", "kbOptions", "repeatDelay", "repeatRate", "numlock", "pointerSpeed",
         "pointerAccel", "naturalScroll", "tapToClick", "disableWhileTyping", "touchpadScroll", "touchpadSpeed"]
 
-    // A script of session/: the shell runs from the repo root, the settings app from its settings/ folder.
+    // The Line's folder: the shell runs from it, the settings app from its settings/ folder.
+    readonly property string shellRoot: Quickshell.shellDir.replace(/\/settings\/?$/, "")
+
+    // A script of session/.
     function session(script) {
-        return Quickshell.shellDir.replace(/\/settings\/?$/, "") + "/session/" + script;
+        return shellRoot + "/session/" + script;
     }
 
     // The clipboard recorders read their settings when they start: restart them when those change.
@@ -175,7 +178,7 @@ Singleton {
             property real levelStep: 2                     // % per press for volume, brightness, keyboard backlight
             property bool kiraVoice: true                  // Kira's quotes on an empty workspace, and her one-off lines
             property bool workspaceScrollInverted: false   // SUPER+scroll: scroll down for the next workspace
-            property string wallpaper: "/usr/share/kira/wallpapers/default.png"   // "" = leave it to another tool
+            property string wallpaper: root.shellRoot + "/assets/wallpapers/default.png"   // The Line's own; "" = leave it to another tool
             property var wallpapers: ({})                   // { "DP-2": path }: a screen's own, over `wallpaper`
             property bool wallpaperStillOnBattery: true      // animated wallpapers stop on battery
             property string primaryScreen: ""               // "" = the first screen

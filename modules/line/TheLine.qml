@@ -15,6 +15,8 @@ Scope {
 
     readonly property string screenName: modelData.name
     readonly property bool panelHere: UiState.openScreen === screenName && UiState.openPanel !== ""
+    // A panel open on any screen: a click on this one closes it too.
+    readonly property bool panelAnywhere: UiState.openPanel !== ""
     // A dialog from the line (polkit) is open on this screen: it takes the keyboard and every click.
     readonly property bool dialogHere: (Polkit.active && Polkit.screen === screenName) || UiState.sheetScreen === screenName
         || UiState.powerScreen === screenName || UiState.clipScreen === screenName || UiState.emojiScreen === screenName
@@ -149,9 +151,9 @@ Scope {
             enabled: Power.keepAwake
         }
 
-        // Input only where something is: the tiles, or the whole surface while a panel is open
+        // Input only where something is: the tiles, or the whole surface while a panel is open on any screen
         // (so a click outside closes it without reaching the window below).
-        mask: root.panelHere || root.dialogHere ? fullMask : (root.fullscreen || root.stage > 0 ? noMask : tilesMask)
+        mask: root.panelAnywhere || root.dialogHere ? fullMask : (root.fullscreen || root.stage > 0 ? noMask : tilesMask)
 
         Region {
             id: fullMask
@@ -178,7 +180,7 @@ Scope {
 
             MouseArea {
                 anchors.fill: parent
-                enabled: root.panelHere
+                enabled: root.panelAnywhere
                 onClicked: UiState.close()
             }
 

@@ -39,7 +39,18 @@ Item {
     Text {
         x: 14
         y: name.y + name.implicitHeight + 6
-        text: (card.setting?.sub ?? "") + "      version " + Sys.line
+        text: card.setting?.sub ?? ""
+        font.family: Theme.fontMono
+        font.pixelSize: 11
+        color: Theme.muted
+    }
+
+    // The version, at the end of the line.
+    Text {
+        anchors.right: parent.right
+        anchors.rightMargin: 12
+        y: name.y + name.implicitHeight + 6
+        text: "version " + Sys.line
         font.family: Theme.fontMono
         font.pixelSize: 11
         color: Theme.muted

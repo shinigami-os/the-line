@@ -72,13 +72,25 @@ Item {
                         width: list.width
                         height: 30
 
+                        // its name (and label), then where it is mounted
                         Text {
+                            id: partName
                             x: 24
                             y: 4
-                            text: part.modelData.mount !== "" ? part.modelData.mount : part.modelData.label || part.modelData.name
+                            text: part.modelData.name + (part.modelData.label ? "  " + part.modelData.label : "")
                             font.family: Theme.fontMono
                             font.pixelSize: 11
                             color: part.modelData.mount !== "" ? Theme.text : Theme.muted
+                        }
+                        Text {
+                            visible: part.modelData.mount !== ""
+                            anchors.left: partName.right
+                            anchors.leftMargin: 14
+                            y: 4
+                            text: part.modelData.mount === "[SWAP]" ? "swap" : "on " + part.modelData.mount
+                            font.family: Theme.fontMono
+                            font.pixelSize: 11
+                            color: Theme.accent
                         }
                         Text {
                             anchors.right: parent.right

@@ -136,7 +136,7 @@ hl.bind("SUPER+P", hl.dsp.global("the-line:performance"))
 
 ```json
 { "accent": "#9A5CFF", "reduceMotion": false, "motionScale": 1.0, "screens": [], "terminal": "foot",
-  "wallpaper": "/usr/share/kira/wallpapers/default.png", "wallpapers": { "DP-2": "/path/to/its/own.mp4" },
+  "wallpaper": "/usr/share/the-line/assets/wallpapers/default.png", "wallpapers": { "DP-2": "/path/to/its/own.mp4" },
   "wallpaperStillOnBattery": true, "primaryScreen": "", "workspaceIcons": false,
   "kiraVoice": true, "workspaceScrollInverted": false, "levelStep": 2,
   "clipboardMax": 200, "clipboardImages": true, "clipboardWipeOnLogin": false }
