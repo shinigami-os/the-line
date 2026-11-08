@@ -15,6 +15,7 @@ Singleton {
     property var known: []           // saved Wi-Fi connection names
     property string wired: "—"       // the cable: "connected", "unplugged", ...
     property string address: "—"     // IPv4 on the local network
+    property string publicAddress: "—"   // as the internet sees it: asked to api.ipify.org, only while the section is open
     property string busy: ""         // the SSID being connected to
     property string error: ""        // the last failure, said plainly
     property bool scanning: false    // true while the Network section is shown: scans every 12 s
@@ -151,6 +152,28 @@ Singleton {
         stdout: StdioCollector {
             onStreamFinished: root.address = text.trim() || "—"
         }
+    }
+
+    // The public address: one HTTPS request to api.ipify.org when the Network section opens, then every 5 minutes
+    // while it stays open. Nothing is sent but the request itself.
+    onScanningChanged: if (scanning && !outside.running) outside.running = true
+
+    Process {
+        id: outside
+        command: ["curl", "-s", "-4", "--max-time", "6", "https://api.ipify.org"]
+        stdout: StdioCollector {
+            onStreamFinished: {
+                const ip = text.trim();
+                root.publicAddress = /^\d{1,3}(\.\d{1,3}){3}$/.test(ip) ? ip : "offline";
+            }
+        }
+    }
+
+    Timer {
+        running: root.scanning
+        repeat: true
+        interval: 300000
+        onTriggered: if (!outside.running) outside.running = true
     }
 
     Timer {

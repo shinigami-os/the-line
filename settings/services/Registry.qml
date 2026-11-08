@@ -60,6 +60,8 @@ Singleton {
           sub: "A network cable", keywords: "cable lan wired" },
         { section: "network", group: "This computer", source: "net", key: "address", kind: "info", label: "IP address",
           sub: "On the local network", keywords: "ip address local lan" },
+        { section: "network", group: "This computer", source: "net", key: "publicAddress", kind: "info", label: "Public IP address",
+          sub: "As the internet sees you · asked to api.ipify.org while this page is open", keywords: "ip address public external wan internet outside" },
 
         { section: "bluetooth", group: "Bluetooth", source: "bt", key: "enabled", kind: "toggle", label: "Bluetooth",
           sub: "The adapter's power", keywords: "on off radio" },

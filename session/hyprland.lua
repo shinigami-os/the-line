@@ -21,6 +21,17 @@ local function the_line_setting(key)
     return nil
 end
 
+-- A text setting from the same file ("accent": "#9A5CFF"), or `default`.
+local function the_line_text(key, default)
+    local f = io.open(HOME .. "/.config/the-line/config.json", "r")
+    if not f then
+        return default
+    end
+    local text = f:read("*a")
+    f:close()
+    return text:match('"' .. key .. '"%s*:%s*"([^"]*)"') or default
+end
+
 local function load_user(name)
     local path = HOME .. "/.config/the-line/hypr/" .. name .. ".lua"
     local f = io.open(path, "r")
@@ -66,7 +77,8 @@ hl.config({
         gaps_out = 12,   -- around a group of windows; gaps_in is between windows of the same group
         border_size = 1,
         col = {
-            active_border = "rgba(9a5cffff)",   -- the accent
+            -- the accent (config.json); a change applies live, through session/the-line-apply accent
+            active_border = "rgba(" .. the_line_text("accent", "#9A5CFF"):gsub("#", ""):lower() .. "ff)",
             inactive_border = "rgba(3a3631ff)", -- border
         },
         resize_on_border = true,
@@ -252,12 +264,25 @@ hl.bind("SUPER+F", hl.dsp.window.fullscreen(), { desc = "Windows: Fullscreen" })
 hl.bind("SUPER+ALT+Space", hl.dsp.exec_cmd(LINE .. "toggleFloat"), { desc = "Windows: Float / tile (floated apps are remembered)" })
 hl.bind("SUPER+SHIFT+Space", hl.dsp.window.center(), { desc = "Windows: Centre a floating window" })
 hl.bind("SUPER+Y", hl.dsp.layout("togglesplit"), { desc = "Windows: Toggle split" })
+-- SUPER+SHIFT+arrow: a tiled window moves in the layout (past the edge of a screen, to the next screen);
+-- a floating one goes straight to the screen that way, at the same place on it.
+local function move_window(dir)
+    return function()
+        local w = hl.get_active_window()
+        if w and w.floating then
+            -- named by address: Hyprland then keeps its place on the new screen
+            hl.dispatch(hl.dsp.window.move({ monitor = dir:sub(1, 1), window = "address:" .. w.address }))
+        else
+            hl.dispatch(hl.dsp.window.move({ direction = dir }))
+        end
+    end
+end
+
 for _, d in ipairs(dirs) do
     local arrow, letter, dir = d[1], d[2], d[3]
     for _, key in ipairs({ arrow, letter }) do
         hl.bind("SUPER+" .. key, hl.dsp.focus({ direction = dir }), { desc = "Windows: Focus " .. dir })
-        -- Moving past the edge of a screen sends the window to the next screen.
-        hl.bind("SUPER+SHIFT+" .. key, hl.dsp.window.move({ direction = dir }), { desc = "Windows: Move the window " .. dir })
+        hl.bind("SUPER+SHIFT+" .. key, move_window(dir), { desc = "Windows: Move the window " .. dir })
     end
 end
 hl.bind("SUPER+mouse:272", hl.dsp.window.drag(), { mouse = true, desc = "Windows: Move with the mouse" })

@@ -45,6 +45,11 @@ Singleton {
         onTriggered: Quickshell.execDetached([root.session("the-line-apply"), "idle"])
     }
     Timer {
+        id: applyAccent
+        interval: 700   // swatches stepped through: one cursor build for the last one
+        onTriggered: Quickshell.execDetached([root.session("the-line-apply"), "accent"])
+    }
+    Timer {
         id: applyWorkspaces
         interval: 800   // ←→ held on a workspace: one Hyprland reload at the end
         onTriggered: Quickshell.execDetached([root.session("the-line-apply"), "workspaces"])
@@ -73,6 +78,8 @@ Singleton {
             applyIdle.restart();
         else if (key === "workspaceApps")
             applyWorkspaces.restart();
+        else if (key === "accent")
+            applyAccent.restart();
     }
 
     // FileView does not create the directory.

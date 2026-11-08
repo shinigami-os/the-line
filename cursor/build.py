@@ -27,7 +27,9 @@ SS = 4  # supersampling
 
 FILL = (19, 18, 17, 255)       # bg
 LINE = (236, 232, 225, 255)    # text
-ACCENT = (154, 92, 255, 255)   # accent
+# The accent: Kira violet, or THE_LINE_ACCENT="#RRGGBB" (the-line-apply rebuilds the cursor when you change it).
+_hex = os.environ.get("THE_LINE_ACCENT", "#9A5CFF").lstrip("#")
+ACCENT = (int(_hex[0:2], 16), int(_hex[2:4], 16), int(_hex[4:6], 16), 255) if len(_hex) == 6 else (154, 92, 255, 255)
 ERROR = (239, 122, 94, 255)    # error
 DIM = (90, 84, 76, 255)        # borderStrong
 
@@ -407,7 +409,11 @@ def main():
                 os.remove(link)
             os.symlink(name, link)
 
-    # A preview sheet: every cursor at 48 px on dark and on light.
+    if len(sys.argv) > 1:
+        print("built", len(CURSORS), "cursors in", out)
+        return
+
+    # A preview sheet (in-repo builds only): every cursor at 48 px on dark and on light.
     names = list(CURSORS)
     cols, cell = 8, 72
     rows = math.ceil(len(names) / cols)

@@ -53,8 +53,10 @@ ShellRoot {
                 UiState.resizing = event.data === "resize";
             // Re-read only when something we show changed, and once things settle (debounced): re-reading on
             // every workspace event while SUPER+scroll creates and destroys workspaces crashed Quickshell.
-            if (event.name === "fullscreen")
+            if (event.name === "fullscreen") {
                 refreshWorkspaces.restart();
+                refreshWorkspacesLate.restart();
+            }
             if (["openwindow", "closewindow", "windowtitlev2", "movewindowv2"].includes(event.name))
                 refreshToplevels.restart();
         }
@@ -62,6 +64,20 @@ ShellRoot {
     Timer {
         id: refreshWorkspaces
         interval: 120
+        onTriggered: Hyprland.refreshWorkspaces()
+    }
+    // Hyprland can still report the old state 120 ms after leaving fullscreen: read it once more later.
+    Timer {
+        id: refreshWorkspacesLate
+        interval: 700
+        onTriggered: Hyprland.refreshWorkspaces()
+    }
+    // And while a workspace counts as fullscreen, keep checking: a stale "fullscreen" would keep the line hidden
+    // until the next toggle. It heals within 2.5 s whatever missed the change.
+    Timer {
+        running: Hyprland.workspaces.values.some(w => w.hasFullscreen)
+        repeat: true
+        interval: 2500
         onTriggered: Hyprland.refreshWorkspaces()
     }
     Timer {

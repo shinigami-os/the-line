@@ -12,8 +12,8 @@ Singleton {
     readonly property var nodes: Pipewire.nodes.values.filter(n => n.audio)
     readonly property var outputs: nodes.filter(n => n.isSink && !n.isStream)
     readonly property var inputs: nodes.filter(n => !n.isSink && !n.isStream)
-    // Apps playing: streams that send audio out.
-    readonly property var streams: nodes.filter(n => n.isStream && !n.isSink)
+    // Apps playing: in Quickshell a playback stream is a sink stream (it takes the app's audio to an output).
+    readonly property var streams: nodes.filter(n => n.isStream && n.isSink)
     readonly property var sink: Pipewire.defaultAudioSink
     readonly property var source: Pipewire.defaultAudioSource
 

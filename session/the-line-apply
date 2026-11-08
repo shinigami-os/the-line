@@ -3,6 +3,8 @@
 # setting changes, and at login (idle, readme):
 #   idle        ~/.config/the-line/hypridle.conf, then (re)starts hypridle with it
 #   workspaces  ~/.config/the-line/hypr/workspaces.lua (apps that open on their workspace), then reloads Hyprland
+#   accent      the accent outside the shell: window borders (live), and the cursor, rebuilt in that colour into
+#               ~/.local/share/icons/TheLine (cursor/build.py, needs python3 + Pillow), then reloaded
 #   readme      ~/.config/the-line/README.md: which file holds what, and who writes it
 # The generated files are rewritten from config.json each time: change these settings in Settings, not in them.
 
@@ -57,6 +59,21 @@ workspaces() {
     hyprctl reload >/dev/null 2>&1
 }
 
+accent() {
+    hex=$(jq -r '.accent // "#9A5CFF"' "$cfg" 2>/dev/null | tr -d '#' | tr 'A-F' 'a-f')
+    case "$hex" in [0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]) ;; *) hex=9a5cff ;; esac
+    hyprctl dispatch "function() hl.config({ general = { col = { active_border = \"rgba(${hex}ff)\" } } }) end" >/dev/null 2>&1
+
+    icons="$HOME/.local/share/icons"
+    shell="${THE_LINE_DIR:-/usr/share/the-line}"
+    rm -rf "$icons/.TheLine.new"
+    if THE_LINE_ACCENT="#$hex" python3 "$shell/cursor/build.py" "$icons/.TheLine.new" >/dev/null 2>&1; then
+        rm -rf "$icons/TheLine"
+        mv "$icons/.TheLine.new" "$icons/TheLine"
+        hyprctl setcursor TheLine "${HYPRCURSOR_SIZE:-24}" >/dev/null 2>&1
+    fi
+}
+
 readme() {
     cat > "$dir/README.md" <<'EOF'
 # Your settings for The Line
@@ -83,6 +100,7 @@ EOF
 case "$1" in
     idle) idle ;;
     workspaces) workspaces ;;
+    accent) accent ;;
     readme) readme ;;
-    *) echo "usage: the-line-apply idle|workspaces|readme" >&2; exit 1 ;;
+    *) echo "usage: the-line-apply idle|workspaces|accent|readme" >&2; exit 1 ;;
 esac

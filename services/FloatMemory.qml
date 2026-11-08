@@ -16,6 +16,8 @@ Singleton {
 
     property var memory: ({})   // class -> { w, h, x, y } (x, y on the window's screen)
     property bool dirty: false
+    // The Line's own windows with a fixed floating rule (session/hyprland.lua): never remembered over it.
+    readonly property var fixed: ["the-line-settings"]
     readonly property string rulesPath: Quickshell.env("HOME") + "/.config/the-line/hypr/floating.lua"
 
     function toggle() {
@@ -25,9 +27,18 @@ Singleton {
 
     // Settings > Workspaces: forget an app, its next window opens tiled.
     function forget(cls) {
-        if (memory[cls] === undefined)
+        // This singleton starts on first use: called before its file has loaded, read the file now.
+        let mem = memory;
+        if (mem[cls] === undefined) {
+            try {
+                mem = JSON.parse(state.text() || "{}");
+            } catch (e) {
+                mem = {};
+            }
+        }
+        if (mem[cls] === undefined)
             return;
-        const m = Object.assign({}, memory);
+        const m = Object.assign({}, mem);
         delete m[cls];
         memory = m;
         save(true);
@@ -61,7 +72,7 @@ Singleton {
         Hyprland.dispatch("hl.dsp.window.float({ action = \"enable\", " + target + " })");
         Hyprland.dispatch("hl.dsp.window.resize({ x = " + w + ", y = " + h + ", " + target + " })");
         Hyprland.dispatch("hl.dsp.window.move({ x = " + x + ", y = " + y + ", " + target + " })");
-        if (cls !== "") {
+        if (cls !== "" && fixed.indexOf(cls) < 0) {
             const m = Object.assign({}, memory);
             m[cls] = { w: w, h: h, x: x - mx, y: y - my };
             memory = m;
@@ -158,6 +169,7 @@ Singleton {
     FileView {
         id: state
         path: Quickshell.env("HOME") + "/.local/state/the-line/floating.json"
+        blockLoading: true
         printErrors: false
         onLoaded: {
             try {
