@@ -298,7 +298,7 @@ bind("Print", hl.dsp.exec_cmd("grim - | wl-copy"), { locked = true, desc = "Scre
 bind("SUPER+SHIFT+S", hl.dsp.exec_cmd(SHELL .. "/session/the-line-shot"), { desc = "Screenshots and tools: Screenshot (Flameshot, on this screen)" })
 bind("CTRL+Print", hl.dsp.exec_cmd("grim -g \"$(slurp)\" - | tesseract - - | wl-copy"), { desc = "Screenshots and tools: Text from an area (OCR) to the clipboard" })
 bind("ALT+Print", hl.dsp.exec_cmd("hyprpicker -a"), { desc = "Screenshots and tools: Colour picker to the clipboard" })
-bind("SUPER+ALT+R", hl.dsp.exec_cmd("pkill -INT -x wf-recorder || { mkdir -p ~/Videos/Recordings && wf-recorder -g \"$(slurp)\" -f ~/Videos/Recordings/$(date +%Y-%m-%d_%H.%M.%S).mp4; }"), { desc = "Screenshots and tools: Record an area (again to stop)" })
+bind("SUPER+ALT+R", hl.dsp.exec_cmd(SHELL .. "/session/the-line-record"), { desc = "Screenshots and tools: Record an area (again to stop)" })
 
 -- Windows
 bind("SUPER+Q", hl.dsp.window.close(), { desc = "Windows: Close the window" })

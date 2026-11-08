@@ -1,0 +1,26 @@
+#!/bin/sh
+# Printed for /etc/greetd/start-greeter.sh to eval before it starts cage: the keyboard layout of the last user's
+# Settings > Input (kbLayout, kbVariant, kbOptions in ~/.config/the-line/config.json), so the password is typed on the
+# layout they use in their session. Nothing printed when they left it on the console's: start-greeter.sh then keeps
+# the layout it derives from /etc/keymaps. Needs their home to be readable by greetd's user.
+# (A config path as the argument is for trying it out.)
+cfg="${1:-}"
+if [ -z "$cfg" ]; then
+    user=$(cat /var/lib/greetd/last-user 2>/dev/null)
+    [ -n "$user" ] || exit 0
+    home=$(getent passwd "$user" | cut -d: -f6)
+    cfg="$home/.config/the-line/config.json"
+fi
+[ -r "$cfg" ] || exit 0
+command -v jq >/dev/null 2>&1 || exit 0
+
+layout=$(jq -r '.kbLayout // ""' "$cfg" 2>/dev/null)
+[ -n "$layout" ] || exit 0
+# only safe words reach the shell: letters, digits, : , _ - (a layout like "us,fr", options like "caps:escape")
+safe() { printf '%s' "$1" | grep -Eq '^[A-Za-z0-9_:,-]*$'; }
+variant=$(jq -r '.kbVariant // ""' "$cfg" 2>/dev/null)
+options=$(jq -r '.kbOptions // ""' "$cfg" 2>/dev/null)
+safe "$layout" && safe "$variant" && safe "$options" || exit 0
+echo "export XKB_DEFAULT_LAYOUT='$layout'"
+echo "export XKB_DEFAULT_VARIANT='$variant'"
+echo "export XKB_DEFAULT_OPTIONS='$options'"

@@ -5,8 +5,9 @@ import qs.services
 
 // The login screen. Black; two dials of ticks (minutes, seconds) come out of the left edge and turn with the time,
 // read where they cross The Line, which runs across the whole screen at mid-height (an accent marker at each reading
-// point). The hour stands on the line past the dials, the day under it. On the right: who, and the password typed as
-// accent ticks hanging from the line. Top right: the session, Reboot, Power off.
+// point). The hour stands on the line inside the dials, like clockwork's; the day and the date past them, the line
+// running between the two. On the right: who, and the password typed as accent ticks hanging from the line. Top right:
+// the keyboard layout, the session, Reboot, Power off.
 //   checking  the dials start to spin while PAM answers
 //   refused   they slow down again, the typed ticks drain into their marker in the error colour, the line shakes
 //   granted   "shedding": the dials accelerate, and every tick that passes the reading point peels off onto the line
@@ -222,12 +223,17 @@ Item {
                 return;
             }
             const k = event.key;
-            if (k === Qt.Key_Return || k === Qt.Key_Enter) {
+            const pad = Keypad.digit(event);   // the numpad with NumLock off (cage can't set it) still types digits
+            if (pad !== "") {
+                greeter.buffer += pad;
+            } else if (k === Qt.Key_Return || k === Qt.Key_Enter) {
                 if (greeter.buffer !== "")
                     Login.signIn(greeter.buffer);
             } else if (k === Qt.Key_Backspace) {
                 greeter.buffer = event.modifiers & Qt.ControlModifier ? "" : greeter.buffer.slice(0, -1);
             } else if (k === Qt.Key_Escape) {
+                if (greeter.buffer === "")
+                    Login.leave();   // test mode only
                 greeter.buffer = "";
             } else if (k === Qt.Key_Tab || k === Qt.Key_Backtab) {
                 Login.nextUser(k === Qt.Key_Backtab ? -1 : 1);
@@ -474,37 +480,38 @@ Item {
             NumberAnimation { duration: Anim.d(260) }
         }
 
-        // the hour, standing on the line past the dials, and the day under it
+        // the hour, standing on the line inside the dials (the minutes and the seconds are the dials themselves)
         Text {
             id: hour
-            x: greeter.cx + greeter.secR + 70 * greeter.s
-            y: greeter.cy - height + 8 * greeter.s
+            x: greeter.cx + greeter.minR - 76 * greeter.s - width
+            y: greeter.cy - height + 10 * greeter.s
             text: Qt.formatTime(Time.now, "HH")
             font.family: Theme.fontUi
-            font.pixelSize: 100 * greeter.s
+            font.pixelSize: 112 * greeter.s
             font.weight: Font.Light
             color: Theme.text
         }
-        Column {
-            x: hour.x + 4 * greeter.s
-            y: greeter.cy + 18 * greeter.s
-            spacing: 6 * greeter.s
 
-            Text {
-                text: Qt.formatDate(Time.now, "dddd").toUpperCase()
-                font.family: Theme.fontUi
-                font.pixelSize: 15 * greeter.s
-                font.weight: Font.DemiBold
-                font.letterSpacing: 6 * greeter.s
-                color: Theme.text
-            }
-            Text {
-                text: Qt.formatDate(Time.now, "dd MMM yyyy").toLowerCase()
-                font.family: Theme.fontMono
-                font.pixelSize: 11 * greeter.s
-                font.letterSpacing: 2 * greeter.s
-                color: Theme.muted
-            }
+        // the day and the date past the dials, the line running between them
+        Text {
+            id: dayName
+            x: greeter.cx + greeter.secR + 72 * greeter.s
+            y: greeter.cy - height - 10 * greeter.s
+            text: Qt.formatDate(Time.now, "dddd").toUpperCase()
+            font.family: Theme.fontUi
+            font.pixelSize: 20 * greeter.s
+            font.weight: Font.DemiBold
+            font.letterSpacing: 8 * greeter.s
+            color: Theme.text
+        }
+        Text {
+            x: dayName.x
+            y: greeter.cy + 12 * greeter.s
+            text: Qt.formatDate(Time.now, "dd MMM yyyy").toLowerCase()
+            font.family: Theme.fontMono
+            font.pixelSize: 12 * greeter.s
+            font.letterSpacing: 3 * greeter.s
+            color: Theme.muted
         }
 
         // who: above the line, right-aligned on the password's marker
@@ -536,7 +543,8 @@ Item {
             y: greeter.cy + 30 * greeter.s
             text: Login.message !== "" ? Login.message.toLowerCase()
                 : Login.phase === "checking" ? "checking…"
-                : greeter.buffer === "" ? "type your password" + (Login.users.length > 1 ? "   tab: who" : "")
+                : greeter.buffer === "" ? (Login.testing ? "test mode: the password is test, esc leaves"
+                    : "type your password" + (Login.users.length > 1 ? "   tab: who" : ""))
                 : "↵ sign in"
             font.family: Theme.fontMono
             font.pixelSize: 11 * greeter.s
@@ -568,6 +576,17 @@ Item {
                 }
             }
 
+            // the keyboard the password is typed on (cage takes it from the console's keymap, or the last user's
+            // Settings > Input: greeter-env)
+            Text {
+                visible: text !== ""
+                readonly property string layout: Quickshell.env("XKB_DEFAULT_LAYOUT") ?? ""
+                text: layout === "" ? "" : layout + (Quickshell.env("XKB_DEFAULT_VARIANT") ? " · " + Quickshell.env("XKB_DEFAULT_VARIANT") : "")
+                font.family: Theme.fontMono
+                font.pixelSize: 11 * greeter.s
+                font.letterSpacing: 2
+                color: Theme.borderStrong
+            }
             Action {
                 visible: Login.sessions.length > 0
                 text: (Login.session?.name ?? "").toLowerCase() + (Login.sessions.length > 1 ? "  ·  f2" : "")

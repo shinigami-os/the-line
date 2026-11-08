@@ -1,0 +1,51 @@
+#!/bin/sh
+# Puts The Line's login screen first in /etc/greetd/start-greeter.sh, and starts cage on the last user's keyboard layout.
+#   sudo /usr/share/the-line/greeter/install-greetd [start-greeter.sh]
+# qylock and then the eww greeter stay behind it as fallbacks (each runs only if the one before died without starting a
+# session). The old file is kept once as <file>.before-the-line. Safe to run again.
+set -e
+f="${1:-/etc/greetd/start-greeter.sh}"
+# the path it was run by (/usr/share/the-line/...), not where a symlink leads: that is what start-greeter.sh keeps
+dir="$(cd "$(dirname "$0")" && pwd)"
+[ -f "$f" ] || { echo "no $f: is greetd set up with Kira's start-greeter.sh?" >&2; exit 1; }
+[ -e "$f.before-the-line" ] || cp -p "$f" "$f.before-the-line"
+changed=
+
+# 1. the layout: before cage starts, from Settings > Input of the last user (greeter-env prints nothing when it is the console's)
+if ! grep -q 'greeter-env' "$f"; then
+    grep -q '^qylock=' "$f" || { echo "the qylock= line isn't where expected: nothing changed" >&2; exit 1; }
+    awk -v env="$dir/greeter-env" '
+    /^qylock=/ && !done {
+        print "# The Line: the last user'"'"'s keyboard layout (Settings > Input), when it is not the console'"'"'s"
+        print "[ -x " env " ] && eval \"$(" env " 2>/dev/null)\""
+        print ""
+        done = 1
+    }
+    { print }' "$f" > "$f.new"
+    chmod --reference="$f" "$f.new" 2>/dev/null || chmod 755 "$f.new"
+    mv "$f.new" "$f"
+    changed=1
+fi
+
+# 2. the greeter itself, first
+if ! grep -q '^theline=' "$f"; then
+    old='[ -d /usr/share/kira-qylock/themes ] && run_cage "$qylock"'
+    grep -qF "$old" "$f" || { echo "the qylock line isn't where expected: nothing more changed" >&2; exit 1; }
+    awk -v old="$old" -v launch="$dir/launch.sh" '
+    $0 == old {
+        print "theline=" launch
+        print "[ -x \"$theline\" ] && run_cage \"$theline\""
+        print ""
+        print "# The Line'"'"'s greeter touches /run/greetd/launched before it starts a session too: no marker and no TERM, it died"
+        print "if [ -z \"$terminated\" ] && [ ! -e /run/greetd/launched ] && [ -d /usr/share/kira-qylock/themes ]; then"
+        print "    run_cage \"$qylock\""
+        print "fi"
+        next
+    }
+    { print }' "$f" > "$f.new"
+    chmod --reference="$f" "$f.new" 2>/dev/null || chmod 755 "$f.new"
+    mv "$f.new" "$f"
+    changed=1
+fi
+
+[ -n "$changed" ] && echo "done: $f (the old one: $f.before-the-line)" || echo "already there"
