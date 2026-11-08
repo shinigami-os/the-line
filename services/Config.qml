@@ -45,8 +45,9 @@ Singleton {
     readonly property bool tapToClick: adapter.tapToClick
     readonly property bool disableWhileTyping: adapter.disableWhileTyping
     readonly property real touchpadScroll: adapter.touchpadScroll
+    readonly property real touchpadSpeed: adapter.touchpadSpeed
     readonly property var inputKeys: ["kbLayout", "kbVariant", "kbOptions", "repeatDelay", "repeatRate", "numlock", "pointerSpeed",
-        "pointerAccel", "naturalScroll", "tapToClick", "disableWhileTyping", "touchpadScroll"]
+        "pointerAccel", "naturalScroll", "tapToClick", "disableWhileTyping", "touchpadScroll", "touchpadSpeed"]
 
     // A script of session/: the shell runs from the repo root, the settings app from its settings/ folder.
     function session(script) {
@@ -178,6 +179,7 @@ Singleton {
             property bool tapToClick: true
             property bool disableWhileTyping: true
             property real touchpadScroll: 0.5
+            property real touchpadSpeed: 0                  // -1 .. 1, set on each touchpad (hl.device), apart from the mouse
         }
     }
 }

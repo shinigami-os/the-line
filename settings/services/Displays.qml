@@ -4,16 +4,21 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 
-// Settings > Displays: the screens as Hyprland has them (hyprctl monitors all -j), changed by writing their lines in
-// ~/.config/the-line/hypr/monitors.lua (one hl.monitor line per screen; other lines of the file stay) and reloading.
-// Every change asks to be kept: without Enter within 15 s it goes back. A detached watchdog goes back too
+// Settings > Displays: the screens as Hyprland has them (hyprctl monitors all -j). Changes are only drawn at first
+// (`screens` is the plan, `live` what Hyprland has): Apply writes their lines in ~/.config/the-line/hypr/monitors.lua
+// (one hl.monitor line per screen; other lines of the file stay) and reloads Hyprland once.
+// Then it asks to be kept: without Enter within 15 s it goes back. A detached watchdog goes back too
 // (after 20 s), even if this app is closed or can't be seen any more.
 // Positions are Hyprland's: logical pixels (the mode divided by the scale, turned when rotated).
 Singleton {
     id: root
 
-    property var screens: []          // [{ name, desc, w, h, hz, x, y, scale, transform, disabled, modes: [{ w, h, hz }] }]
+    property var screens: []          // the plan: [{ name, desc, w, h, hz, x, y, scale, transform, disabled, modes: [{ w, h, hz }] }]
+    property var live: []             // what Hyprland has
+    property string main: Config.primaryScreen   // the main screen, as planned
+    property string mainBefore: ""     // the main screen before the change waiting to be kept
     property string selected: ""
+    property bool resync: false        // the next read replaces the plan (after going back)
     property bool pending: false       // a change waits to be kept
     property int countdown: 0
     property string error: ""
@@ -21,9 +26,15 @@ Singleton {
     readonly property string path: Quickshell.env("HOME") + "/.config/the-line/hypr/monitors.lua"
     readonly property string state: Quickshell.env("HOME") + "/.local/state/the-line"
     readonly property var current: screens.find(s => s.name === selected) ?? null
+    // Something drawn that Hyprland doesn't have yet.
+    readonly property bool dirty: main !== Config.primaryScreen || JSON.stringify(screens.map(shape)) !== JSON.stringify(live.map(shape))
+
+    function shape(s) {
+        return [s.name, s.w, s.h, Number(s.hz).toFixed(2), s.x, s.y, Number(s.scale).toFixed(4), s.transform, s.disabled];
+    }
 
     // Rows of the section (source "displays") read these.
-    readonly property bool primary: current !== null && current.name === Config.primaryScreen
+    readonly property bool primary: current !== null && current.name === main
     readonly property bool enabled: current !== null && !current.disabled
     readonly property real scale: current?.scale ?? 1
     readonly property int transform: current?.transform ?? 0
@@ -102,11 +113,35 @@ Singleton {
         return screens.map(s => s.name === name ? Object.assign({}, s, changes) : s);
     }
 
+    // The free spot against the others nearest to x, y (where a dragged screen would land), or null.
+    function snap(name, x, y) {
+        const s = screens.find(s => s.name === name);
+        if (!s)
+            return null;
+        const candidates = spots(screens, s).concat([{ x: s.x, y: s.y }]);
+        return candidates.reduce((a, b) => Math.hypot(b.x - x, b.y - y) < Math.hypot(a.x - x, a.y - y) ? b : a);
+    }
+
     // A screen dropped (map) or pushed (Shift+arrows) towards x, y: the nearest free spot against the others.
     function moveTo(name, x, y, dir) {
         const s = screens.find(s => s.name === name);
         if (!s)
             return;
+        // in a row: trade places with the neighbour that way
+        if (dir === "left" || dir === "right") {
+            const me = rect(s);
+            const side = screens.filter(o => o.name !== s.name && !o.disabled).map(o => ({ o: o, r: rect(o) }))
+                .filter(n => n.r.y < me.y + me.h && me.y < n.r.y + n.r.h)
+                .filter(n => dir === "left" ? n.r.x + n.r.w === me.x : n.r.x === me.x + me.w);
+            if (side.length > 0) {
+                const n = side[0];
+                const plan = dir === "left"
+                    ? changed(name, { x: n.r.x }).map(o => o.name === n.o.name ? Object.assign({}, o, { x: n.r.x + me.w }) : o)
+                    : changed(name, { x: me.x + n.r.w }).map(o => o.name === n.o.name ? Object.assign({}, o, { x: me.x }) : o);
+                stage(settle(plan));
+                return;
+            }
+        }
         let candidates = spots(screens, s);
         if (dir === "left") candidates = candidates.filter(p => p.x < s.x);
         if (dir === "right") candidates = candidates.filter(p => p.x > s.x);
@@ -119,7 +154,7 @@ Singleton {
         const best = candidates.reduce((a, b) => weight(b) < weight(a) ? b : a);
         if (best.x === s.x && best.y === s.y)
             return;
-        apply(normalize(changed(name, { x: best.x, y: best.y })));
+        stage(normalize(changed(name, { x: best.x, y: best.y })));
     }
 
     function options(what) {
@@ -149,11 +184,11 @@ Singleton {
         if (what === "mode") {
             const m = String(v).match(/^(\d+)x(\d+)@([\d.]+)$/);
             if (m)
-                apply(settle(changed(s.name, { w: Number(m[1]), h: Number(m[2]), hz: m[3] })));
+                stage(settle(changed(s.name, { w: Number(m[1]), h: Number(m[2]), hz: m[3] })));
         } else if (what === "scale") {
-            apply(settle(changed(s.name, { scale: Number(v) })));
+            stage(settle(changed(s.name, { scale: Number(v) })));
         } else {
-            apply(settle(changed(s.name, { transform: Number(v) })));
+            stage(settle(changed(s.name, { transform: Number(v) })));
         }
     }
 
@@ -164,11 +199,9 @@ Singleton {
             return;
         if (key === "scale" || key === "transform")
             setOption(key, v);
-        else if (key === "primary" && v) {
-            Config.set("primaryScreen", s.name);
-            // workspaces shared out again, the main screen first (session/hyprland.lua)
-            Quickshell.execDetached(["hyprctl", "dispatch", "function() the_line_spread_workspaces() end"]);
-        } else if (key === "enabled") {
+        else if (key === "primary" && v)
+            main = s.name;
+        else if (key === "enabled") {
             if (!v && screens.filter(o => !o.disabled).length <= 1) {
                 error = "The last screen on stays on";
                 return;
@@ -176,7 +209,7 @@ Singleton {
             // back on: its first mode if Hyprland lost it, to the right of the others
             const right = Math.max(0, ...screens.filter(o => !o.disabled).map(o => rect(o).x + rect(o).w));
             const mode = s.w > 0 ? {} : { w: s.modes[0]?.w ?? 1920, h: s.modes[0]?.h ?? 1080, hz: s.modes[0]?.hz ?? "60.00" };
-            apply(settle(changed(s.name, Object.assign({ disabled: !v }, v ? Object.assign({ x: right, y: 0, scale: s.scale || 1 }, mode) : {}))));
+            stage(settle(changed(s.name, Object.assign({ disabled: !v }, v ? Object.assign({ x: right, y: 0, scale: s.scale || 1 }, mode) : {}))));
         }
     }
 
@@ -206,7 +239,20 @@ Singleton {
         return lines.join("\n") + "\n";
     }
 
-    function apply(plan) {
+    function stage(plan) {
+        error = "";
+        screens = plan;
+    }
+
+    function discard() {
+        error = "";
+        screens = live;
+        main = Config.primaryScreen;
+    }
+
+    // Apply: the main screen at once (nothing to go wrong), the screens through monitors.lua, then a wait to be kept.
+    function apply() {
+        const plan = screens;
         error = "";
         if (plan.every(s => s.disabled)) {
             error = "The last screen on stays on";
@@ -215,6 +261,16 @@ Singleton {
         const on = plan.filter(s => !s.disabled).map(rect);
         if (on.some((a, i) => on.some((b, j) => j > i && overlaps(a, b)))) {
             error = "Those screens would overlap";
+            return;
+        }
+        if (main !== Config.primaryScreen) {
+            if (!pending)
+                mainBefore = Config.primaryScreen;
+            setMain(main);
+        }
+        if (JSON.stringify(plan.map(shape)) === JSON.stringify(live.map(shape))) {
+            if (mainBefore !== "" && !pending)
+                mainBefore = "";
             return;
         }
         const token = String(Date.now());
@@ -226,17 +282,31 @@ Singleton {
             + "( sleep 20; [ \"$(cat \"$st/monitors.pending\" 2>/dev/null)\" = \"$token\" ] || exit 0; "
             + "cp \"$st/monitors.lua.bak\" \"$target\"; rm -f \"$st/monitors.pending\"; hyprctl reload ) >/dev/null 2>&1 &",
             "sh", state, path, token, pending ? "0" : "1", compose(plan)]);
-        screens = plan;
+        live = plan;
         pending = true;
         countdown = 15;
         tick.restart();
         refreshSoon.restart();
     }
 
+    // The main screen in config.json, and the workspaces shared out again from it (session/hyprland.lua).
+    function setMain(name) {
+        Config.set("primaryScreen", name);
+        main = name;
+        spread.restart();
+    }
+
+    Timer {
+        id: spread
+        interval: 1500   // after Hyprland's reload, if there is one
+        onTriggered: Quickshell.execDetached(["hyprctl", "dispatch", "function() the_line_spread_workspaces() end"])
+    }
+
     function keep() {
         if (!pending)
             return;
         pending = false;
+        mainBefore = "";
         tick.stop();
         Quickshell.execDetached(["rm", "-f", state + "/monitors.pending"]);
         refreshSoon.restart();
@@ -246,7 +316,12 @@ Singleton {
         if (!pending)
             return;
         pending = false;
+        if (mainBefore !== "") {
+            setMain(mainBefore);
+            mainBefore = "";
+        }
         tick.stop();
+        resync = true;
         Quickshell.execDetached(["sh", "-c", "cp \"$1/monitors.lua.bak\" \"$2\"; rm -f \"$1/monitors.pending\"; hyprctl reload >/dev/null 2>&1",
             "sh", state, path]);
         refreshSoon.restart();
@@ -310,9 +385,14 @@ Singleton {
                             .filter((x, i, all) => all.findIndex(o => o.w === x.w && o.h === x.h && o.hz === x.hz) === i)
                             .sort((a, b) => b.w * b.h - a.w * a.h || Number(b.hz) - Number(a.hz))
                     })).sort((a, b) => a.disabled - b.disabled || a.x - b.x || a.y - b.y);
-                    // while a change waits, the plan stays what was asked (Hyprland may still be reloading)
-                    if (!root.pending)
-                        root.screens = list;
+                    // while a change waits, or is only drawn, the plan stays what was asked
+                    if (!root.pending) {
+                        const keepPlan = root.dirty && !root.resync;
+                        root.live = list;
+                        if (!keepPlan)
+                            root.screens = list;
+                        root.resync = false;
+                    }
                     if (!list.some(s => s.name === root.selected))
                         root.selected = list.find(s => s.name === Config.primaryScreen)?.name ?? list[0]?.name ?? "";
                 } catch (e) {

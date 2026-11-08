@@ -3,9 +3,10 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import qs.services
 
-// Settings > Displays > Arrangement: the screens as they sit, drawn to scale. The selected one is framed in the
-// accent; the rows below change it. ←→ pick a screen · Shift+arrows move it against the next screen that way ·
-// with the mouse: click to pick, drag to move (it snaps against the others). Screens turned off wait under the map.
+// Settings > Displays > Arrangement: the screens as planned, drawn small with room around them. The selected one is
+// framed in the accent; the rows below change it. ←→ pick a screen · Shift+arrows move it against the next screen
+// that way · with the mouse: click to pick, drag to move. A dragged screen snaps from spot to spot against the
+// others (an outline shows where it lands). Nothing reaches the screens before Apply. Screens turned off wait under the map.
 Item {
     id: map
 
@@ -21,11 +22,15 @@ Item {
     readonly property real minY: rects.length ? Math.min(...rects.map(r => r.y)) : 0
     readonly property real spanW: rects.length ? Math.max(...rects.map(r => r.x + r.w)) - minX : 1
     readonly property real spanH: rects.length ? Math.max(...rects.map(r => r.y + r.h)) - minY : 1
-    readonly property real mapH: 170
-    readonly property real f: Math.min((width - 40) / spanW, mapH / spanH)
+    readonly property real bigW: rects.length ? Math.max(...rects.map(r => r.w)) : 1
+    readonly property real bigH: rects.length ? Math.max(...rects.map(r => r.h)) : 1
+    readonly property real mapH: 210
+    // room for one more screen on every side, so a screen can be dragged above, below or beyond the others
+    readonly property real f: Math.min((width - 40) / (spanW + 2 * bigW), mapH / (spanH + 2 * bigH))
     readonly property real ox: (width - spanW * f) / 2
+    readonly property real oy: (mapH - spanH * f) / 2
 
-    implicitHeight: mapH + 20 + (off.length > 0 ? 34 : 0)
+    implicitHeight: mapH + 12 + (off.length > 0 ? 30 : 0)
 
     function key(event) {
         const k = event.key;
@@ -48,6 +53,15 @@ Item {
         return false;
     }
 
+    // The map's frame: a dotted grid would be noise; a faint border says where the room ends.
+    Rectangle {
+        width: parent.width
+        height: map.mapH
+        color: "transparent"
+        border.width: 1
+        border.color: Theme.border
+    }
+
     Repeater {
         model: map.on
 
@@ -57,21 +71,25 @@ Item {
             required property var modelData
             readonly property var r: Displays.rect(modelData)
             readonly property bool chosen: modelData.name === Displays.selected
-            readonly property bool main: modelData.name === Config.primaryScreen
+            readonly property bool main: modelData.name === Displays.main
+            // while dragged: the spot it would land on, in Hyprland's pixels
+            property var spot: null
 
-            x: map.ox + (r.x - map.minX) * map.f + (drag.active ? drag.activeTranslation.x : 0)
-            y: 6 + (r.y - map.minY) * map.f + (drag.active ? drag.activeTranslation.y : 0)
+            function spotAt(tx, ty) {
+                return Displays.snap(modelData.name, r.x + tx / map.f, r.y + ty / map.f);
+            }
+
+            x: map.ox + ((spot ? spot.x : r.x) - map.minX) * map.f
+            y: map.oy + ((spot ? spot.y : r.y) - map.minY) * map.f
             z: drag.active ? 2 : chosen ? 1 : 0
             width: r.w * map.f
             height: r.h * map.f
 
             Behavior on x {
-                enabled: !drag.active
-                NumberAnimation { duration: Anim.base; easing.type: Anim.easing }
+                NumberAnimation { duration: Anim.hover; easing.type: Anim.easing }
             }
             Behavior on y {
-                enabled: !drag.active
-                NumberAnimation { duration: Anim.base; easing.type: Anim.easing }
+                NumberAnimation { duration: Anim.hover; easing.type: Anim.easing }
             }
 
             Rectangle {
@@ -87,20 +105,20 @@ Item {
 
                 Column {
                     anchors.centerIn: parent
-                    spacing: 2
+                    spacing: 1
 
                     Text {
                         anchors.horizontalCenter: parent.horizontalCenter
                         text: screen.modelData.name
                         font.family: Theme.fontMono
-                        font.pixelSize: 11
+                        font.pixelSize: 10
                         color: Theme.text
                     }
                     Text {
                         anchors.horizontalCenter: parent.horizontalCenter
-                        text: screen.modelData.w + "×" + screen.modelData.h + (screen.modelData.scale !== 1 ? "  " + Math.round(screen.modelData.scale * 100) + "%" : "")
+                        text: screen.modelData.w + "×" + screen.modelData.h + (screen.modelData.scale !== 1 ? " " + Math.round(screen.modelData.scale * 100) + "%" : "")
                         font.family: Theme.fontMono
-                        font.pixelSize: 9
+                        font.pixelSize: 8
                         color: Theme.muted
                     }
                 }
@@ -109,8 +127,8 @@ Item {
                 Rectangle {
                     visible: screen.main
                     anchors.horizontalCenter: parent.horizontalCenter
-                    y: 5
-                    width: 18
+                    y: 4
+                    width: 14
                     height: 2
                     color: Theme.accent
                 }
@@ -132,12 +150,29 @@ Item {
                     if (active) {
                         map.picked();
                         Displays.selected = screen.modelData.name;
+                        screen.spot = screen.spotAt(0, 0);
                     } else {
-                        // dropped: the nearest free spot against the others, in Hyprland's pixels
-                        Displays.moveTo(screen.modelData.name, Math.round(screen.r.x + activeTranslation.x / map.f),
-                            Math.round(screen.r.y + activeTranslation.y / map.f), "");
+                        // moved first, then let go of the spot: no slide back to the old place on the way
+                        const s = screen.spot;
+                        if (s && (s.x !== screen.r.x || s.y !== screen.r.y))
+                            Displays.moveTo(screen.modelData.name, s.x, s.y, "");
+                        screen.spot = null;
                     }
                 }
+                onActiveTranslationChanged: if (active) screen.spot = screen.spotAt(activeTranslation.x, activeTranslation.y)
+            }
+
+            // Under the hand while dragging: where the pointer is, faint, so the jump to the spot reads as a snap.
+            Rectangle {
+                visible: drag.active
+                x: drag.activeTranslation.x - (parent.x - map.ox - (screen.r.x - map.minX) * map.f)
+                y: drag.activeTranslation.y - (parent.y - map.oy - (screen.r.y - map.minY) * map.f)
+                width: parent.width
+                height: parent.height
+                color: "transparent"
+                border.width: 1
+                border.color: Theme.muted
+                opacity: 0.5
             }
         }
     }
@@ -145,7 +180,7 @@ Item {
     // Screens turned off.
     Row {
         visible: map.off.length > 0
-        y: map.mapH + 20
+        y: map.mapH + 12
         spacing: 16
 
         Repeater {

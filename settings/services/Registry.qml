@@ -33,8 +33,9 @@ Singleton {
         { id: "storage", name: "Storage", keywords: "disk drive space partition usage", plan: "Disks, partitions, what fills your home" },
         { id: "apps", name: "Default apps", keywords: "browser file manager terminal open with mime", plan: "Browser, file manager, terminal, viewers" },
         { id: "signin", name: "Sign-in", keywords: "howdy face fingerprint login password", plan: "Howdy face models, fingerprints" },
-        { id: "system", name: "System", keywords: "hostname name date time timezone clock about version kernel", plan: "Hostname, date and time, time zone, about this computer" },
-        { id: "line", name: "The Line", keywords: "shell bar line", plan: "" }
+        { id: "system", name: "System", keywords: "hostname name date time timezone clock specifications hardware kernel", plan: "Hostname, date and time, time zone, this computer" },
+        { id: "line", name: "The Line", keywords: "shell bar line", plan: "" },
+        { id: "about", name: "About", keywords: "version credits author creator links github website", plan: "" }
     ]
 
     // Row kinds drawn by their own component (in modules/settings).
@@ -43,7 +44,7 @@ Singleton {
         wifiNetworks: "WifiNetworks.qml", btDevices: "BtDevices.qml", audioDevices: "AudioDevices.qml", audioStreams: "AudioStreams.qml",
         text: "TextSetting.qml", timezone: "ZonePicker.qml", datetime: "DateTimeSetting.qml", faces: "FaceModels.qml",
         chargeLimit: "ChargeLimit.qml", appKeys: "AppKeys.qml", lineKeys: "LineKeys.qml", displayMap: "DisplayMap.qml",
-        displayModes: "DisplayModes.qml", kbLayout: "LayoutPicker.qml"
+        displayModes: "DisplayModes.qml", kbLayout: "LayoutPicker.qml", aboutCard: "AboutCard.qml"
     })
 
     function isCustom(setting) {
@@ -82,24 +83,29 @@ Singleton {
           label: "Repeat speed", sub: "Letters per second, once it repeats", keywords: "repeat rate speed" },
         { section: "input", group: "Keyboard", key: "numlock", kind: "toggle", label: "Num Lock on at login",
           sub: "The number pad types numbers", keywords: "numlock numpad numbers" },
-        { section: "input", group: "Mouse and touchpad", key: "pointerSpeed", kind: "slider", min: -1, max: 1, step: 0.05, decimals: 2, unit: "",
-          label: "Pointer speed", sub: "0 is the device's own speed", keywords: "mouse speed sensitivity cursor pointer" },
-        { section: "input", group: "Mouse and touchpad", key: "pointerAccel", kind: "choice", label: "Acceleration",
+        { section: "input", group: "Mouse", key: "pointerSpeed", kind: "slider", min: -1, max: 1, step: 0.05, decimals: 2, unit: "",
+          label: "Speed", sub: "0 is the mouse's own speed", keywords: "mouse speed sensitivity cursor pointer" },
+        { section: "input", group: "Mouse", key: "pointerAccel", kind: "choice", label: "Acceleration",
           sub: "Flat: the pointer moves as far as your hand", keywords: "mouse acceleration accel flat adaptive gaming",
           choices: [{ value: "", label: "device's" }, { value: "adaptive", label: "adaptive" }, { value: "flat", label: "flat" }] },
-        { section: "input", group: "Mouse and touchpad", key: "tapToClick", kind: "toggle", label: "Tap to click",
+        { section: "input", group: "Touchpad", key: "touchpadSpeed", kind: "slider", min: -1, max: 1, step: 0.05, decimals: 2, unit: "",
+          label: "Speed", sub: "The touchpad's own, apart from the mouse", keywords: "touchpad trackpad speed sensitivity cursor pointer" },
+        { section: "input", group: "Touchpad", key: "tapToClick", kind: "toggle", label: "Tap to click",
           sub: "A tap on the touchpad clicks", keywords: "touchpad tap click trackpad" },
-        { section: "input", group: "Mouse and touchpad", key: "naturalScroll", kind: "toggle", label: "Natural scrolling",
+        { section: "input", group: "Touchpad", key: "naturalScroll", kind: "toggle", label: "Natural scrolling",
           sub: "On the touchpad, the page follows your fingers", keywords: "touchpad scroll reverse natural direction trackpad" },
-        { section: "input", group: "Mouse and touchpad", key: "touchpadScroll", kind: "slider", min: 0.1, max: 2, step: 0.05, decimals: 2, unit: "×",
+        { section: "input", group: "Touchpad", key: "touchpadScroll", kind: "slider", min: 0.1, max: 2, step: 0.05, decimals: 2, unit: "×",
           label: "Touchpad scroll speed", sub: "How far two fingers scroll", keywords: "touchpad scroll speed factor trackpad" },
-        { section: "input", group: "Mouse and touchpad", key: "disableWhileTyping", kind: "toggle", label: "Touchpad off while typing",
+        { section: "input", group: "Touchpad", key: "disableWhileTyping", kind: "toggle", label: "Touchpad off while typing",
           sub: "No stray clicks from your palms", keywords: "touchpad typing palm disable trackpad" },
 
         { section: "shortcuts", group: "Your apps", key: "appKeys", kind: "appKeys", label: "Your app keys",
           sub: "Enter gives new keys · Delete removes one · kept in hypr/apps.lua", keywords: "app launch keys bind hotkey terminal browser" },
         { section: "shortcuts", group: "The Line's", key: "lineKeys", kind: "lineKeys", label: "The Line's keys",
           sub: "Enter gives new keys · Delete turns one off · R puts it back", keywords: "rebind keys bind hotkey shortcut launcher lock screenshot window workspace" },
+        { section: "shortcuts", group: "The Line's", key: "workspaceKeys", kind: "info", label: "Workspaces 1 to 10",
+          sub: "Go: Super · send the window: Super+Ctrl · send and follow: Super+Shift", keywords: "workspace number digit send move",
+          value: "the 1 … 0 keys" },
         { section: "shortcuts", group: "The Line's", key: "cheatsheet", kind: "info", label: "Every shortcut at once",
           sub: "The cheat sheet, anywhere", keywords: "cheat sheet help list", value: "Super + F1" },
 
@@ -112,11 +118,22 @@ Singleton {
           sub: "Enter, then type a city", keywords: "timezone zone city region clock" },
         { section: "system", group: "Date and time", source: "sys", key: "time", kind: "datetime", label: "Date and time",
           sub: "Turn off the automatic time to set it by hand", keywords: "date time clock set" },
-        { section: "system", group: "About", source: "sys", key: "release", kind: "info", label: "Kira Linux", sub: "The base system's version", keywords: "version release about" },
-        { section: "system", group: "About", source: "sys", key: "kernel", kind: "info", label: "Kernel", sub: "Shinigami", keywords: "kernel linux version shinigami" },
-        { section: "system", group: "About", source: "sys", key: "cpu", kind: "info", label: "Processor", sub: "", keywords: "cpu processor" },
-        { section: "system", group: "About", source: "sys", key: "memory", kind: "info", label: "Memory", sub: "", keywords: "ram memory" },
-        { section: "system", group: "About", source: "sys", key: "uptime", kind: "info", label: "Running for", sub: "Since the last start", keywords: "uptime" },
+        { section: "system", group: "Specifications", source: "sys", key: "model", kind: "info", label: "Computer", sub: "", keywords: "model vendor laptop hardware" },
+        { section: "system", group: "Specifications", source: "sys", key: "cpu", kind: "info", label: "Processor", sub: "", keywords: "cpu processor" },
+        { section: "system", group: "Specifications", source: "sys", key: "gpu", kind: "info", label: "Graphics", sub: "", keywords: "gpu graphics card nvidia intel amd video" },
+        { section: "system", group: "Specifications", source: "sys", key: "memory", kind: "info", label: "Memory", sub: "", keywords: "ram memory" },
+        { section: "system", group: "Specifications", source: "sys", key: "kernel", kind: "info", label: "Kernel", sub: "", keywords: "kernel linux version shinigami" },
+        { section: "system", group: "Specifications", source: "sys", key: "uptime", kind: "info", label: "Running for", sub: "Since the last start", keywords: "uptime" },
+
+        { section: "about", group: "The Line", key: "aboutCard", kind: "aboutCard", label: "The Line", bare: true,
+          sub: "A desktop shell for Hyprland, made with Quickshell", keywords: "version shell" },
+        { section: "about", group: "The Line", source: "sys", key: "os", kind: "info", label: "Running on", sub: "The system under it", keywords: "os distribution kira linux release" },
+        { section: "about", group: "The Line", source: "sys", key: "hyprland", kind: "info", label: "Hyprland", sub: "The compositor: windows, workspaces, keys", keywords: "compositor wayland version" },
+        { section: "about", group: "The Line", source: "sys", key: "quickshell", kind: "info", label: "Quickshell", sub: "What the shell is built with (QML)", keywords: "qml qt version" },
+        { section: "about", group: "Made by", key: "creator", kind: "info", label: "OxoGhost", sub: "Who made The Line", keywords: "creator author credits", value: "creator" },
+        { section: "about", group: "Made by", key: "website", kind: "link", label: "Website", sub: "Enter opens it", keywords: "site web link", value: "oxoghost.dev", url: "https://oxoghost.dev" },
+        { section: "about", group: "Made by", key: "github", kind: "link", label: "GitHub", sub: "Enter opens it", keywords: "github code link", value: "github.com/OxoGhost01", url: "https://github.com/OxoGhost01" },
+        { section: "about", group: "Made by", key: "source", kind: "link", label: "The Line's code", sub: "Enter opens it", keywords: "source repository git link", value: "github.com/shinigami-os/the-line", url: "https://github.com/shinigami-os/the-line" },
 
         { section: "signin", group: "Your face", source: "sys", key: "faces", kind: "faces", label: "Faces",
           sub: "Recorded with howdy · Delete removes one", keywords: "howdy face camera record ir" },
@@ -257,7 +274,7 @@ Singleton {
             return String(v).split("/").pop();
         if (setting.kind === "workspaceApps")
             return (v ?? []).length + " apps";
-        if (setting.kind === "info")
+        if (setting.kind === "info" || setting.kind === "link")
             return String(v);
         if (setting.kind === "text" || setting.kind === "timezone")
             return String(v);
@@ -288,7 +305,9 @@ Singleton {
     // Steps a setting: toggles flip, sliders and choices move by `dir` (-1 / 1, wrapping for choices).
     function step(setting, dir) {
         const v = value(setting);
-        if (setting.kind === "toggle") {
+        if (setting.kind === "link") {
+            Qt.openUrlExternally(setting.url);
+        } else if (setting.kind === "toggle") {
             set(setting, !v);
         } else if (setting.kind === "slider") {
             set(setting, snap(setting, v + dir * setting.step));

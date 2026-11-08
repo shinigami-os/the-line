@@ -36,8 +36,12 @@ Singleton {
         return ["SUPER", "CTRL", "ALT", "SHIFT"].filter(m => held.indexOf(m) >= 0).concat([key]).join("+");
     }
 
+    // Binds made with "code:N" come back from the Lua config with no key and keycode 0: the workspace keys are
+    // known by their number (session/hyprland.lua binds workspace i to code (i % 10) + 9).
     function comboOf(bind) {
-        const key = (bind.key ?? "") === "" && bind.keycode ? "code:" + bind.keycode : (bind.key ?? "");
+        const ws = (bind.description ?? "").match(/workspace (\d+)/);
+        const key = (bind.key ?? "") !== "" ? bind.key : bind.keycode ? "code:" + bind.keycode
+            : ws ? "code:" + (Number(ws[1]) % 10 + 9) : "";
         return mods.filter(m => bind.modmask & m[0]).map(m => m[1]).concat([key]).join("+");
     }
 
@@ -327,7 +331,7 @@ Singleton {
                 try {
                     root.binds = JSON.parse(text).filter(b => b.submap === "").map(b => ({
                         combo: root.comboOf(b), desc: b.description ?? "", mouse: b.mouse
-                    }));
+                    })).filter(b => !b.combo.endsWith("+") && b.combo !== "");
                     root.buildLine();
                 } catch (e) {
                     console.warn("keys:", e);

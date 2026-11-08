@@ -26,7 +26,9 @@ Rectangle {
     readonly property real cursorY: custom && body.item && body.item.cursorY !== undefined && body.item.cursorY >= 0 ? body.y + body.item.cursorY : -1
     readonly property real cursorH: custom && body.item && body.item.cursorH !== undefined ? body.item.cursorH : 34
 
-    height: custom ? 52 + (body.item ? body.item.implicitHeight : 0) + 16 : 52
+    // `bare`: a custom row that draws its own title (About's card): no label over it
+    readonly property bool bare: setting.bare === true
+    height: custom ? (bare ? 12 : 52) + (body.item ? body.item.implicitHeight : 0) + 16 : 52
     color: selected ? Theme.surface2 : "transparent"
 
     Behavior on color {
@@ -49,10 +51,15 @@ Rectangle {
         onHoveredChanged: if (hovered && !row.custom && Registry.hoverPicks()) row.picked()
     }
     TapHandler {
-        onTapped: row.picked()
+        onTapped: {
+            row.picked();
+            if (row.setting.kind === "link")
+                Qt.openUrlExternally(row.setting.url);
+        }
     }
 
     Column {
+        visible: !row.bare
         x: 18
         y: 26 - height / 2
         width: parent.width - control.width - 54
@@ -83,7 +90,7 @@ Rectangle {
         id: body
 
         x: 18
-        y: 52
+        y: row.bare ? 12 : 52
         width: row.width - 36
         active: row.custom
         source: row.custom ? Registry.customs[row.setting.kind] : ""
@@ -106,19 +113,19 @@ Rectangle {
         y: 26 - height / 2
         visible: !row.custom
         width: row.setting.kind === "slider" || row.setting.kind === "stops" || row.setting.kind === "speed" ? 300
-            : row.setting.kind === "toggle" ? 70 : row.setting.kind === "info" ? infoText.implicitWidth : choices.width
+            : row.setting.kind === "toggle" ? 70 : row.setting.kind === "info" || row.setting.kind === "link" ? infoText.implicitWidth : choices.width
         height: row.setting.kind === "speed" ? 34 : 20
 
         // Info: just the value.
         Text {
             id: infoText
-            visible: row.setting.kind === "info"
+            visible: row.setting.kind === "info" || row.setting.kind === "link"
             anchors.right: parent.right
             anchors.verticalCenter: parent.verticalCenter
-            text: visible ? Registry.valueText(row.setting) : ""
+            text: visible ? Registry.valueText(row.setting) + (row.setting.kind === "link" ? "  ↗" : "") : ""
             font.family: Theme.fontMono
             font.pixelSize: 11
-            color: Theme.text
+            color: row.setting.kind === "link" ? Theme.accent : Theme.text
         }
 
         // Toggle: a short line with the knob at its end, "on" lit in the accent.

@@ -20,8 +20,17 @@ ShellRoot {
         implicitHeight: 740
         color: Theme.bg
 
-        // Closing the window ends the app.
-        onVisibleChanged: if (!visible) Qt.quit()
+        // Closing the window ends the app; with screen changes not applied, it comes back to ask first.
+        onVisibleChanged: {
+            if (visible)
+                return;
+            if (Displays.dirty && !Displays.pending) {
+                visible = true;
+                view.quit();
+            } else {
+                Qt.quit();
+            }
+        }
 
         SettingsView {
             id: view

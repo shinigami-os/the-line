@@ -22,6 +22,13 @@ Singleton {
     property string cpu: "—"
     property string memory: "—"
     property string uptime: "—"
+    property string model: "—"
+    property string gpu: "—"
+    // About: what The Line runs on
+    property string os: "—"
+    property string hyprland: "—"
+    property string quickshell: "—"
+    property string line: "—"
 
     property var faces: []                 // [{ id, label, time }] from /etc/howdy/models/<user>.dat
     property bool faceHyprlock: false      // face sign-in turned on for unlocking the screen
@@ -97,6 +104,9 @@ Singleton {
             "grep -q 'pam_howdy.so  # the-line' /etc/pam.d/hyprlock 2>/dev/null && echo facehyprlock=1",
             "grep -q 'pam_howdy.so  # the-line' /etc/pam.d/greetd 2>/dev/null && echo facegreetd=1",
             "b=$(ls -d /sys/class/power_supply/BAT* 2>/dev/null | head -n1); [ -n \"$b\" ] && [ -f \"$b/charge_control_end_threshold\" ] && echo charge=$(cat \"$b/charge_control_end_threshold\")",
+            "echo model=$(cat /sys/class/dmi/id/sys_vendor /sys/class/dmi/id/product_name 2>/dev/null | tr '\\n' ' ')",
+            "echo gpu=$(lspci 2>/dev/null | grep -Ei 'vga|3d|display' | paste -sd '|')",
+            "echo os=$(. /etc/os-release; echo $PRETTY_NAME)",
             "echo fingerprint=$(fprintd-list \"$USER\" 2>&1 | head -n1)",
             "echo faces=$(cat /etc/howdy/models/$USER.dat 2>/dev/null | tr -d '\\n')"
         ].join("; ")]
@@ -116,6 +126,15 @@ Singleton {
                 root.cpu = (v.cpu || "—").replace(/\s+/g, " ");
                 root.memory = v.memory || "—";
                 root.uptime = v.uptime || "—";
+                root.model = (v.model || "").trim() || "—";
+                // "00:02.0 VGA compatible controller: Intel Corporation Raptor Lake-P [UHD Graphics] (rev 04)" -> "Intel UHD Graphics"
+                root.gpu = (v.gpu || "").split("|").filter(g => g !== "").map(g => {
+                    const d = g.replace(/^\S+\s+[^:]+:\s*/, "").replace(/\s*\(rev [0-9a-f]+\)$/, "");
+                    const vendor = d.split(" ")[0].replace("Advanced", "AMD");
+                    const name = d.match(/\[([^\]]+)\]\s*$/);
+                    return name ? vendor + " " + name[1] : d;
+                }).join(" · ") || "—";
+                root.os = (v.os || "—") + (v.release ? " " + v.release : "");
                 root.faceHyprlock = v.facehyprlock === "1";
                 root.faceGreetd = v.facegreetd === "1";
                 root.chargeSupported = v.charge !== undefined;
@@ -127,6 +146,24 @@ Singleton {
                     root.faces = models.map(m => ({ id: m.id, label: m.label, time: m.time }));
                 } catch (e) {
                     root.faces = [];
+                }
+            }
+        }
+    }
+
+    // Versions, once: Hyprland, Quickshell, and The Line itself (its git revision while it runs from a checkout).
+    Process {
+        running: true
+        command: ["sh", "-c", "echo hyprland=$(hyprctl version -j 2>/dev/null | jq -r .tag); echo quickshell=$(qs --version 2>/dev/null | awk 'NR==1 { print $2 }'); "
+            + "echo line=$(cat \"$1/VERSION\" 2>/dev/null || git -C \"$1\" describe --tags --always --dirty 2>/dev/null)",
+            "sh", Quickshell.shellDir.replace(/\/settings\/?$/, "")]
+        stdout: StdioCollector {
+            onStreamFinished: {
+                for (const l of text.split("\n")) {
+                    const eq = l.indexOf("=");
+                    const v = l.slice(eq + 1).trim();
+                    if (eq > 0 && v !== "")
+                        root[l.slice(0, eq)] = l.startsWith("hyprland") ? v.replace(/^v/, "") : v;
                 }
             }
         }

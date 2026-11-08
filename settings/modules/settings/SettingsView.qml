@@ -36,6 +36,47 @@ Item {
     readonly property int rowH: 31
     readonly property int firstRowY: topLineY + 30
 
+    // Displays only draws its changes: leaving it (Esc, another section, a search jump, quitting) with changes not
+    // applied asks first. `then` runs once answered (apply or not); "Esc stay" drops it.
+    property var askApply: null
+    property bool quitAfterKeep: false
+
+    function guard(then) {
+        if (Displays.dirty && !Displays.pending)
+            askApply = then;
+        else
+            then();
+    }
+
+    function answer(apply) {
+        const then = askApply;
+        askApply = null;
+        if (apply)
+            Displays.apply();
+        else
+            Displays.discard();
+        then();
+    }
+
+    // Closing waits for an applied change to be kept or to go back.
+    function quit() {
+        guard(() => {
+            if (Displays.pending)
+                quitAfterKeep = true;
+            else
+                Qt.quit();
+        });
+    }
+
+    Connections {
+        target: Displays
+
+        function onPendingChanged() {
+            if (!Displays.pending && view.quitAfterKeep)
+                Qt.quit();
+        }
+    }
+
     function rowCenter(i) {
         return firstRowY + i * rowH + rowH / 2;
     }
@@ -70,6 +111,10 @@ Item {
     function jump(result) {
         if (!result)
             return;
+        if (result.section !== "displays" && askApply === null && Displays.dirty && !Displays.pending) {
+            guard(() => jump(result));
+            return;
+        }
         endSearch();
         sectionIndex = Registry.sections.findIndex(s => s.id === result.section);
         if (result.kind === "setting") {
@@ -112,6 +157,17 @@ Item {
         Keys.onPressed: event => {
             Registry.keyAt = Date.now();
             const k = event.key;
+            // Apply the screens? Enter applies, Delete doesn't, Esc stays on the page.
+            if (view.askApply !== null) {
+                if (k === Qt.Key_Return || k === Qt.Key_Enter)
+                    view.answer(true);
+                else if (k === Qt.Key_Delete || k === Qt.Key_Backspace)
+                    view.answer(false);
+                else if (k === Qt.Key_Escape)
+                    view.askApply = null;
+                event.accepted = true;
+                return;
+            }
             // A screen change waits to be kept: Enter keeps it, Esc goes back, wherever the keyboard is.
             if (Displays.pending && (k === Qt.Key_Return || k === Qt.Key_Enter || k === Qt.Key_Escape)) {
                 if (k === Qt.Key_Escape)
@@ -128,12 +184,12 @@ Item {
             }
             if (event.modifiers & Qt.ControlModifier) {
                 if (k === Qt.Key_Q || k === Qt.Key_W)
-                    Qt.quit();
+                    view.quit();
                 return;
             }
             const setting = view.rows[view.rowIndex];
             const custom = setting && Registry.isCustom(setting);
-            const stepper = setting && setting.kind !== "toggle" && setting.kind !== "info" && !custom;
+            const stepper = setting && setting.kind !== "toggle" && setting.kind !== "info" && setting.kind !== "link" && !custom;
             if (view.area === "spine") {
                 if (k === Qt.Key_Up || k === Qt.Key_Down) {
                     view.sectionIndex = Math.max(0, Math.min(Registry.sections.length - 1, view.sectionIndex + (k === Qt.Key_Up ? -1 : 1)));
@@ -143,7 +199,7 @@ Item {
                         view.rowIndex = 0;
                     }
                 } else if (k === Qt.Key_Escape) {
-                    Qt.quit();
+                    view.quit();
                 } else if (event.text.length === 1 && event.text.trim() !== "") {
                     view.startSearch(event.text);
                 } else {
@@ -161,7 +217,7 @@ Item {
                 } else if ((k === Qt.Key_Return || k === Qt.Key_Enter || k === Qt.Key_Space) && !custom && setting.kind !== "info") {
                     Registry.step(setting, 1);
                 } else if (k === Qt.Key_Left || k === Qt.Key_Escape || k === Qt.Key_Backspace || k === Qt.Key_Backtab) {
-                    view.area = "spine";
+                    view.guard(() => view.area = "spine");
                 } else if (event.text.length === 1 && event.text.trim() !== "") {
                     view.startSearch(event.text);
                 } else {
@@ -330,12 +386,12 @@ Item {
                 cursorShape: Qt.PointingHandCursor
             }
             TapHandler {
-                onTapped: {
+                onTapped: view.guard(() => {
                     view.endSearch();
                     view.sectionIndex = tick.index;
                     view.area = "spine";
                     keys.forceActiveFocus();
-                }
+                })
             }
         }
     }
@@ -484,16 +540,46 @@ Item {
 
             // Displays: a change waiting to be kept, or why one was refused.
             Row {
-                visible: page.sec.id === "displays" && (Displays.pending || Displays.error !== "")
+                visible: page.sec.id === "displays" && (Displays.pending || Displays.dirty || Displays.error !== "")
                 x: 28
                 y: 60
                 spacing: 18
 
                 Text {
-                    text: Displays.pending ? "Keep these settings? Going back in " + Displays.countdown + " s" : Displays.error
+                    text: Displays.error !== "" ? Displays.error : Displays.pending ? "Keep these settings? Going back in " + Displays.countdown + " s"
+                        : "Not applied yet: the screens change on Apply (or Esc)"
                     font.family: Theme.fontMono
                     font.pixelSize: 11
-                    color: Displays.pending ? Theme.accent : Theme.error
+                    color: Displays.error !== "" ? Theme.error : Theme.accent
+                }
+                Text {
+                    visible: Displays.dirty && !Displays.pending
+                    text: "Apply"
+                    font.family: Theme.fontMono
+                    font.pixelSize: 11
+                    font.weight: Font.DemiBold
+                    color: Theme.text
+
+                    HoverHandler {
+                        cursorShape: Qt.PointingHandCursor
+                    }
+                    TapHandler {
+                        onTapped: Displays.apply()
+                    }
+                }
+                Text {
+                    visible: Displays.dirty && !Displays.pending
+                    text: "Undo"
+                    font.family: Theme.fontMono
+                    font.pixelSize: 11
+                    color: Theme.muted
+
+                    HoverHandler {
+                        cursorShape: Qt.PointingHandCursor
+                    }
+                    TapHandler {
+                        onTapped: Displays.discard()
+                    }
                 }
                 Text {
                     visible: Displays.pending
@@ -784,6 +870,112 @@ Item {
                         }
                         TapHandler {
                             onTapped: view.jump(result.modelData)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // ------------------------------------------------------------------ apply the screens?
+
+    Item {
+        anchors.fill: parent
+        visible: opacity > 0
+        opacity: view.askApply !== null ? 1 : 0
+
+        Behavior on opacity {
+            NumberAnimation { duration: Anim.hover }
+        }
+
+        // Clicks don't reach the page under it; a click outside the box stays on the page.
+        Rectangle {
+            anchors.fill: parent
+            color: "black"
+            opacity: 0.5
+
+            TapHandler {
+                onTapped: view.askApply = null
+            }
+        }
+
+        Rectangle {
+            anchors.centerIn: parent
+            width: 460
+            height: 150
+            color: Theme.bg
+            border.width: 1
+            border.color: Theme.borderStrong
+
+            Rectangle {
+                width: 2
+                height: parent.height
+                color: Theme.accent
+            }
+
+            Column {
+                x: 26
+                y: 22
+                spacing: 6
+
+                Text {
+                    text: "Apply the changes to your screens?"
+                    font.family: Theme.fontUi
+                    font.pixelSize: 16
+                    font.weight: Font.Medium
+                    color: Theme.text
+                }
+                Text {
+                    text: "They are tried at once: Enter then keeps them, or they go back in 15 s."
+                    font.family: Theme.fontUi
+                    font.pixelSize: 11
+                    color: Theme.muted
+                }
+            }
+
+            Row {
+                x: 26
+                y: parent.height - 44
+                spacing: 24
+
+                Repeater {
+                    model: [
+                        { keys: "↵", text: "Apply", act: 1 },
+                        { keys: "Del", text: "Don't apply", act: 0 },
+                        { keys: "Esc", text: "Stay here", act: -1 }
+                    ]
+
+                    Row {
+                        id: choice
+
+                        required property var modelData
+
+                        spacing: 8
+
+                        Text {
+                            text: choice.modelData.keys
+                            font.family: Theme.fontMono
+                            font.pixelSize: 11
+                            color: Theme.muted
+                        }
+                        Text {
+                            text: choice.modelData.text
+                            font.family: Theme.fontUi
+                            font.pixelSize: 12
+                            font.weight: choice.modelData.act === 1 ? Font.DemiBold : Font.Medium
+                            color: choice.modelData.act === 1 ? Theme.accent : Theme.text
+                        }
+
+                        HoverHandler {
+                            cursorShape: Qt.PointingHandCursor
+                        }
+                        TapHandler {
+                            onTapped: {
+                                if (choice.modelData.act < 0)
+                                    view.askApply = null;
+                                else
+                                    view.answer(choice.modelData.act === 1);
+                            }
                         }
                     }
                 }
