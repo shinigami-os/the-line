@@ -48,9 +48,10 @@ Tile {
     readonly property string query: UiState.launcherQuery
     property int selected: 0
     readonly property int maxRows: 6
-    readonly property var apps: Apps.search(query, maxRows)
-    readonly property bool showRun: query.trim() !== "" && apps.length === 0
-    readonly property var results: showRun ? [{ kind: "run" }] : apps.map(a => ({ kind: "app", app: a }))
+    readonly property bool showCalc: kind === "tl" && Calc.result !== ""
+    readonly property var apps: Apps.search(query, showCalc ? maxRows - 1 : maxRows)
+    readonly property bool showRun: query.trim() !== "" && apps.length === 0 && !showCalc
+    readonly property var results: (showCalc ? [{ kind: "calc" }] : []).concat(showRun ? [{ kind: "run" }] : apps.map(a => ({ kind: "app", app: a })))
 
     function occupied(n) {
         const ws = Hyprland.workspaces.values.find(w => w.id === n);
@@ -68,6 +69,8 @@ Tile {
             return;
         if (r.kind === "app")
             Apps.launch(r.app);
+        else if (r.kind === "calc")
+            Calc.copy();
         else
             Apps.runInTerminal(query.trim());
         UiState.close();
@@ -77,6 +80,8 @@ Tile {
         const r = results[selected];
         if (r?.kind === "app")
             UiState.launcherQuery = r.app.name;
+        else if (r?.kind === "calc")
+            UiState.launcherQuery = Calc.result;
     }
 
     // Which panel is open on this screen: "tl" launcher, "tm" music, "tw" workspace overview (double tap Super).
@@ -502,7 +507,7 @@ Tile {
                 height: 24
 
                 Section {
-                    text: tile.showRun ? "RUN" : "APPS"
+                    text: tile.showCalc ? (tile.apps.length > 0 ? "CALC · APPS" : "CALC") : tile.showRun ? "RUN" : "APPS"
                 }
             }
 
@@ -525,11 +530,13 @@ Tile {
                     LauncherRow {
                         width: parent.width
                         selected: tile.selected === appSlot.index
-                        glyph: appSlot.result?.kind === "run" ? "$" : Apps.glyph(appSlot.result?.app?.name ?? "")
+                        readonly property string kind: appSlot.result?.kind ?? ""
+
+                        glyph: kind === "run" ? "$" : kind === "calc" ? "=" : Apps.glyph(appSlot.result?.app?.name ?? "")
                         icon: appSlot.result?.kind === "app" && (appSlot.result.app.icon ?? "") !== "" ? Quickshell.iconPath(appSlot.result.app.icon, true) : ""
-                        name: appSlot.result?.kind === "run" ? tile.query.trim() : (appSlot.result?.app?.name ?? "")
-                        monoName: appSlot.result?.kind === "run"
-                        description: appSlot.result?.kind === "run" ? "run in terminal" : (appSlot.result?.app?.genericName || appSlot.result?.app?.comment || "")
+                        name: kind === "run" ? tile.query.trim() : kind === "calc" ? Calc.result : (appSlot.result?.app?.name ?? "")
+                        monoName: kind === "run" || kind === "calc"
+                        description: kind === "run" ? "run in terminal" : kind === "calc" ? "copy · Tab to keep going" : (appSlot.result?.app?.genericName || appSlot.result?.app?.comment || "")
                         keycap: tile.selected === appSlot.index ? "↵" : ""
                         onHovered: tile.selected = appSlot.index
                         onActivated: tile.activate(appSlot.index)

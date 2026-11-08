@@ -269,10 +269,10 @@ Tile {
                     }
                     Toggle {
                         width: (panel.width - 8) / 2
-                        label: "Do not disturb"
-                        sub: Notifs.dnd ? "on · line only" : "off"
-                        on: Notifs.dnd
-                        onClicked: Notifs.dnd = !Notifs.dnd
+                        label: "Keep awake"
+                        sub: Power.keepAwake ? "on · never sleeps" : "off"
+                        on: Power.keepAwake
+                        onClicked: Power.keepAwake = !Power.keepAwake
                     }
                 }
             }

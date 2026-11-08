@@ -10,9 +10,9 @@ Runs on Hyprland (FHT comes later). Done so far:
 - the line: end caps, workspace marker, volume/brightness gauge, notification pulse
 - top-left tile at rest: workspace numerals and window title
 - top-centre tile: clock, notification toast, notifications panel and calendar
-- top-right tile: performance summary, Wi-Fi, volume, battery. The summary opens the performance dashboard, the icons open quick settings (toggles, sliders, reduce motion, power)
+- top-right tile: performance summary, Wi-Fi, volume, battery. The summary opens the performance dashboard, the icons open quick settings (Wi-Fi, Bluetooth, night light, keep awake, sliders, reduce motion, power)
 
-- top-left tile grows into the launcher: apps (most launched first) and run in terminal; the panel height follows the results
+- top-left tile grows into the launcher: apps (most launched first), a calculator (qalc, on anything with an operator, a function or "to"; "=" forces it) and run in terminal; the panel height follows the results
 
 - music part of the top-left tile (MPRIS) with its progress on the line; it grows into the music panel (cover, track ruler with seek, controls, player picker)
 
@@ -35,6 +35,7 @@ Runs on Hyprland (FHT comes later). Done so far:
 - clipboard history (SUPER+V) and emoji picker (SUPER+semicolon), both grown from the line, with search
 
 - floating (SUPER+ALT+Space): a window floats at 75% of its tiled size, centred; floated apps are remembered with their size and place (`~/.config/the-line/hypr/floating.lua`)
+- files: yazi in foot (SUPER+E), the default file manager (SUPER+SHIFT+E)
 - screenshots with Flameshot on the focused screen; The Line's defaults for foot (black glass, VS Code-style keys) and Flameshot are installed on first login
 
 Next: welcome screen, first-run welcome, launcher shortcuts section, easter eggs from the backlog.

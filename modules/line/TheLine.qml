@@ -135,6 +135,11 @@ Scope {
         WlrLayershell.layer: root.fullscreen || root.stage > 0 ? WlrLayer.Overlay : WlrLayer.Top
         WlrLayershell.keyboardFocus: root.panelHere || root.dialogHere ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 
+        IdleInhibitor {
+            window: win
+            enabled: Power.keepAwake
+        }
+
         // Input only where something is: the tiles, or the whole surface while a panel is open
         // (so a click outside closes it without reaching the window below).
         mask: root.panelHere || root.dialogHere ? fullMask : (root.fullscreen || root.stage > 0 ? noMask : tilesMask)
