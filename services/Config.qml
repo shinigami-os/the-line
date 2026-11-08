@@ -5,7 +5,8 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 
-// User settings, read from ~/.config/the-line/config.json (every key optional).
+// User settings, read from ~/.config/the-line/config.json (every key optional). That file is yours: written by the
+// shell and the settings app, never by an update. ~/.config/the-line/README.md lists every file and who writes it.
 // THE_LINE_SCREENS="HDMI-A-1,DP-2" overrides `screens` for a single run.
 Singleton {
     id: root
@@ -21,10 +22,28 @@ Singleton {
     readonly property int clipboardMax: adapter.clipboardMax
     readonly property bool clipboardImages: adapter.clipboardImages
     readonly property bool clipboardWipeOnLogin: adapter.clipboardWipeOnLogin
+    readonly property bool accentFromWallpaper: adapter.accentFromWallpaper
+    readonly property int idleDim: adapter.idleDim
+    readonly property int idleLock: adapter.idleLock
+    readonly property int idleSuspend: adapter.idleSuspend
+    readonly property string powerButton: adapter.powerButton
+    readonly property var workspaceApps: adapter.workspaceApps
+
+    // A script of session/: the shell runs from the repo root, the settings app from its settings/ folder.
+    function session(script) {
+        return Quickshell.shellDir.replace(/\/settings\/?$/, "") + "/session/" + script;
+    }
 
     // The clipboard recorders read their settings when they start: restart them when those change.
-    onClipboardMaxChanged: if (loadedOnce) Quickshell.execDetached([Qt.resolvedUrl("../session/the-line-clipboard").toString().replace("file://", "")])
-    onClipboardImagesChanged: if (loadedOnce) Quickshell.execDetached([Qt.resolvedUrl("../session/the-line-clipboard").toString().replace("file://", "")])
+    onClipboardMaxChanged: if (loadedOnce && inShell) Quickshell.execDetached([session("the-line-clipboard")])
+    onClipboardImagesChanged: if (loadedOnce && inShell) Quickshell.execDetached([session("the-line-clipboard")])
+    // hypridle and Hyprland's workspace rules are generated from this file (session/the-line-apply), by whoever
+    // changes those settings, right after writing it (see set()).
+    Timer {
+        id: applyIdle
+        interval: 600   // a dragged slider: one hypridle restart at the end
+        onTriggered: Quickshell.execDetached([root.session("the-line-apply"), "idle"])
+    }
     readonly property bool workspaceScrollInverted: adapter.workspaceScrollInverted
 
     // Hyprland reads workspaceScrollInverted from this file itself: reload it when the setting changes.
@@ -45,6 +64,10 @@ Singleton {
     function set(key, value) {
         adapter[key] = value;
         file.writeAdapter();
+        if (key === "idleDim" || key === "idleLock" || key === "idleSuspend")
+            applyIdle.restart();
+        else if (key === "workspaceApps")
+            Quickshell.execDetached([session("the-line-apply"), "workspaces"]);
     }
 
     // FileView does not create the directory.
@@ -73,6 +96,12 @@ Singleton {
             property bool workspaceScrollInverted: false   // SUPER+scroll: scroll down for the next workspace
             property string wallpaper: "/usr/share/kira/wallpapers/default.png"   // "" = leave it to another tool
             property list<string> screens: []
+            property bool accentFromWallpaper: false        // the settings app picks the accent when the wallpaper changes
+            property int idleDim: 10                        // minutes, 0 = never (all three)
+            property int idleLock: 30
+            property int idleSuspend: 60
+            property string powerButton: "menu"            // menu, suspend, lock, nothing
+            property var workspaceApps: []                  // [{ class, name, workspace }]: the app always opens there
         }
     }
 }

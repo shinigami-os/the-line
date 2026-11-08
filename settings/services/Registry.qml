@@ -9,6 +9,9 @@ import Quickshell
 //   slider   min, max, step, unit
 //   choice   choices: [{ value, label }]
 //   color    choices: [{ value, label }] drawn as swatches
+//   stops    stops: [{ value, label }] on a line slider (idle times)
+//   speed    motionScale shown as a speed, 0.5× to 2× (a slider, 1× in the middle, log scale)
+//   wallpaper, workspaceApps, floatingApps: rows with their own component, which takes the keyboard while selected
 // A section without settings yet shows what is planned for it (`plan`).
 Singleton {
     id: root
@@ -33,6 +36,10 @@ Singleton {
     ]
 
     readonly property var settings: [
+        { section: "appearance", group: "Wallpaper", key: "wallpaper", kind: "wallpaper", label: "Wallpaper",
+          sub: "← → to look, Enter to set it", keywords: "background image picture" },
+        { section: "appearance", group: "Accent", key: "accentFromWallpaper", kind: "toggle", label: "Accent from the wallpaper",
+          sub: "Picks the accent in the wallpaper each time you change it", keywords: "color colour matugen auto" },
         { section: "appearance", group: "Accent", key: "accent", kind: "color", label: "Accent colour",
           sub: "The workspace marker, toggles, selections", keywords: "color colour highlight",
           choices: [
@@ -43,14 +50,28 @@ Singleton {
           ] },
         { section: "appearance", group: "Motion", key: "reduceMotion", kind: "toggle", label: "Reduce motion",
           sub: "Everything appears at once", keywords: "animation accessibility" },
-        { section: "appearance", group: "Motion", key: "motionScale", kind: "choice", label: "Motion speed",
-          sub: "How long every animation takes", keywords: "animation speed slow fast",
-          choices: [{ value: 0.75, label: "Quick" }, { value: 1, label: "Normal" }, { value: 1.3, label: "Calm" }, { value: 1.6, label: "Slow" }] },
+        { section: "appearance", group: "Motion", key: "motionScale", kind: "speed", label: "Motion speed",
+          sub: "Every animation, faster or slower", keywords: "animation speed slow fast" },
 
         { section: "workspaces", group: "Workspace ruler", key: "workspaceIcons", kind: "toggle", label: "App icons on the ruler",
           sub: "Each workspace shows its app's icon instead of its number", keywords: "icons numbers" },
-        { section: "workspaces", group: "Workspace ruler", key: "workspaceScrollInverted", kind: "toggle", label: "Scroll down for the next workspace",
-          sub: "SUPER + scroll", keywords: "scroll direction invert" },
+        { section: "workspaces", group: "Workspace ruler", key: "workspaceScrollInverted", kind: "choice", label: "SUPER + scroll up goes to",
+          sub: "Scrolling down goes the other way", keywords: "scroll direction invert wheel",
+          choices: [{ value: false, label: "the next one (3 → 4)" }, { value: true, label: "the previous one (4 → 3)" }] },
+        { section: "workspaces", group: "Apps on their workspace", key: "workspaceApps", kind: "workspaceApps", label: "Apps on their workspace",
+          sub: "An app listed here always opens on its workspace", keywords: "rule bind assign app open" },
+        { section: "workspaces", group: "Floating apps", key: "floating", kind: "floatingApps", label: "Remembered floating apps",
+          sub: "Set floating with SUPER + ALT + Space: they open floating, where you left them", keywords: "float window size place remember forget" },
+
+        { section: "power", group: "When idle", key: "idleDim", kind: "stops", label: "Dim the screens after",
+          sub: "Any key or move brings the brightness back", keywords: "idle dim brightness timeout", stops: root.minutes },
+        { section: "power", group: "When idle", key: "idleLock", kind: "stops", label: "Lock after",
+          sub: "The screens stay on once locked", keywords: "idle lock hyprlock timeout password", stops: root.minutes },
+        { section: "power", group: "When idle", key: "idleSuspend", kind: "stops", label: "Suspend after",
+          sub: "The session is locked first", keywords: "idle suspend sleep timeout", stops: root.minutes },
+        { section: "power", group: "Power button", key: "powerButton", kind: "choice", label: "Pressing the power button",
+          sub: "A long press still turns the computer off", keywords: "power button acpi",
+          choices: [{ value: "menu", label: "power menu" }, { value: "suspend", label: "suspend" }, { value: "lock", label: "lock" }, { value: "nothing", label: "nothing" }] },
 
         { section: "line", group: "Levels", key: "levelStep", kind: "slider", min: 1, max: 10, step: 1, unit: "%",
           label: "Volume and brightness step", sub: "How much one key press changes", keywords: "volume brightness keyboard backlight keys" },
@@ -64,6 +85,11 @@ Singleton {
         { section: "line", group: "Clipboard", key: "clipboardWipeOnLogin", kind: "toggle", label: "Empty it at each login",
           sub: "Nothing copied survives a logout", keywords: "clipboard privacy clear" }
     ]
+
+    // Idle times, in minutes (0 = never).
+    readonly property var minutes: [1, 2, 3, 5, 10, 15, 20, 30, 45, 60, 90, 120, 180, 0].map(m => ({
+        value: m, label: m === 0 ? "never" : m < 60 ? m + " min" : (m / 60) + " h"
+    }))
 
     function section(id) {
         return sections.find(s => s.id === id) ?? null;
@@ -84,12 +110,25 @@ Singleton {
             return v ? "on" : "off";
         if (setting.kind === "slider")
             return v + (setting.unit ? " " + setting.unit : "");
-        const c = (setting.choices ?? []).find(c => same(c.value, v));
+        if (setting.kind === "speed")
+            return speed(v).toFixed(2) + "×";
+        if (setting.kind === "wallpaper")
+            return String(v).split("/").pop();
+        if (setting.kind === "workspaceApps")
+            return (v ?? []).length + " apps";
+        const c = (setting.choices ?? setting.stops ?? []).find(c => same(c.value, v));
         return c ? c.label : String(v);
     }
 
     function same(a, b) {
         return typeof a === "number" ? Math.abs(a - Number(b)) < 0.001 : String(a).toLowerCase() === String(b).toLowerCase();
+    }
+
+    // Sets a setting. Picking an accent by hand stops taking it from the wallpaper.
+    function set(setting, v) {
+        Config.set(setting.key, v);
+        if (setting.key === "accent" && Config.accentFromWallpaper)
+            Config.set("accentFromWallpaper", false);
     }
 
     // Steps a setting: toggles flip, sliders and choices move by `dir` (-1 / 1, wrapping for choices).
@@ -99,11 +138,53 @@ Singleton {
             Config.set(setting.key, !v);
         } else if (setting.kind === "slider") {
             Config.set(setting.key, Math.max(setting.min, Math.min(setting.max, v + dir * setting.step)));
-        } else {
+        } else if (setting.kind === "speed") {
+            setSpeed(Math.round((speed(v) + dir * 0.05) * 100) / 100);
+        } else if (setting.kind === "stops") {
+            const i = setting.stops.findIndex(c => same(c.value, v));
+            Config.set(setting.key, setting.stops[Math.max(0, Math.min(setting.stops.length - 1, (i < 0 ? 0 : i) + dir))].value);
+        } else if (setting.choices) {
             const list = setting.choices;
             const i = list.findIndex(c => same(c.value, v));
-            Config.set(setting.key, list[((i < 0 ? 0 : i + dir) + list.length) % list.length].value);
+            set(setting, list[((i < 0 ? 0 : i + dir) + list.length) % list.length].value);
         }
+    }
+
+    // Motion speed: config.json keeps motionScale, a duration factor (speed 2× = durations × 0.5).
+    function speed(scale) {
+        return 1 / Math.max(0.01, scale);
+    }
+
+    function setSpeed(value) {
+        Config.set("motionScale", 1 / Math.max(0.5, Math.min(2, value)));
+    }
+
+    // `text` with every word of the search lit in the accent (StyledText).
+    function highlight(text, query) {
+        const esc = t => t.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        const words = query.trim().toLowerCase().split(/\s+/).filter(w => w !== "");
+        if (words.length === 0)
+            return esc(text);
+        const lit = new Array(text.length).fill(false);
+        const lower = text.toLowerCase();
+        for (const w of words) {
+            let i = lower.indexOf(w);
+            while (i >= 0) {
+                for (let k = i; k < i + w.length; k++)
+                    lit[k] = true;
+                i = lower.indexOf(w, i + w.length);
+            }
+        }
+        let out = "";
+        let open = false;
+        for (let k = 0; k < text.length; k++) {
+            if (lit[k] !== open) {
+                out += lit[k] ? "<font color=\"" + Theme.accent + "\">" : "</font>";
+                open = lit[k];
+            }
+            out += esc(text[k]);
+        }
+        return out + (open ? "</font>" : "");
     }
 
     // The search: every setting and every section, by label, sub, keywords and section name.

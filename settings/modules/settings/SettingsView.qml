@@ -25,6 +25,8 @@ Item {
     property bool contentShown: false
     property real grow: 0
 
+    property var currentRow: null   // the selected SettingRow, for the rows that take the keyboard themselves
+
     property string query: ""
     property int resultIndex: 0
     readonly property var results: Registry.search(query)
@@ -108,7 +110,8 @@ Item {
                 return;
             }
             const setting = view.rows[view.rowIndex];
-            const stepper = setting && setting.kind !== "toggle";
+            const custom = setting && ["wallpaper", "workspaceApps", "floatingApps"].indexOf(setting.kind) >= 0;
+            const stepper = setting && setting.kind !== "toggle" && !custom;
             if (view.area === "spine") {
                 if (k === Qt.Key_Up || k === Qt.Key_Down) {
                     view.sectionIndex = Math.max(0, Math.min(Registry.sections.length - 1, view.sectionIndex + (k === Qt.Key_Up ? -1 : 1)));
@@ -125,11 +128,15 @@ Item {
                     return;
                 }
             } else {
+                if (custom && view.currentRow && view.currentRow.setting.key === setting.key && view.currentRow.key(event)) {
+                    event.accepted = true;
+                    return;
+                }
                 if (k === Qt.Key_Up || k === Qt.Key_Down) {
                     view.rowIndex = Math.max(0, Math.min(view.rows.length - 1, view.rowIndex + (k === Qt.Key_Up ? -1 : 1)));
                 } else if ((k === Qt.Key_Left || k === Qt.Key_Right) && stepper) {
                     Registry.step(setting, k === Qt.Key_Left ? -1 : 1);
-                } else if (k === Qt.Key_Return || k === Qt.Key_Enter || k === Qt.Key_Space) {
+                } else if ((k === Qt.Key_Return || k === Qt.Key_Enter || k === Qt.Key_Space) && !custom) {
                     Registry.step(setting, 1);
                 } else if (k === Qt.Key_Left || k === Qt.Key_Escape || k === Qt.Key_Backspace || k === Qt.Key_Backtab) {
                     view.area = "spine";
@@ -280,6 +287,14 @@ Item {
                 font.pixelSize: 13
                 font.weight: Font.Medium
                 color: tick.current || hover.hovered ? Theme.text : Theme.muted
+                // the active section grows a little, from its tick
+                scale: tick.current ? 1.12 : 1
+                transformOrigin: Item.Left
+
+                Behavior on scale {
+                    NumberAnimation { duration: Anim.panel; easing.type: Anim.easing }
+                }
+
                 opacity: (tick.modelData.plan !== "" && Registry.settingsOf(tick.modelData.id).length === 0) && !tick.current ? 0.6 : 1
 
                 Behavior on color {
@@ -309,20 +324,17 @@ Item {
     readonly property real branchFrom: {
         if (shown < 0)
             return spineX;
-        const s = Registry.sections[shown];
-        return spineX + 16 + labelWidth.measure(s.name) + 10;
+        return spineX + 16 + shownName.implicitWidth * 1.12 + 10;
     }
 
-    TextMetrics {
-        id: labelWidth
+    // The shown section's name, measured (never drawn) for where the branch starts.
+    Text {
+        id: shownName
+        visible: false
+        text: view.shown >= 0 ? Registry.sections[view.shown].name : ""
         font.family: Theme.fontUi
         font.pixelSize: 13
         font.weight: Font.Medium
-
-        function measure(t) {
-            text = t;
-            return width;
-        }
     }
 
     // The branch from the tick to the box.
@@ -507,9 +519,14 @@ Item {
                             order: 1 + index
                             shown: view.contentShown
                             width: list.width
-                            height: isGroup ? (index === 0 ? 26 : 44) : 52
+                            height: isGroup ? (index === 0 ? 26 : 44) : (rowLoader.item ? rowLoader.item.height : 52)
 
-                            onSelectedChanged: if (selected) flick.reveal(entry)
+                            onSelectedChanged: {
+                                if (selected) {
+                                    view.currentRow = rowLoader.item;
+                                    flick.reveal(entry);
+                                }
+                            }
 
                             Text {
                                 visible: entry.isGroup
@@ -524,12 +541,27 @@ Item {
                             }
 
                             Loader {
+                                id: rowLoader
                                 active: !entry.isGroup
                                 width: parent.width
+                                onLoaded: {
+                                    if (entry.selected) {
+                                        view.currentRow = item;
+                                        revealLater.restart();
+                                    }
+                                }
+
+                                // A jump selects the row before it exists: reveal it once the list has its heights.
+                                Timer {
+                                    id: revealLater
+                                    interval: 50
+                                    onTriggered: flick.reveal(entry)
+                                }
                                 sourceComponent: SettingRow {
                                     width: entry.width
                                     setting: entry.modelData.setting
                                     selected: entry.selected
+                                    onRefocus: keys.forceActiveFocus()
                                     onPicked: {
                                         if (view.area === "search")
                                             return;
@@ -588,7 +620,7 @@ Item {
                         order: 1 + index
                         shown: view.contentShown
                         width: parent.width
-                        height: 44
+                        height: 48
 
                         Rectangle {
                             anchors.fill: parent
@@ -607,17 +639,32 @@ Item {
                         Text {
                             id: resultLabel
                             x: 18
-                            anchors.verticalCenter: parent.verticalCenter
-                            text: result.modelData.label
+                            y: resultSub.visible ? 7 : (parent.height - height) / 2
+                            text: Registry.highlight(result.modelData.label, view.query)
+                            textFormat: Text.StyledText
                             font.family: Theme.fontUi
                             font.pixelSize: 13
                             font.weight: Font.Medium
                             color: Theme.text
                         }
                         Text {
+                            id: resultSub
+                            x: 18
+                            y: 27
+                            visible: text !== ""
+                            width: parent.width - 160
+                            elide: Text.ElideRight
+                            text: Registry.highlight(result.modelData.kind === "setting" ? (result.modelData.setting.sub ?? "") : (Registry.section(result.modelData.section)?.plan ?? ""), view.query)
+                            textFormat: Text.StyledText
+                            font.family: Theme.fontUi
+                            font.pixelSize: 11
+                            font.weight: Font.Medium
+                            color: Theme.muted
+                        }
+                        Text {
                             anchors.left: resultLabel.right
                             anchors.leftMargin: 14
-                            anchors.verticalCenter: parent.verticalCenter
+                            anchors.baseline: resultLabel.baseline
                             text: result.modelData.where
                             font.family: Theme.fontUi
                             font.pixelSize: 12

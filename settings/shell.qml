@@ -9,6 +9,9 @@ import qs.services
 // The Line's settings app: its own process and window (app-id "the-line-settings"), sharing Theme, Anim, Config and
 // the common components with the shell. Started by session/the-line-settings (SUPER+I, the launcher).
 ShellRoot {
+    // Created up front: it watches the "accent from the wallpaper" setting.
+    readonly property var accent: Accent
+
     FloatingWindow {
         id: win
 

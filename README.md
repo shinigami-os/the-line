@@ -38,7 +38,9 @@ Runs on Hyprland (FHT comes later). Done so far:
 - files: yazi in foot (SUPER+E), the default file manager (SUPER+SHIFT+E)
 - screenshots with Flameshot on the focused screen; The Line's defaults for foot (black glass, VS Code-style keys) and Flameshot are installed on first login
 
-Next: welcome screen, first-run welcome, launcher shortcuts section, easter eggs from the backlog.
+- settings app (SUPER+I, `settings/`): its own window, a spine of sections and a search over every setting; done so far: appearance (wallpaper picker, accent, accent from the wallpaper, motion), workspaces (apps on their workspace, remembered floating apps, ruler), power and idle, The Line's own settings
+
+Next: the other settings sections, welcome screen, first-run welcome, launcher shortcuts section, easter eggs from the backlog.
 
 ## Session
 
@@ -47,10 +49,18 @@ Next: welcome screen, first-run welcome, launcher shortcuts section, easter eggs
 - `the-line.desktop`: the greeter entry, installed in `/usr/share/wayland-sessions/`
 - `the-line-session`: environment, session bus, audio, then Hyprland (`/usr/bin/the-line-session`)
 - `hyprland.lua`: The Line's Hyprland config (square, 1 px borders, the shell's curve and timings, the keys)
-- `hypridle.conf`: dim at 10 min, lock (hyprlock) at 30, suspend at 1 h; screens never turned off, no hibernation
+- `the-line-apply`: writes the files other programs read from `config.json` (`hypridle.conf` with your idle times, `hypr/workspaces.lua`), and `~/.config/the-line/README.md`
+- `the-line-settings`: opens the settings app, or brings it forward (`the-line-settings power` opens a section)
 - `apps.lua`: the default app keys (just the terminal), copied to `~/.config/the-line/hypr/` on first login
 
 The shell is expected in `/usr/share/the-line` (or wherever `THE_LINE_DIR` points). Workspaces are shared out evenly between screens, left to right (2 screens: 1 and 5; 3 screens: 1, 4, 7; `primary_monitor = "<name>"` in `custom.lua` puts a screen first). Your own Hyprland bits go in `~/.config/the-line/hypr/` (`monitors.lua`, `apps.lua`, `custom.lua`; The Line writes `floating.lua`); coming from Sleex, its monitors, app keys and custom general settings are copied there on the first login.
+
+### Where your settings live
+
+Everything you set lives in `~/.config/the-line/` (and state like launch counts in `~/.local/state/the-line/`); updates
+only replace `/usr/share/the-line`. Each file says in its first lines whether it is yours or generated, and
+`~/.config/the-line/README.md` (written at each login) lists them all. `config.json` is the source: the generated files
+(`hypridle.conf`, `hypr/workspaces.lua`, `hypr/floating.lua`) are rewritten from it.
 
 To try it from a checkout before it is packaged:
 

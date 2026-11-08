@@ -1,4 +1,4 @@
--- The Line: Hyprland configuration.
+-- The Line: Hyprland configuration. Part of The Line: every update replaces this file, don't change it.
 -- Square corners, 1px borders, one curve (quartic ease-out) shared with the shell's motion.
 -- Your own settings go in ~/.config/the-line/hypr/: monitors.lua, apps.lua (your app keys), custom.lua (loaded last).
 
@@ -184,7 +184,8 @@ hl.on("hyprland.start", function()
     hl.exec_cmd("hyprctl setcursor TheLine 24")
     hl.exec_cmd("QT_QPA_PLATFORM=wayland " .. QS)
     hl.exec_cmd(SHELL .. "/session/the-line-clipboard --login")   -- clipboard history, with its settings
-    hl.exec_cmd("hypridle -c " .. SHELL .. "/session/hypridle.conf")
+    hl.exec_cmd(SHELL .. "/session/the-line-apply idle")     -- hypridle, with your idle times (config.json)
+    hl.exec_cmd(SHELL .. "/session/the-line-apply readme")   -- ~/.config/the-line/README.md: what each file holds
 end)
 
 ------------- Keys -------------
@@ -305,4 +306,5 @@ load_user("apps")
 -- The settings app floats at the size it is drawn for, centred.
 hl.window_rule({ match = { class = "^(the-line-settings)$" }, float = true, size = "1120 740" })
 load_user("floating")   -- written by The Line: the apps you float, where you left them
+load_user("workspaces") -- written by The Line from config.json: apps that open on their workspace
 load_user("custom")

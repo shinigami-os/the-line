@@ -229,6 +229,11 @@ ShellRoot {
             root.togglePower(0);
         }
 
+        // Settings > Workspaces: forget a remembered floating app.
+        function forgetFloat(cls: string): void {
+            FloatMemory.forget(cls);
+        }
+
         // The power button, from acpid (session/ has no part in it: a dispatched global arrives as a key
         // release, so Shortcut.onPressed never fires).
         // The button often comes in twice per press (two ACPI devices report it): the second one is dropped.
@@ -237,7 +242,12 @@ ShellRoot {
             if (now - root.lastPowerButton < 800)
                 return;
             root.lastPowerButton = now;
-            root.togglePower(3);
+            if (Config.powerButton === "suspend")
+                Power.suspend();
+            else if (Config.powerButton === "lock")
+                Power.lock();
+            else if (Config.powerButton !== "nothing")
+                root.togglePower(3);
         }
 
         function clipboard(): void {

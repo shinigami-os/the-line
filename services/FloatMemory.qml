@@ -23,6 +23,17 @@ Singleton {
             active.running = true;
     }
 
+    // Settings > Workspaces: forget an app, its next window opens tiled.
+    function forget(cls) {
+        if (memory[cls] === undefined)
+            return;
+        const m = Object.assign({}, memory);
+        delete m[cls];
+        memory = m;
+        save(true);
+        maybeReload(cls);
+    }
+
     function monitorOf(id) {
         return Hyprland.monitors.values.find(m => m.id === id) ?? null;
     }
@@ -65,7 +76,7 @@ Singleton {
 
     function save(now) {
         const lines = ["-- Written by The Line: the apps you set floating, with their last size and place on their screen.",
-            "-- Tile an app again (SUPER+ALT+Space) and it leaves this list."];
+            "-- Tile an app again (SUPER+ALT+Space) and it leaves this list. Edits here are replaced: forget an app in Settings > Workspaces."];
         for (const cls in memory) {
             const g = memory[cls];
             // "W H" and "X Y", space-separated (with a comma Hyprland ignores them); move is on the window's screen.
