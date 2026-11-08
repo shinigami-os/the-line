@@ -40,7 +40,9 @@ Singleton {
     // Row kinds drawn by their own component (in modules/settings).
     readonly property var customs: ({
         wallpaper: "WallpaperPicker.qml", workspaceApps: "WorkspaceRules.qml", floatingApps: "FloatingApps.qml",
-        wifiNetworks: "WifiNetworks.qml", btDevices: "BtDevices.qml", audioDevices: "AudioDevices.qml", audioStreams: "AudioStreams.qml"
+        wifiNetworks: "WifiNetworks.qml", btDevices: "BtDevices.qml", audioDevices: "AudioDevices.qml", audioStreams: "AudioStreams.qml",
+        text: "TextSetting.qml", timezone: "ZonePicker.qml", datetime: "DateTimeSetting.qml", faces: "FaceModels.qml",
+        chargeLimit: "ChargeLimit.qml"
     })
 
     function isCustom(setting) {
@@ -48,10 +50,35 @@ Singleton {
     }
 
     function backend(setting) {
-        return setting.source === "net" ? Net : setting.source === "bt" ? Bt : setting.source === "sound" ? Sound : null;
+        return setting.source === "net" ? Net : setting.source === "bt" ? Bt : setting.source === "sound" ? Sound
+            : setting.source === "sys" ? Sys : null;
     }
 
     readonly property var settings: [
+        { section: "system", group: "This computer", source: "sys", key: "hostname", kind: "text", label: "Name of this computer",
+          sub: "How other devices on the network see it", keywords: "hostname name computer network",
+          placeholder: "letters, digits and dashes", validate: "^[A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?$" },
+        { section: "system", group: "Date and time", source: "sys", key: "ntp", kind: "toggle", label: "Set the time automatically",
+          sub: "From the internet (chrony)", keywords: "ntp chrony sync clock automatic" },
+        { section: "system", group: "Date and time", source: "sys", key: "timezone", kind: "timezone", label: "Time zone",
+          sub: "Enter, then type a city", keywords: "timezone zone city region clock" },
+        { section: "system", group: "Date and time", source: "sys", key: "time", kind: "datetime", label: "Date and time",
+          sub: "Turn off the automatic time to set it by hand", keywords: "date time clock set" },
+        { section: "system", group: "About", source: "sys", key: "release", kind: "info", label: "Kira Linux", sub: "The base system's version", keywords: "version release about" },
+        { section: "system", group: "About", source: "sys", key: "kernel", kind: "info", label: "Kernel", sub: "Shinigami", keywords: "kernel linux version shinigami" },
+        { section: "system", group: "About", source: "sys", key: "cpu", kind: "info", label: "Processor", sub: "", keywords: "cpu processor" },
+        { section: "system", group: "About", source: "sys", key: "memory", kind: "info", label: "Memory", sub: "", keywords: "ram memory" },
+        { section: "system", group: "About", source: "sys", key: "uptime", kind: "info", label: "Running for", sub: "Since the last start", keywords: "uptime" },
+
+        { section: "signin", group: "Your face", source: "sys", key: "faces", kind: "faces", label: "Faces",
+          sub: "Recorded with howdy · Delete removes one", keywords: "howdy face camera record ir" },
+        { section: "signin", group: "Your face", source: "sys", key: "faceHyprlock", kind: "toggle", label: "Unlock the screen with your face",
+          sub: "Your password still works if it doesn't see you", keywords: "howdy lock hyprlock unlock face" },
+        { section: "signin", group: "Your face", source: "sys", key: "faceGreetd", kind: "toggle", label: "Log in with your face",
+          sub: "On the login screen, before the password", keywords: "howdy login greeter face" },
+        { section: "signin", group: "Fingerprint", source: "sys", key: "fingerprint", kind: "info", label: "Fingerprint reader",
+          sub: "Through fprintd", keywords: "fingerprint fprintd reader" },
+
         { section: "network", group: "Wi-Fi", source: "net", key: "wifiEnabled", kind: "toggle", label: "Wi-Fi",
           sub: "Wireless networking", keywords: "wireless radio airplane" },
         { section: "network", group: "Wi-Fi", source: "net", key: "networks", kind: "wifiNetworks", label: "Networks around",
@@ -120,6 +147,8 @@ Singleton {
           sub: "The screens stay on once locked", keywords: "idle lock hyprlock timeout password", stops: root.minutes },
         { section: "power", group: "When idle", key: "idleSuspend", kind: "stops", label: "Suspend after",
           sub: "The session is locked first", keywords: "idle suspend sleep timeout", stops: root.minutes },
+        { section: "power", group: "Battery", source: "sys", key: "chargeLimit", kind: "chargeLimit", label: "Stop charging at",
+          sub: "A battery that stays plugged in lasts longer below 100 % · ← →", keywords: "battery charge limit threshold health 80" },
         { section: "power", group: "Power button", key: "powerButton", kind: "choice", label: "Pressing the power button",
           sub: "A long press still turns the computer off", keywords: "power button acpi",
           choices: [{ value: "menu", label: "power menu" }, { value: "suspend", label: "suspend" }, { value: "lock", label: "lock" }, { value: "nothing", label: "nothing" }] },
@@ -178,6 +207,10 @@ Singleton {
             return (v ?? []).length + " apps";
         if (setting.kind === "info")
             return String(v);
+        if (setting.kind === "text" || setting.kind === "timezone")
+            return String(v);
+        if (setting.kind === "chargeLimit")
+            return Sys.chargeSupported ? v + " %" : "not offered";
         if (isCustom(setting))
             return "›";
         const c = (setting.choices ?? setting.stops ?? []).find(c => same(c.value, v));

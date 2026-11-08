@@ -456,6 +456,18 @@ Item {
                 }
             }
 
+            // What the system helper is doing, or why it didn't work (System, Sign-in, Power: the password prompts).
+            Text {
+                readonly property bool here: ["system", "signin", "power"].indexOf(page.sec.id) >= 0
+                visible: here && (Sys.busy !== "" || Sys.error !== "")
+                x: 28
+                y: 60
+                text: Sys.busy !== "" ? Sys.busy : Sys.error
+                font.family: Theme.fontMono
+                font.pixelSize: 11
+                color: Sys.busy !== "" ? Theme.accent : Theme.error
+            }
+
             // Not built yet: what is coming.
             PanelItem {
                 visible: page.settings.length === 0
