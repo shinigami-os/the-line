@@ -228,6 +228,12 @@ ShellRoot {
             root.togglePower(0);
         }
 
+        // The power button, from acpid (session/ has no part in it: a dispatched global arrives as a key
+        // release, so Shortcut.onPressed never fires).
+        function powerButton(): void {
+            root.togglePower(3);
+        }
+
         function clipboard(): void {
             root.toggleDialog("clipScreen");
         }
