@@ -7,6 +7,7 @@ import Quickshell.Io
 import Quickshell.Hyprland
 import Quickshell.Services.UPower
 import qs.modules.line
+import qs.modules.lock
 import qs.services
 
 ShellRoot {
@@ -99,6 +100,8 @@ ShellRoot {
         TheLine {}
     }
 
+    LockScreen {}
+
     // Hyprland binds, e.g. hl.bind("SUPER+SPACE", hl.dsp.global("the-line:launcher"))
     component Shortcut: GlobalShortcut {
         appid: "the-line"
@@ -169,6 +172,11 @@ ShellRoot {
         name: "wallpapers"
         description: "Wallpaper picker"
         onPressed: root.toggleDialog("wallScreen")
+    }
+    Shortcut {
+        name: "lock"
+        description: "Lock the screens"
+        onPressed: Lock.lock()
     }
     Shortcut {
         name: "visualiser"
@@ -289,6 +297,15 @@ ShellRoot {
 
         function emoji(): void {
             root.toggleDialog("emojiScreen");
+        }
+
+        function lock(): void {
+            Lock.lock();
+        }
+
+        // Development: a lock that opens by itself after `seconds` (5 at least), whatever is typed.
+        function lockTest(seconds: int): void {
+            Lock.lockTest(seconds);
         }
 
         function visualiser(): void {

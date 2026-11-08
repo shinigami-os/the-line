@@ -31,7 +31,8 @@ idle() {
         echo "# Edits here are replaced: change the times in Settings. 0 = never. The screens are never turned off."
         echo
         echo "general {"
-        echo "    lock_cmd = pidof hyprlock || hyprlock"
+        # The Line's lock; hyprlock when the shell isn't there to answer
+        echo "    lock_cmd = qs -p ${THE_LINE_DIR:-/usr/share/the-line} ipc call line lock || pidof hyprlock || hyprlock"
         echo "    before_sleep_cmd = loginctl lock-session"
         echo "}"
         if [ "$dim" -gt 0 ]; then

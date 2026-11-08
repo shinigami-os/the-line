@@ -273,7 +273,7 @@ bind("CTRL+ALT+Delete", hl.dsp.global("the-line:power"), { desc = "The Line: pow
 bind("XF86PowerOff", hl.dsp.global("the-line:powerButton"), { locked = true, desc = "The Line: power menu (asks first)" })
 
 -- Session
-bind("SUPER+L", hl.dsp.exec_cmd("hyprlock"), { desc = "Session: Lock" })
+bind("SUPER+L", hl.dsp.global("the-line:lock"), { desc = "Session: Lock" })
 
 -- Volume and brightness: the line itself shows the level, no popup.
 bind("XF86AudioMute", hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"), { locked = true, desc = "Volume and brightness: Mute" })

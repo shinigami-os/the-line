@@ -4,6 +4,7 @@ import Quickshell.Wayland
 import Quickshell.Hyprland
 import Quickshell.Services.UPower
 import qs.modules.desktop
+import qs.modules.lock
 import qs.modules.tiles
 import qs.services
 
@@ -62,6 +63,7 @@ Scope {
     property bool edgePeek: false
     property bool reveal: false
     readonly property int target: !introDone || (fullscreen && !edgePeek) ? 3
+        : Lock.locked || UiState.unlocking ? 2
         : Visualiser.on && !edgePeek && !reveal && !panelHere ? 2 : 0
 
     // React to `target` itself: a handler on what it reads can run before it has caught up.
@@ -205,7 +207,7 @@ Scope {
         color: "transparent"
         WlrLayershell.namespace: "the-line"
         // Hyprland draws fullscreen windows over the top layer, so the line moves to the overlay layer meanwhile.
-        WlrLayershell.layer: root.fullscreen || root.stage > 0 ? WlrLayer.Overlay : WlrLayer.Top
+        WlrLayershell.layer: root.fullscreen || root.stage > 0 || UiState.unlocking ? WlrLayer.Overlay : WlrLayer.Top
         // While a surface holds the keyboard (exclusive), Hyprland sends clicks to such surfaces only: with a panel open,
         // every screen's surface takes the keyboard, so a click on another screen still reaches its close area. The
         // panel's own screen takes it a moment later (keysTaken), as Hyprland gives the keys to the last one.
@@ -377,6 +379,11 @@ Scope {
                     acceptedButtons: Qt.AllButtons
                     onActiveChanged: if (!active) clickHold.restart()
                 }
+            }
+
+            UnlockCurtain {
+                anchors.fill: parent
+                screenName: root.screenName
             }
 
             WallpaperStrip {

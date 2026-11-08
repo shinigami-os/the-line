@@ -11,7 +11,7 @@ Singleton {
     property bool keepAwake: false
 
     function lock() {
-        Quickshell.execDetached(["hyprlock"]);
+        Lock.lock();
     }
 
     function logout() {

@@ -54,7 +54,7 @@ Singleton {
           keywords: "ocr tesseract read", run: s => root.exec("grim -g \"$(slurp)\" - | tesseract - - | wl-copy") },
         { id: "record", name: "Record an area", about: "to ~/Videos/Recordings, again to stop", bind: "Screenshots and tools: Record an area (again to stop)",
           keywords: "video screencast wf-recorder", run: s => root.exec("pkill -INT -x wf-recorder || { mkdir -p ~/Videos/Recordings && wf-recorder -g \"$(slurp)\" -f ~/Videos/Recordings/$(date +%Y-%m-%d_%H.%M.%S).mp4; }") },
-        { id: "lock", name: "Lock", about: "the screens", bind: "Session: Lock", keywords: "screen password", run: s => root.exec("hyprlock") },
+        { id: "lock", name: "Lock", about: "the screens", bind: "Session: Lock", keywords: "screen password", run: s => Lock.lock() },
         { id: "power", name: "Power menu", about: "log out, suspend, restart, power off", bind: "The Line: power menu",
           keywords: "shutdown reboot logout suspend", run: s => { UiState.powerSelected = 0; root.dialog("powerScreen", s); } },
         { id: "restart", name: "Restart the shell", about: "The Line starts again", bind: "The Line: restart the shell",

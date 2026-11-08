@@ -13,6 +13,9 @@ Singleton {
     // The screens the clipboard history and the emoji picker are open on ("" for closed).
     property string clipScreen: ""
     property string emojiScreen: ""
+    // Coming back from the lock: the unlock curtain plays on every screen (modules/lock/UnlockCurtain.qml).
+    property bool unlocking: false
+
     // The screen the wallpaper picker (SUPER+T) is open on.
     property string wallScreen: ""
 
