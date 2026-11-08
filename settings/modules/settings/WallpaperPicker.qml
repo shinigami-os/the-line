@@ -3,8 +3,8 @@ import Quickshell
 import Quickshell.Io
 import qs.services
 
-// Settings > Appearance > Wallpaper: thumbnails of Kira's wallpapers and yours (~/Pictures/Wallpapers,
-// ~/.local/share/wallpapers). ←→ (and ↑↓ inside the grid) move the cursor, Enter sets it; a click sets it at once.
+// Settings > Appearance > Wallpaper: thumbnails of The Line's wallpapers (assets/wallpapers), Kira's, and yours
+// (~/Pictures/Wallpapers, ~/.local/share/wallpapers). ←→ (and ↑↓ inside the grid) move the cursor, Enter sets it; a click sets it at once.
 Item {
     id: picker
 
@@ -47,8 +47,9 @@ Item {
 
     Process {
         running: true
-        command: ["sh", "-c", "for d in /usr/share/kira/wallpapers \"$HOME/Pictures/Wallpapers\" \"$HOME/.local/share/wallpapers\"; do "
-            + "find \"$d\" -maxdepth 1 -type f \\( -iname '*.png' -o -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.webp' \\) 2>/dev/null | sort; done"]
+        command: ["sh", "-c", "for d in \"$1/assets/wallpapers\" /usr/share/kira/wallpapers \"$HOME/Pictures/Wallpapers\" \"$HOME/.local/share/wallpapers\"; do "
+            + "find \"$d\" -maxdepth 1 -type f \\( -iname '*.png' -o -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.webp' \\) 2>/dev/null | sort; done",
+            "sh", Quickshell.shellDir.replace(/\/settings\/?$/, "")]
         stdout: StdioCollector {
             onStreamFinished: {
                 picker.files = text.split("\n").filter(f => f !== "");
@@ -116,7 +117,7 @@ Item {
 
                 HoverHandler {
                     cursorShape: Qt.PointingHandCursor
-                    onHoveredChanged: if (hovered) picker.cursor = thumb.index
+                    onHoveredChanged: if (hovered && Registry.hoverPicks()) picker.cursor = thumb.index
                 }
                 TapHandler {
                     onTapped: {

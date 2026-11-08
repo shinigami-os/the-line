@@ -44,6 +44,11 @@ Singleton {
         interval: 600   // a dragged slider: one hypridle restart at the end
         onTriggered: Quickshell.execDetached([root.session("the-line-apply"), "idle"])
     }
+    Timer {
+        id: applyWorkspaces
+        interval: 800   // ←→ held on a workspace: one Hyprland reload at the end
+        onTriggered: Quickshell.execDetached([root.session("the-line-apply"), "workspaces"])
+    }
     readonly property bool workspaceScrollInverted: adapter.workspaceScrollInverted
 
     // Hyprland reads workspaceScrollInverted from this file itself: reload it when the setting changes.
@@ -67,7 +72,7 @@ Singleton {
         if (key === "idleDim" || key === "idleLock" || key === "idleSuspend")
             applyIdle.restart();
         else if (key === "workspaceApps")
-            Quickshell.execDetached([session("the-line-apply"), "workspaces"]);
+            applyWorkspaces.restart();
     }
 
     // FileView does not create the directory.

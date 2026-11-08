@@ -7,6 +7,7 @@ import qs.services
 
 // Settings > Workspaces > Remembered floating apps: what the shell keeps in ~/.local/state/the-line/floating.json.
 // Forgetting one asks the shell (IPC), which owns that list and rewrites hypr/floating.lua.
+// The Line's own floating windows (rules in session/hyprland.lua) come first: always floating, nothing to forget.
 // Keyboard: ↑↓ lines · Delete / Enter forgets.
 Item {
     id: floating
@@ -18,7 +19,9 @@ Item {
 
     signal picked
 
-    implicitHeight: Math.max(34, classes.length * 34)
+    readonly property var fixed: [{ name: "Settings", detail: "the-line-settings   1120 × 740, centred" }]
+
+    implicitHeight: (fixed.length + Math.max(1, classes.length)) * 34
 
     function forget(cls) {
         const shell = Quickshell.shellDir.replace(/\/settings\/?$/, "");
@@ -58,17 +61,64 @@ Item {
         onLoadFailed: floating.memory = {}
     }
 
+    Column {
+        width: parent.width
+
+        Repeater {
+            model: floating.fixed
+
+            Item {
+                id: fixedLine
+
+                required property var modelData
+
+                width: floating.width
+                height: 34
+
+                Text {
+                    id: fixedName
+                    x: 10
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: fixedLine.modelData.name
+                    font.family: Theme.fontUi
+                    font.pixelSize: 13
+                    font.weight: Font.Medium
+                    color: Theme.text
+                }
+                Text {
+                    anchors.left: fixedName.right
+                    anchors.leftMargin: 10
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: fixedLine.modelData.detail
+                    font.family: Theme.fontMono
+                    font.pixelSize: 10
+                    color: Theme.muted
+                }
+                Text {
+                    anchors.right: parent.right
+                    anchors.rightMargin: 10
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: "always · The Line"
+                    font.family: Theme.fontMono
+                    font.pixelSize: 10
+                    color: Theme.muted
+                }
+            }
+        }
+    }
+
     Text {
         visible: floating.classes.length === 0
         x: 10
-        y: 9
-        text: "None yet: SUPER + ALT + Space floats a window, and its app is remembered"
+        y: floating.fixed.length * 34 + 9
+        text: "Yours: none yet. SUPER + ALT + Space floats a window, and its app is remembered"
         font.family: Theme.fontMono
         font.pixelSize: 11
         color: Theme.muted
     }
 
     Column {
+        y: floating.fixed.length * 34
         width: parent.width
 
         Repeater {
@@ -125,7 +175,7 @@ Item {
                     }
                 }
                 HoverHandler {
-                    onHoveredChanged: if (hovered && floating.active) floating.cursor = line.index
+                    onHoveredChanged: if (hovered && floating.active && Registry.hoverPicks()) floating.cursor = line.index
                 }
             }
         }

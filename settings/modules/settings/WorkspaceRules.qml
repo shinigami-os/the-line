@@ -227,7 +227,7 @@ Item {
                 }
 
                 HoverHandler {
-                    onHoveredChanged: if (hovered && rules.active) rules.cursor = line.index
+                    onHoveredChanged: if (hovered && rules.active && Registry.hoverPicks()) rules.cursor = line.index
                 }
             }
         }
@@ -251,7 +251,7 @@ Item {
             }
             HoverHandler {
                 cursorShape: Qt.PointingHandCursor
-                onHoveredChanged: if (hovered && rules.active) rules.cursor = rules.list.length
+                onHoveredChanged: if (hovered && rules.active && Registry.hoverPicks()) rules.cursor = rules.list.length
             }
             TapHandler {
                 onTapped: {
@@ -322,7 +322,7 @@ Item {
                     color: Theme.muted
                 }
                 HoverHandler {
-                    onHoveredChanged: if (hovered) rules.pick = match.index
+                    onHoveredChanged: if (hovered && Registry.hoverPicks()) rules.pick = match.index
                 }
                 TapHandler {
                     onTapped: rules.add(match.modelData)

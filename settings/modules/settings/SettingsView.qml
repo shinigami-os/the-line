@@ -103,6 +103,7 @@ Item {
 
         focus: true
         Keys.onPressed: event => {
+            Registry.keyAt = Date.now();
             const k = event.key;
             if (event.modifiers & Qt.ControlModifier) {
                 if (k === Qt.Key_Q || k === Qt.Key_W)
@@ -215,6 +216,7 @@ Item {
                 }
             }
             onMoved: (dx, dy) => {
+                Registry.keyAt = Date.now();
                 if (dy !== 0 && view.results.length > 0)
                     view.resultIndex = (view.resultIndex + dy + view.results.length) % view.results.length;
             }
@@ -682,7 +684,7 @@ Item {
                         }
 
                         HoverHandler {
-                            onHoveredChanged: if (hovered) view.resultIndex = result.index
+                            onHoveredChanged: if (hovered && Registry.hoverPicks()) view.resultIndex = result.index
                         }
                         TapHandler {
                             onTapped: view.jump(result.modelData)

@@ -1,0 +1,20 @@
+#!/bin/sh
+# Runs the shell and starts it again when it crashes, so a crash never leaves the session without its line.
+# A normal quit ends it. SUPER+End restarts the shell by stopping qs: this loop brings it back.
+# Crashing 5 times within a minute stops the loop (something is broken: no point in a crash loop).
+dir="${THE_LINE_DIR:-/usr/share/the-line}"
+crashes=0
+since=$(date +%s)
+while :; do
+    QT_QPA_PLATFORM=wayland qs -p "$dir"
+    code=$?
+    [ "$code" -lt 128 ] && exit "$code"   # quit normally (not killed by a signal)
+    now=$(date +%s)
+    if [ $((now - since)) -gt 60 ]; then
+        crashes=0
+        since=$now
+    fi
+    crashes=$((crashes + 1))
+    [ "$crashes" -ge 5 ] && exit "$code"
+    sleep 1
+done

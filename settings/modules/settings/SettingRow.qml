@@ -41,7 +41,7 @@ Rectangle {
     }
 
     HoverHandler {
-        onHoveredChanged: if (hovered && !row.custom) row.picked()
+        onHoveredChanged: if (hovered && !row.custom && Registry.hoverPicks()) row.picked()
     }
     TapHandler {
         onTapped: row.picked()

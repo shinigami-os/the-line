@@ -91,6 +91,14 @@ Singleton {
         value: m, label: m === 0 ? "never" : m < 60 ? m + " min" : (m / 60) + " h"
     }))
 
+    // Hovering selects a row, but not right after a key: a list scrolled by the keyboard slides rows under a still
+    // pointer, and they would take the selection back.
+    property real keyAt: 0
+
+    function hoverPicks() {
+        return Date.now() - keyAt > Math.max(500, Anim.base + 400);   // longer than the list's scroll, at any speed
+    }
+
     function section(id) {
         return sections.find(s => s.id === id) ?? null;
     }

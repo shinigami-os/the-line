@@ -182,7 +182,7 @@ hl.on("hyprland.start", function()
     spread_workspaces()
     hl.exec_cmd("dbus-update-activation-environment --all")
     hl.exec_cmd("hyprctl setcursor TheLine 24")
-    hl.exec_cmd("QT_QPA_PLATFORM=wayland " .. QS)
+    hl.exec_cmd(SHELL .. "/session/the-line-shell")   -- the shell, started again if it ever crashes
     hl.exec_cmd(SHELL .. "/session/the-line-clipboard --login")   -- clipboard history, with its settings
     hl.exec_cmd(SHELL .. "/session/the-line-apply idle")     -- hypridle, with your idle times (config.json)
     hl.exec_cmd(SHELL .. "/session/the-line-apply readme")   -- ~/.config/the-line/README.md: what each file holds
@@ -206,7 +206,8 @@ hl.bind("SUPER+Super_L", hl.dsp.global("the-line:launcherTap"), { release = true
 hl.bind("SUPER+N", hl.dsp.global("the-line:notifications"), { desc = "The Line: notifications and calendar" })
 hl.bind("SUPER+A", hl.dsp.global("the-line:quicksettings"), { desc = "The Line: quick settings" })
 hl.bind("SUPER+P", hl.dsp.global("the-line:performance"), { desc = "The Line: performance" })
-hl.bind("SUPER+End", hl.dsp.exec_cmd("pkill -f '^qs -p " .. SHELL .. "$'; " .. QS), { desc = "The Line: restart the shell" })
+-- the-line-shell starts it again; without it running (a session from before it existed), start it
+hl.bind("SUPER+End", hl.dsp.exec_cmd("pkill -f '^qs -p " .. SHELL .. "$'; pgrep -f '^/bin/sh .*/session/the-line-shell$' >/dev/null || " .. SHELL .. "/session/the-line-shell"), { desc = "The Line: restart the shell" })
 -- Coming with their features (the keys are reserved already):
 hl.bind("SUPER+F1", hl.dsp.global("the-line:cheatsheet"), { desc = "The Line: every shortcut, in one sheet" })
 hl.bind("SUPER+V", hl.dsp.global("the-line:clipboard"), { desc = "The Line: clipboard history" })
