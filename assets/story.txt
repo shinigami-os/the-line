@@ -16,7 +16,7 @@ line.offer = pick one, or let the wallpaper decide. it has good taste. (it hasn'
 
 workspaces.1 = on the left, your *workspaces*. ten of them, hanging from the line like laundry. elegant laundry.
 workspaces.2 = *super + a number* goes there. *super + scroll* goes there but faster.
-workspaces.3 = under them, the name of what you're doing. or "desktop", when you're just admiring our wallpaper (no judgement)
+workspaces.3 = under them, the name of what you're doing. or "desktop", when you're just admiring your wallpaper (no judgement)
 
 launcher.1 = tap *super*, and the tile grows into a *launcher*.
 launcher.2 = it finds apps, solves sums, runs commands, and knows where the settings are. type *?* and it recites its prefixes, like a waiter reciting the menu.
