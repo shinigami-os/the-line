@@ -31,7 +31,12 @@ Scope {
     readonly property bool keysHere: panelHere || dialogHere || storyScreen
     property bool keysTaken: false
 
-    onKeysHereChanged: {
+    onKeysHereChanged: updateKeys()
+
+    // (also at creation: the first-login story is already running when the screens' surfaces appear)
+    Component.onCompleted: updateKeys()
+
+    function updateKeys() {
         // one screen: no other surface to wait for
         keysTaken = keysHere && Quickshell.screens.length === 1;
         if (keysHere && !keysTaken)
