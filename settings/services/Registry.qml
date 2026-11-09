@@ -230,12 +230,7 @@ Singleton {
           sub: "Picks it in the primary screen's wallpaper each time it changes", keywords: "color colour matugen auto" },
         { section: "appearance", group: "Accent", key: "accent", kind: "color", label: "Accent colour",
           sub: "The workspace marker, toggles, selections", keywords: "color colour highlight",
-          choices: [
-              { value: "#9A5CFF", label: "Kira violet" }, { value: "#5C8DFF", label: "Blue" },
-              { value: "#4FC3B5", label: "Teal" }, { value: "#6CC495", label: "Green" },
-              { value: "#E8B04B", label: "Amber" }, { value: "#EF7A5E", label: "Coral" },
-              { value: "#E86FA5", label: "Pink" }, { value: "#ECE8E1", label: "Bone" }
-          ] },
+          choices: Theme.accents },
         { section: "appearance", group: "Other apps", key: "iconTheme", kind: "iconTheme", label: "Icon theme",
           sub: "Apps' icons, and the launcher's · ← → · Qt apps need qt6ct · apps change when they start again",
           keywords: "icons papirus gtk qt qt6ct theme apps" },

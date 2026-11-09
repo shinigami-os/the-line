@@ -57,6 +57,8 @@ Singleton {
         { id: "lock", name: "Lock", about: "the screens", bind: "Session: Lock", keywords: "screen password", run: s => Lock.lock() },
         { id: "power", name: "Power menu", about: "log out, suspend, restart, power off", bind: "The Line: power menu",
           keywords: "shutdown reboot logout suspend", run: s => { UiState.powerSelected = 0; root.dialog("powerScreen", s); } },
+        { id: "welcome", name: "The welcome story", about: "The Line told again, from the start", keywords: "tour intro tutorial help first run story hello",
+          run: s => Welcome.start("all") },
         { id: "restart", name: "Restart the shell", about: "The Line starts again", bind: "The Line: restart the shell",
           keywords: "reload quickshell", run: s => root.exec("pkill -f '^qs -p " + Config.shellRoot + "$'; pgrep -f '^/bin/sh .*/session/the-line-shell$' >/dev/null || " + Config.session("the-line-shell")) }
     ]

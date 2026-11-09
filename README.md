@@ -50,7 +50,9 @@ Runs on Hyprland (FHT comes later). Done so far:
 - login screen (`greeter/`, run by greetd under cage): two dials of ticks turning off the left edge, read on the line; signing in winds them up until they shed their ticks onto the line, which runs out to both edges before the session starts. The PAM conversation starts as soon as the greeter does, so a face or fingerprint in greetd's PAM stack signs in with no typing; the numpad types digits, and the keyboard layout is the last user's (Settings > Input) when it isn't the console's (`greeter/greeter-env`). `sudo greeter/install-greetd` puts it first in `/etc/greetd/start-greeter.sh` (qylock and eww stay as fallbacks). `QS_TESTING=1 QS_SCREEN=<screen> qs -p greeter` shows it inside a session ("test" signs in, Esc leaves)
 - screen recording (SUPER+ALT+R, `session/the-line-record`): a notification when it starts, and when it stops with where the file is
 
-Next: the welcome screen (first run, replayable).
+- welcome story (`services/Welcome.qml`, `modules/welcome`, texts in `assets/story.txt`): at the first login every screen goes black and Kira tells The Line in twelve beats, on the real line and tiles (the launcher types itself, a real notification arrives, the gauge sweeps, the shell folds for fullscreen); offers to change reduce motion, the accent (swatches or "from the wallpaper") and Kira's voice on the spot; the wallpaper is only revealed at the end. → ← Space Enter go on and back, ↑↓ or a letter choose, Esc asks to skip. Replay: type "welcome" in the launcher, or `qs -p . ipc call line welcome` (`welcomeHere`: only the focused screen). Seen once: `~/.local/state/the-line/welcome-done`
+
+Next: step 7, the install script.
 
 ## Session
 
@@ -102,6 +104,7 @@ qs -p . ipc call line clockFace         # the clock easter egg
 qs -p . ipc call line search fire        # open the launcher with a search typed in
 qs -p . ipc call line wallpapers         # the wallpaper picker on the focused screen
 qs -p . ipc call line visualiser         # the music visualiser on / off
+qs -p . ipc call line welcomeHere        # the welcome story on the focused screen only
 qs -p . ipc call line lockTest 15        # a lock that opens by itself after 15 s, for trying it out
 qs -p . ipc call line say "hello"        # Kira says a line on top of the windows
 qs -p . ipc call line overview           # the workspace overview

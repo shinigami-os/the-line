@@ -5,6 +5,7 @@ import Quickshell.Hyprland
 import Quickshell.Services.UPower
 import qs.modules.desktop
 import qs.modules.lock
+import qs.modules.welcome
 import qs.modules.tiles
 import qs.services
 
@@ -22,8 +23,12 @@ Scope {
     readonly property bool dialogHere: (Polkit.active && Polkit.screen === screenName) || UiState.sheetScreen === screenName
         || UiState.powerScreen === screenName || UiState.clipScreen === screenName || UiState.emojiScreen === screenName
         || UiState.wallScreen === screenName
+    // The welcome story: on every screen it runs on (all of them on a first login), and on its own screen the story
+    // itself is told (Welcome).
+    readonly property bool storyHere: Welcome.active && (Welcome.scope === "all" || Welcome.screen === screenName)
+    readonly property bool storyScreen: Welcome.active && Welcome.screen === screenName
     // This screen's surface wants the keyboard (a panel or a dialog open here); keysTaken follows it a moment later.
-    readonly property bool keysHere: panelHere || dialogHere
+    readonly property bool keysHere: panelHere || dialogHere || storyScreen
     property bool keysTaken: false
 
     onKeysHereChanged: {
@@ -62,7 +67,9 @@ Scope {
     //   reveal    visualiser: the pointer over the tiles' band
     property bool edgePeek: false
     property bool reveal: false
-    readonly property int target: !introDone || (fullscreen && !edgePeek) ? 3
+    // The story drives the screens it runs on: the story screen follows its beats, the others stay out until the finale.
+    readonly property int target: storyHere ? (storyScreen || Welcome.finale ? Welcome.stage : 3)
+        : !introDone || (fullscreen && !edgePeek) ? 3
         : Lock.locked || UiState.unlocking ? 2
         : Visualiser.on && !edgePeek && !reveal && !panelHere ? 2 : 0
 
@@ -74,8 +81,18 @@ Scope {
     Timer {
         id: introTimer
         interval: 700
-        running: !root.introDone && (Config.wallpaperFor(root.screenName) === "" || (wallpaper.item?.ready ?? false))
+        running: !root.introDone && !Welcome.holdWallpaper && (Config.wallpaperFor(root.screenName) === "" || (wallpaper.item?.ready ?? false))
         onTriggered: root.introDone = true
+    }
+
+    // The story's finale is this screen's intro: the line and the tiles are already coming back, don't play it twice.
+    Connections {
+        target: Welcome
+
+        function onFinaleChanged() {
+            if (Welcome.finale && root.storyHere)
+                root.introDone = true;
+        }
     }
 
     // While the line is withdrawn, a notification or a level change draws it back for the event (peek).
@@ -161,7 +178,7 @@ Scope {
 
     Loader {
         id: wallpaper
-        active: Config.wallpaperFor(root.screenName) !== ""
+        active: Config.wallpaperFor(root.screenName) !== "" && !Welcome.holdWallpaper
         sourceComponent: Wallpaper {
             screen: root.modelData
             paused: root.fullscreen || (Config.wallpaperStillOnBattery && UPower.onBattery)
@@ -207,11 +224,12 @@ Scope {
         color: "transparent"
         WlrLayershell.namespace: "the-line"
         // Hyprland draws fullscreen windows over the top layer, so the line moves to the overlay layer meanwhile.
-        WlrLayershell.layer: root.fullscreen || root.stage > 0 || UiState.unlocking ? WlrLayer.Overlay : WlrLayer.Top
+        WlrLayershell.layer: root.fullscreen || root.stage > 0 || UiState.unlocking || root.storyHere ? WlrLayer.Overlay : WlrLayer.Top
         // While a surface holds the keyboard (exclusive), Hyprland sends clicks to such surfaces only: with a panel open,
         // every screen's surface takes the keyboard, so a click on another screen still reaches its close area. The
         // panel's own screen takes it a moment later (keysTaken), as Hyprland gives the keys to the last one.
-        WlrLayershell.keyboardFocus: (root.keysHere && root.keysTaken) || (root.panelAnywhere && !root.keysHere)
+        // (not during the welcome story: its other screens are black and take every click themselves)
+        WlrLayershell.keyboardFocus: (root.keysHere && root.keysTaken) || (root.panelAnywhere && !root.keysHere && !Welcome.active)
             ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 
         IdleInhibitor {
@@ -222,7 +240,7 @@ Scope {
         // Input only where something is: the tiles, or the whole surface while a panel is open on any screen
         // (so a click outside closes it without reaching the window below). While peeking or visualising, the
         // tiles' whole band (to know when the pointer leaves it).
-        mask: root.panelAnywhere || root.dialogHere ? fullMask
+        mask: root.panelAnywhere || root.dialogHere || root.storyHere ? fullMask
             : root.edgePeek || (Visualiser.on && !root.fullscreen) ? bandMask
             : root.stage > 0 ? noMask : tilesMask
         // A new input region reaches Hyprland with the next frame: on a still screen there may be none for a long
@@ -262,9 +280,29 @@ Scope {
             anchors.fill: parent
             focus: true
 
-            Keys.onEscapePressed: UiState.close()
+            // Black, for the welcome story: under the line and tiles on the story screen, over everything elsewhere.
+            WelcomeCover {
+                anchors.fill: parent
+                z: root.storyScreen || Welcome.finale ? -1 : 1000
+                visible: root.storyHere || opacity > 0
+                lifted: Welcome.finale && (Config.wallpaperFor(root.screenName) === "" || (wallpaper.item?.ready ?? false))
+            }
+
+            // (a specific handler runs before the generic one below and would swallow Esc: the story gets it first)
+            Keys.onEscapePressed: event => {
+                if (root.storyScreen)
+                    Welcome.key(event);
+                else
+                    UiState.close();
+            }
             // Keys typed while the launcher's screen is still taking the keyboard land here: they go on to it.
             Keys.onPressed: event => {
+                // the story takes every key on its screen
+                if (root.storyScreen) {
+                    Welcome.key(event);
+                    event.accepted = true;
+                    return;
+                }
                 if (!root.panelHere && UiState.openPanel === "tl" && event.text !== "" && event.text.charCodeAt(0) >= 32)
                     UiState.launcherQuery += event.text;
             }
@@ -303,20 +341,20 @@ Scope {
                     screenName: root.screenName
                     workspace: root.workspace
                     musicHidden: root.stage >= 1
-                    collapsed: root.stage >= 2
+                    collapsed: root.stage >= 2 || (root.storyHere && !Welcome.shown.left)
                 }
 
                 ClockTile {
                     id: clockTile
                     screenName: root.screenName
                     fullscreen: root.fullscreen
-                    collapsed: root.stage >= 2
+                    collapsed: root.stage >= 2 || (root.storyHere && !Welcome.shown.center)
                 }
 
                 StatusTile {
                     id: statusTile
                     screenName: root.screenName
-                    collapsed: root.stage >= 2
+                    collapsed: root.stage >= 2 || (root.storyHere && !Welcome.shown.right)
                 }
             }
 
@@ -326,13 +364,15 @@ Scope {
             }
 
             Line {
+                // on the screens the story doesn't tell itself on, nothing of it may show (the pulse, the gauge)
+                visible: !(root.storyHere && !root.storyScreen && !Welcome.finale)
                 anchors.fill: parent
                 screenName: root.screenName
                 quietDesktop: root.desktopEmpty
                 workspace: root.workspace
                 musicShown: root.stage < 1
-                markerShown: root.stage < 2
-                tileShown: root.stage < 2
+                markerShown: root.stage < 2 && (!root.storyHere || Welcome.shown.marker)
+                tileShown: root.stage < 2 && (!root.storyHere || Welcome.shown.center)
                 spectrumShown: root.stage === 2
                 reach: root.stage >= 3 && !root.peek ? 0 : 1
 
@@ -384,6 +424,11 @@ Scope {
             UnlockCurtain {
                 anchors.fill: parent
                 screenName: root.screenName
+            }
+
+            Story {
+                visible: root.storyScreen
+                z: 2000
             }
 
             WallpaperStrip {

@@ -178,7 +178,9 @@ Tile {
     onQueryChanged: selected = 0
     onKindChanged: {
         if (kind === "tl") {
-            search.forceActiveFocus();
+            // (the welcome story keeps the keys: it types into the launcher itself)
+            if (!Welcome.active)
+                search.forceActiveFocus();
             Tools.refresh();
         } else
             UiState.launcherQuery = "";

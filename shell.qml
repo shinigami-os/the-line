@@ -303,6 +303,15 @@ ShellRoot {
             Lock.lock();
         }
 
+        // The welcome story: on every screen (the first login's), or only on the focused one (to try it).
+        function welcome(): void {
+            Welcome.start("all");
+        }
+
+        function welcomeHere(): void {
+            Welcome.start("one");
+        }
+
         // Development: a lock that opens by itself after `seconds` (5 at least), whatever is typed.
         function lockTest(seconds: int): void {
             Lock.lockTest(seconds);

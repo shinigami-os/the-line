@@ -21,6 +21,14 @@ Singleton {
     // A toggled control: accent at 14% over surface.
     readonly property color accentTint: Qt.tint(surface, Qt.rgba(accent.r, accent.g, accent.b, 0.14))
 
+    // The accents offered (Settings > Appearance, and the welcome story).
+    readonly property var accents: [
+        { value: "#9A5CFF", label: "Kira violet" }, { value: "#5C8DFF", label: "Blue" },
+        { value: "#4FC3B5", label: "Teal" }, { value: "#6CC495", label: "Green" },
+        { value: "#E8B04B", label: "Amber" }, { value: "#EF7A5E", label: "Coral" },
+        { value: "#E86FA5", label: "Pink" }, { value: "#ECE8E1", label: "Bone" }
+    ]
+
     readonly property string fontUi: "Raleway"
     readonly property string fontMono: Qt.fontFamilies().indexOf("IBM Plex Mono") >= 0 ? "IBM Plex Mono" : "JetBrains Mono"
 
