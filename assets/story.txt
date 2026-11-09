@@ -4,9 +4,9 @@
 # *words* are lit in the accent. {user} {host} {uptime} {packages}... are filled in live, like Kira's quotes.
 # Lines starting with # are comments.
 
-hello.1 = bonjour, {user}.
-hello.2 = this is a short story. four minutes, no popcorn needed (but i won't stop you).
-hello.3 = *→* to go on, *←* to go back, *esc* to leave. i will not be offended. i will be a little offended.
+hello.1 = welcome to *The Line*
+hello.2 = a shell based only on one Line, to keep things simple.
+hello.3 = *→* to go on, *←* to go back, *esc* to leave. i will not be offended don't worry (well, maybe a little)
 hello.offer = if animations make you queasy, say so now. i'll tell the story standing still.
 
 line.1 = this is *the line*.
@@ -15,8 +15,8 @@ line.3 = that little bar is the *accent*. it has opinions about colour. so, pres
 line.offer = pick one, or let the wallpaper decide. it has good taste. (it hasn't shown up yet. patience.)
 
 workspaces.1 = on the left, your *workspaces*. ten of them, hanging from the line like laundry. elegant laundry.
-workspaces.2 = *super + a number* goes there. *super + scroll* goes there faster.
-workspaces.3 = under them, the name of what you're doing. or "desktop", when you're doing nothing. no judgement.
+workspaces.2 = *super + a number* goes there. *super + scroll* goes there but faster.
+workspaces.3 = under them, the name of what you're doing. or "desktop", when you're just admiring our wallpaper (no judgement)
 
 launcher.1 = tap *super*, and the tile grows into a *launcher*.
 launcher.2 = it finds apps, solves sums, runs commands, and knows where the settings are. type *?* and it recites its prefixes, like a waiter reciting the menu.
@@ -24,8 +24,8 @@ launcher.3 = i typed "fir" for you. you're welcome.
 
 clock.1 = in the middle, the hour, and the *notifications*. they arrive like this.
 clock.2 = *super + n* opens them, with a calendar. there is a do-not-disturb, for days when the world can wait.
-clock.notify.title = ceci n'est pas une notification
-clock.notify.body = (c'est une notification.)
+clock.notify.title = test de Juilen à nouveau
+clock.notify.body = (did you get it ?)
 
 status.1 = on the right, the state of the machine: processor, memory, wi-fi, volume, battery.
 status.2 = *super + a* opens the quick settings. *super + p* tells you everything the machine is doing, in more detail than you asked for.
@@ -38,11 +38,12 @@ voice.2 = i'm told some people prefer silence. i'd rather not know which.
 voice.line = {user}@{host}. we've met.
 voice.offer = so: do you keep me, or do i go?
 
-fullscreen.1 = when a window goes *fullscreen*, the tiles fold into the line, and the line steps aside. a gentleman.
+fullscreen.1 = when a window goes *fullscreen*, the tiles fold into the line, and the line steps aside. what a gentleman.
 fullscreen.2 = push the pointer against the top edge for a moment and it comes back. then leaves again, discreetly.
 
 keys.1 = you will forget things. it's normal. keep one: *super + f1*. every shortcut, on one sheet.
 keys.2 = and, in passing: *super + i* settings · *super + l* lock · *super + t* wallpapers · *super + v* clipboard.
+keys.3 = PS : you should try *super+m* while playing some music ^^
 
 eggs.1 = there are *easter eggs*. i won't say where. i won't say how many.
 eggs.2 = finding them is your job. i'm only the narrator.
