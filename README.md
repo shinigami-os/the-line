@@ -1,8 +1,8 @@
+<h1 align="center">The Line</h1>
+
 <p align="center">
   <a href="docs/the-line-demo.mp4"><img src="docs/screenshots/hero.jpg" alt="The Line: a desktop shell built on one line. Click to watch the demo." width="900"></a>
 </p>
-
-<h1 align="center">The Line</h1>
 
 <p align="center">
   <em>A desktop shell built on one line.</em><br>
