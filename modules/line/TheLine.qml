@@ -233,8 +233,8 @@ Scope {
         // While a surface holds the keyboard (exclusive), Hyprland sends clicks to such surfaces only: with a panel open,
         // every screen's surface takes the keyboard, so a click on another screen still reaches its close area. The
         // panel's own screen takes it a moment later (keysTaken), as Hyprland gives the keys to the last one.
-        // (not during the welcome story: its other screens are black and take every click themselves)
-        WlrLayershell.keyboardFocus: (root.keysHere && root.keysTaken) || (root.panelAnywhere && !root.keysHere && !Welcome.active)
+        // (during the welcome story every story screen takes the keyboard: Hyprland sends the keys to the pointer's screen)
+        WlrLayershell.keyboardFocus: (root.keysHere && root.keysTaken) || root.storyHere || (root.panelAnywhere && !root.keysHere && !Welcome.active)
             ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 
         IdleInhibitor {
@@ -295,15 +295,15 @@ Scope {
 
             // (a specific handler runs before the generic one below and would swallow Esc: the story gets it first)
             Keys.onEscapePressed: event => {
-                if (root.storyScreen)
+                if (root.storyHere)
                     Welcome.key(event);
                 else
                     UiState.close();
             }
             // Keys typed while the launcher's screen is still taking the keyboard land here: they go on to it.
             Keys.onPressed: event => {
-                // the story takes every key on its screen
-                if (root.storyScreen) {
+                // the story takes every key, on whichever screen the keyboard is (it follows the pointer)
+                if (root.storyHere) {
                     Welcome.key(event);
                     event.accepted = true;
                     return;
