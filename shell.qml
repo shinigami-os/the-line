@@ -7,6 +7,7 @@ import Quickshell.Io
 import Quickshell.Hyprland
 import Quickshell.Services.UPower
 import qs.modules.line
+import qs.modules.demo
 import qs.modules.lock
 import qs.services
 
@@ -101,6 +102,8 @@ ShellRoot {
     }
 
     LockScreen {}
+
+    DemoOverlay {}
 
     // Hyprland binds, e.g. hl.bind("SUPER+SPACE", hl.dsp.global("the-line:launcher"))
     component Shortcut: GlobalShortcut {
@@ -210,6 +213,19 @@ ShellRoot {
 
         function notify(app: string, title: string, body: string): void {
             Notifs.push(app, title, body);
+        }
+
+        // The demo video's runner (scripts/video): a caption for some seconds, the keys it presses, the key display on / off.
+        function caption(text: string, seconds: real): void {
+            Demo.say(text, seconds);
+        }
+
+        function keys(combo: string): void {
+            Demo.press(combo);
+        }
+
+        function keycast(on: bool): void {
+            Demo.keycast = on;
         }
 
         function gauge(kind: string, value: real): void {
