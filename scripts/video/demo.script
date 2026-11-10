@@ -18,6 +18,7 @@
 #   glide <x> <y> <ms>          move the pointer smoothly (pixels of the filmed screen)
 #   hold-pointer-top <ms>       push the pointer against the top edge (the fullscreen peek)
 #   resize <left|right|up|down> <n>   the resize mode's arrows, n steps of 40 px (after `key SUPER+R`, ends with resize-end)
+#   drag-window <from> <to> <ms>   in the workspace overview: drag the first window of workspace <from> onto workspace <to>
 #   notify-later <min> <max> "<title>" "<body>"...   a notification at a random moment in min..max seconds from now
 #                               (one of the bodies at random); the scene goes on meanwhile
 #   mark <name>                 a cut point in the timeline file
@@ -29,17 +30,25 @@
 
 home 3
 
-scene 1 "The line" 12
+scene 1 "The line" 24
 shell playerctl play
 notify-later 2 6 "A random notification" "Hello from the line" "Nothing important, really" "Someone, somewhere, says hi" "Your coffee is ready (it is not)"
 caption "The Line: a desktop shell built on one line" 3.5
 wait 2.9
-ws 5
+run@5 foot
 wait 0.8
-ws 8
+run@8 foot
 wait 0.8
 ws 3
 wait 0.8
+caption "double-tap Super: every workspace at a glance" 3.5
+double-tap-super
+wait 2.4
+caption "and drag a window from one workspace to another" 3.5
+drag-window 5 8 1100
+wait 1.2
+double-tap-super
+wait 0.9
 
 scene 2 "Launcher" 15
 caption "tap Super: apps, sums, commands, settings" 3.5

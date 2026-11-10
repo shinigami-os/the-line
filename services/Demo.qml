@@ -11,6 +11,12 @@ Singleton {
     property string caption: ""
     property var keys: []               // the caps of the last combo, e.g. ["SUPER", "T"]
     property bool keycast: true
+    property var overviews: ({})        // screen name -> its open WorkspaceOverview (it registers itself)
+
+    // Where a cell (win < 0) or a window of the workspace overview is, "x,y" in the screen's pixels; "" if it is not open.
+    function overviewPoint(screen, n, win) {
+        return overviews[screen]?.pointOf(n, win) ?? "";
+    }
 
     function say(text, seconds) {
         caption = text;

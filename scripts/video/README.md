@@ -20,6 +20,8 @@ the shell itself (`services/Demo.qml`, `modules/demo/`), so they are in the reco
   is `shortcut()` in `run.py`; a new combo is one line.
 - The window shortcuts (`SUPER+Q`, `SUPER+F`...) only act on windows the script opened: yours are never touched.
 - The take uses workspaces 3, 5 and 8 of the filmed screen (made there on demand): they must not exist on another screen.
+- `drag-window` (the workspace overview scene) holds the mouse button with `ydotool`; the runner starts `ydotoold` if it is not
+  running (your user needs access to /dev/uinput). The shell tells the runner where the thumbnails are (`qs ipc call line overviewPoint`).
 - Before a take: music player ready (paused), nothing private on screen, the default wallpaper if wanted.
 - The run ends on the workspace it started on; the timeline file lists the real length of each scene and the cut points.
 

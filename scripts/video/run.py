@@ -81,6 +81,17 @@ def monitor(name):
     raise SystemExit("no screen called %s (hyprctl monitors)" % name)
 
 
+def ipc_out(*args):
+    return sh(["qs", "-p", SHELL_DIR, "ipc", "call", "line"] + [str(a) for a in args]).stdout.strip()
+
+
+def ydotoold():
+    """The mouse button (ydotool) needs its daemon: start it if it is not running."""
+    if sh(["pgrep", "-x", "ydotoold"]).returncode != 0:
+        subprocess.Popen(host(["ydotoold"]), stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True)
+        time.sleep(0.8)
+
+
 def ipc(*args):
     sh(["qs", "-p", SHELL_DIR, "ipc", "call", "line"] + [str(a) for a in args])
 
@@ -176,6 +187,8 @@ def estimate(step):
         return 0.25 + 0.075 * len(a[0])
     if v == "glide":
         return int(a[2]) / 1000
+    if v == "drag-window":
+        return 2.1 + int(a[2]) / 1000
     if v == "hold-pointer-top":
         return 0.5 + int(a[0]) / 1000
     if v.startswith("run") or v == "settings":
@@ -227,6 +240,29 @@ class Runner:
     def press(self, name):
         self.show_keys(KEY_LABELS.get(name.upper(), name.upper()))
         sh(["wtype", "-k", name])
+
+    def mouse(self, state):
+        sh(["ydotool", "click", "0x40" if state == "down" else "0x80"])
+
+    def drag_window(self, src, dst, ms):
+        """In the workspace overview: take the first window of workspace src and drop it on workspace dst."""
+        ydotoold()
+        a = ipc_out("overviewPoint", self.screen, src, 0)
+        b = ipc_out("overviewPoint", self.screen, dst, -1)
+        if not a or not b:
+            print("  (drag-window: the overview is not open, or has no window on workspace %s)" % src, file=sys.stderr)
+            return
+        x0, y0 = [int(v) for v in a.split(",")]
+        x1, y1 = [int(v) for v in b.split(",")]
+        self.glide(x0, y0, 600)
+        time.sleep(0.3)
+        self.mouse("down")
+        time.sleep(0.15)
+        self.glide(x0 + 10, y0 + 6, 120)   # past the drag threshold
+        self.glide(x1, y1, ms)
+        time.sleep(0.5)                     # the target cell lit
+        self.mouse("up")
+        time.sleep(0.4)
 
     def resize(self, direction, steps):
         """The resize mode's arrow keys (40 px a step, as in session/hyprland.lua), one step at a time."""
@@ -323,6 +359,8 @@ class Runner:
             self.type(a[0])
         elif v == "press":
             self.press(a[0])
+        elif v == "drag-window":
+            self.drag_window(a[0], a[1], int(a[2]))
         elif v == "resize":
             if self.focused_is_ours():
                 self.resize(a[0], int(a[1]))

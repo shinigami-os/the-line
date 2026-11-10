@@ -13,6 +13,7 @@ Item {
 
     required property bool shown
     required property int active   // active workspace of this screen
+    property string screenName: ""
 
     readonly property real cellW: 168
     readonly property real cellH: 95
@@ -39,6 +40,25 @@ Item {
                 return i + 1;
         }
         return 0;
+    }
+
+    // Where a cell (win < 0) or the win-th window of workspace n is, in the screen's own pixels: the demo video's runner
+    // (scripts/video) drags windows from here. "" when it isn't there.
+    function pointOf(n, win) {
+        const c = cells.itemAt(n - 1);
+        if (!c)
+            return "";
+        const item = win < 0 ? c.screenItem : c.windowItems.itemAt(win);
+        if (!item)
+            return "";
+        const p = item.mapToItem(null, item.width / 2, item.height / 2);
+        return Math.round(p.x) + "," + Math.round(p.y);
+    }
+
+    Component.onCompleted: Demo.overviews[screenName] = overview
+    Component.onDestruction: {
+        if (Demo.overviews[screenName] === overview)
+            delete Demo.overviews[screenName];
     }
 
     function address(toplevel) {
@@ -68,6 +88,8 @@ Item {
                 readonly property real monH: mon ? mon.height / (mon.scale || 1) : 1080
                 readonly property real k: Math.min(overview.cellW / monW, overview.cellH / monH)
                 readonly property bool isActive: n === overview.active
+                readonly property alias screenItem: screen
+                readonly property alias windowItems: windowRepeater
                 readonly property bool dropHere: overview.dragWin !== null && overview.dropTarget === n && n !== overview.dragFrom
 
                 order: Math.floor(index / 5) * 2 + index % 5
@@ -96,6 +118,7 @@ Item {
                         height: cell.monH * cell.k
 
                         Repeater {
+                            id: windowRepeater
                             model: cell.windows
 
                             Rectangle {

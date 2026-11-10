@@ -455,6 +455,7 @@ Tile {
                 enabled: tile.kind === "tw"
                 shown: tile.kind === "tw"
                 active: tile.workspace
+                screenName: tile.screenName
             }
 
             // Kept a moment after closing, so its items can fade out with the frame.

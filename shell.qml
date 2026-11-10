@@ -224,6 +224,10 @@ ShellRoot {
             Demo.press(combo);
         }
 
+        function overviewPoint(screen: string, workspace: int, window: int): string {
+            return Demo.overviewPoint(screen, workspace, window);
+        }
+
         function keycast(on: bool): void {
             Demo.keycast = on;
         }
