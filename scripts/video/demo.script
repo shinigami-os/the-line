@@ -181,7 +181,7 @@ wait 1.0
 press Escape
 wait 0.6
 caption "and the other apps wear the same colours" 3
-run pcmanfm-qt
+run voxel /usr/share/kira/wallpapers
 wait 2.1
 key SUPER+Q
 

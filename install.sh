@@ -79,6 +79,7 @@ flameshot     screenshots with annotations
 wf-recorder   screen recording
 tesseract     text from a screenshot (OCR)
 yazi          the file manager in the terminal
+voxel         the graphical file manager (package kira-voxel on Kira, github.com/AxOS-project/Voxel elsewhere)
 howdy         face sign-in
 fprintd-list  fingerprint sign-in
 cage          the login screen (greetd)"

@@ -53,7 +53,8 @@ sudo ./install.sh           # installs under /usr; log out and pick "The Line" i
 `nmcli` (NetworkManager), `loginctl`, `grim`, `wl-copy` (wl-clipboard), `cliphist`, `hypridle`, `foot`, `python3`.
 **Recommended:** `brightnessctl`, `playerctl`, `qalc`, `cava`, `qt6ct`, `jq`, `slurp`, `matugen`, `mpv`.
 **Optional:** `hyprsunset` (night light), `hyprpicker`, `flameshot`, `wf-recorder`, `tesseract`, `yazi`, `howdy`
-(face sign-in), `fprintd` (fingerprint), `cage` (the login screen). Qt Multimedia (ffmpeg backend) for video wallpapers;
+(face sign-in), `fprintd` (fingerprint), `cage` (the login screen), and [Voxel](https://github.com/AxOS-project/Voxel) as the
+graphical file manager (`kira-voxel` on Kira Linux). Qt Multimedia (ffmpeg backend) for video wallpapers;
 Kvantum and adw-gtk3 so other apps wear The Line's colours. Fonts: Raleway and IBM Plex Mono (JetBrains Mono is the fallback).
 
 It runs on one screen or several (the ten workspaces are shared out between them, the main screen first). There is no
