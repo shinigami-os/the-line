@@ -81,6 +81,16 @@ def monitor(name):
     raise SystemExit("no screen called %s (hyprctl monitors)" % name)
 
 
+def audio_source(wanted):
+    """What the video hears: the sound the computer plays (the monitor of the output you listen on), never a microphone.
+    `wanted` is a source name from `pactl list short sources`, or "" for the default output's monitor."""
+    sources = [l.split("\t")[1] for l in sh(["pactl", "list", "short", "sources"]).stdout.splitlines() if "\t" in l]
+    name = wanted or sh(["pactl", "get-default-sink"]).stdout.strip() + ".monitor"
+    if name not in sources:
+        raise SystemExit("no audio source called %s (pactl list short sources); use --audio-source, or --no-audio" % name)
+    return name
+
+
 def ipc_out(*args):
     return sh(["qs", "-p", SHELL_DIR, "ipc", "call", "line"] + [str(a) for a in args]).stdout.strip()
 
@@ -405,6 +415,8 @@ def main():
     ap.add_argument("--screen", default=None, help="the filmed screen (default: Config primaryScreen, else the focused one)")
     ap.add_argument("--out", default=os.path.expanduser("~/Videos/the-line-demo"))
     ap.add_argument("--max", type=float, default=120, help="the length the whole thing must stay under, seconds")
+    ap.add_argument("--audio-source", default="", help="the sound to record (default: what the default output plays)")
+    ap.add_argument("--no-audio", action="store_true", help="film without sound")
     ap.add_argument("--no-record", action="store_true")
     ap.add_argument("--dry-run", action="store_true")
     ap.add_argument("--list", action="store_true")
@@ -454,7 +466,10 @@ def main():
     ipc("keycast", "true")
     runner.reset(HOME[0])
     if not opts.no_record:
-        recorder = subprocess.Popen(host(["wf-recorder", "-o", screen, "-r", "60", "-x", "yuv420p", "-p", "preset=veryfast",
+        sound = [] if opts.no_audio else ["--audio=" + audio_source(opts.audio_source)]
+        if sound:
+            print("sound: " + sound[0][8:])
+        recorder = subprocess.Popen(host(["wf-recorder", "-o", screen] + sound + [ "-r", "60", "-x", "yuv420p", "-p", "preset=veryfast",
                                           "-p", "crf=17", "-f", base + ".mp4"]), stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         time.sleep(1.2)
 

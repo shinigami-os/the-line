@@ -13,6 +13,8 @@ the shell itself (`services/Demo.qml`, `modules/demo/`), so they are in the reco
   (3 s countdown, then `wf-recorder` on the primary screen, then the scenes, then it stops and prints the timeline). The terminal can be on
   another screen: the runner takes the keyboard on the filmed screen while it runs, so to stop it early use `pkill -INT -f video/run.py`
   from anywhere (Ctrl+C in its terminal would go nowhere: that terminal does not have the keyboard).
+- Sound: the video records what the computer plays (the monitor of the default output, today the Razer one), never a microphone.
+  `--audio-source <name>` picks another (`pactl list short sources`), `--no-audio` films without sound.
 - Music: `playerctl play` is the first command of the video and `playerctl pause` the last (nothing else touches the player).
 - The script language is described at the top of `demo.script`. Every pause there is short on purpose.
 - Run it from a terminal of the filmed session (it uses `hyprctl`, `wtype`, `qs`, `wf-recorder`, `playerctl`).
