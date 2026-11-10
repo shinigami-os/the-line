@@ -312,6 +312,34 @@ Scope {
                     UiState.launcherQuery += event.text;
             }
 
+            // The story's keys. Something else can hold the keyboard focus (the launcher's field, when the story was
+            // started from it), so while the story runs this item takes it back whenever it is lost.
+            Item {
+                id: storyKeys
+
+                Keys.onEscapePressed: event => Welcome.key(event)
+                Keys.onPressed: event => {
+                    Welcome.key(event);
+                    event.accepted = true;
+                }
+
+                Timer {
+                    interval: 250
+                    repeat: true
+                    running: root.storyHere
+                    triggeredOnStart: true
+                    onTriggered: if (!storyKeys.activeFocus) storyKeys.forceActiveFocus()
+                }
+            }
+            Connections {
+                target: root
+
+                function onStoryHereChanged() {
+                    if (!root.storyHere)
+                        content.forceActiveFocus();
+                }
+            }
+
             MouseArea {
                 anchors.fill: parent
                 enabled: root.panelAnywhere
