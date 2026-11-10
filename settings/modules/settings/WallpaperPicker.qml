@@ -1,5 +1,6 @@
 import QtQuick
 import Quickshell
+import qs.modules.common
 import qs.services
 
 // Settings > Appearance > Wallpaper: thumbnails of The Line's wallpapers (assets/wallpapers), Kira's, and yours
@@ -168,22 +169,10 @@ Item {
                 }
 
                 // Moving ones say so, in a corner.
-                Rectangle {
-                    visible: thumb.kind !== "still"
+                KindBadge {
+                    kind: thumb.kind
                     x: 8
                     y: parent.height - height - 8
-                    width: kindText.implicitWidth + 10
-                    height: 16
-                    color: Qt.rgba(0, 0, 0, 0.6)
-
-                    Text {
-                        id: kindText
-                        anchors.centerIn: parent
-                        text: thumb.kind === "video" ? "▶ video" : "▶ gif"
-                        font.family: Theme.fontMono
-                        font.pixelSize: 9
-                        color: "white"
-                    }
                 }
 
                 // The cursor: a white frame; the wallpaper in use: an accent frame and a tick under it.
