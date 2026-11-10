@@ -13,7 +13,6 @@ Singleton {
     readonly property color text: "#ECE8E1"
     readonly property color muted: "#9C968C"
     readonly property color accent: Config.accent
-    readonly property color accentDeep: "#7B2FF7"
     readonly property color accentText: "#0F0D12"
     readonly property color ok: "#6CC495"
     readonly property color error: "#EF7A5E"

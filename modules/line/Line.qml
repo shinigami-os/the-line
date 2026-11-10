@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Shapes
 import qs.services
 
 // The line and everything that happens on it: music progress, workspace marker, level gauge, notification pulse.

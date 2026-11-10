@@ -78,7 +78,6 @@ Singleton {
     }
 
     readonly property var lines: paragraphs(current.id)
-    readonly property string offerPrompt: current.offer ? t(current.id + ".offer") : ""
 
     FileView {
         path: Qt.resolvedUrl("../assets/story.txt").toString().replace("file://", "")

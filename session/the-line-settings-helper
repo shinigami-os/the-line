@@ -24,7 +24,6 @@ case "${1:-}" in
 hostname)
     name="${2:-}"
     printf '%s' "$name" | grep -Eq '^[A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?$' || die "A name with letters, digits and dashes (not at the ends)"
-    old=$(cat /etc/hostname 2>/dev/null)
     printf '%s\n' "$name" > /etc/hostname
     hostname "$name"
     # 127.0.1.1 names this computer for the programs that look it up
