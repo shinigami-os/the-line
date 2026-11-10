@@ -290,7 +290,7 @@ Scope {
                 anchors.fill: parent
                 z: root.storyScreen || Welcome.finale ? -1 : 1000
                 visible: root.storyHere || opacity > 0
-                lifted: Welcome.finale && (Config.wallpaperFor(root.screenName) === "" || (wallpaper.item?.ready ?? false))
+                lifted: !Welcome.checking && (!Welcome.active || (Welcome.finale && (Config.wallpaperFor(root.screenName) === "" || (wallpaper.item?.ready ?? false))))
             }
 
             // (a specific handler runs before the generic one below and would swallow Esc: the story gets it first)
