@@ -1,167 +1,198 @@
-# The Line
+<p align="center">
+  <a href="docs/the-line-demo.mp4"><img src="docs/screenshots/hero.jpg" alt="The Line: a desktop shell built on one line. Click to watch the demo." width="900"></a>
+</p>
 
-The desktop shell of Kira Linux, built with Quickshell on one line. The line crosses the top of the screen and tiles hang beneath it. Notifications, volume, workspaces and music all play out on the line, and the tiles grow into panels instead of opening popups.
+<h1 align="center">The Line</h1>
 
-**[Watch the demo (under 2 minutes)](docs/the-line-demo.mp4)**
+<p align="center">
+  <em>A desktop shell built on one line.</em><br>
+  Quickshell on Hyprland, made for Kira Linux.
+</p>
 
-## Status
+<p align="center">
+  <a href="docs/the-line-demo.mp4"><b>▶ Watch the demo</b></a> (under 2 minutes, no sound needed)
+  &nbsp;·&nbsp; <a href="#install">Install</a>
+  &nbsp;·&nbsp; <a href="#a-tour">A tour</a>
+  &nbsp;·&nbsp; <a href="#keys">Keys</a>
+  &nbsp;·&nbsp; <a href="#make-it-yours">Make it yours</a>
+</p>
 
-Runs on Hyprland (FHT comes later). Done so far:
+---
 
-- `Theme` and `Anim` singletons (colours, fonts, the whole motion system)
-- the line: end caps, workspace marker, volume/brightness gauge, notification pulse
-- top-left tile at rest: workspace numerals and window title
-- top-centre tile: clock, notification toast, notifications panel and calendar
-- top-right tile: performance summary, Wi-Fi, volume, battery. The summary opens the performance dashboard, the icons open quick settings (Wi-Fi, Bluetooth, night light, keep awake, sliders, reduce motion, power)
+There is no dock, no taskbar and no panel. A single line crosses the top of the screen, and everything happens on it:
+workspaces hang from it, a notification runs along it, the volume is drawn on it, music plays out on it. Three small
+tiles sit beneath it, and when you need more they **grow into panels** instead of opening popups: the clock becomes a
+calendar, the launcher unfolds from the workspaces, the machine's state opens into a dashboard. When something goes
+fullscreen the tiles fold into the line and the line steps aside.
 
-- top-left tile grows into the launcher: apps (most launched first), a calculator (qalc, on anything with an operator, a function or "to"), run in terminal, the settings' sections and The Line's shortcuts (wallpapers, clipboard, visualiser, screenshot, do not disturb…, with their keys or an on / off); the panel height follows the results. A first character narrows it: `=` calculate, `>` run, `:` shortcuts, `/` settings, `?` lists them
+Square corners, 1 px greys, one accent colour, one curve for every movement. Nothing is hidden behind a menu, and
+there is no telemetry: the one request The Line makes by itself is the public-address line of Settings › Network, and only
+while that page is open.
 
-- music part of the top-left tile (MPRIS) with its progress on the line; it grows into the music panel (cover, track ruler with seek, controls, player picker)
+## Install
 
-- fullscreen, in stages: the music part leaves, the tiles fold up into the line, the line withdraws into the screen edges. A notification or a level change draws the line back for the event, then it withdraws again. Pushing the pointer against the top edge for 400 ms brings the tiles back until it leaves them
-- music visualiser (SUPER+M, or the button in the music panel; needs cava): the tiles fold into the line and the frequencies hang from it as ticks, one every 6 px on any screen; hovering the top brings the tiles back. Off at each login
-- wallpaper picker (SUPER+T): a line across the bottom of the screen with the wallpapers hanging from it; the screen shows the picked one behind the line before it is set; every screen or one
-
-- Kira's voice on an empty workspace, behind the windows, from `assets/quotes.txt` plus `~/.config/the-line/quotes.txt`, with live `{placeholders}`
-
-- notification daemon (org.freedesktop.Notifications) and the wallpaper: one for every screen or one per screen, a picture, an animated GIF or a video (mp4, webm, mkv, mov: looped, silent, played by Qt's ffmpeg); moving ones stop under a fullscreen window and, by default, on battery
-- double tap Super: the workspace overview (ten small screens with live window thumbnails), grown from the same tile as the launcher; drag a window to another workspace to move it, click one to focus it
-- optional app icons on the workspace ruler (`workspaceIcons` in the config)
-- intro: each screen starts hidden and draws itself in once its wallpaper is shown
-
-- volume, brightness and keyboard backlight keys step by `levelStep`; the clock tile shows which level the line is showing, and its value
-- polkit agent: an app asking for an admin password gets The Line's dialog (the line drawn across the screen, the box opening on it)
-
-- cheat sheet (SUPER+F1): every shortcut, read live (Hyprland's binds and their "Group: what it does" descriptions, the touchpad gestures, foot's and zsh's own bindings, yazi's keymap from its binary and your keymap.toml), in tabs
-
-- power menu (CTRL+ALT+Delete, the power button): the line runs through it, hold to confirm
-
-- clipboard history (SUPER+V) and emoji picker (SUPER+semicolon), both grown from the line, with search
-
-- floating (SUPER+ALT+Space): a window floats at 75% of its tiled size, centred; floated apps are remembered with their size and place (`~/.config/the-line/hypr/floating.lua`)
-- files: yazi in foot (SUPER+E), the default file manager (SUPER+SHIFT+E)
-- screenshots with Flameshot on the focused screen; The Line's defaults for foot (black glass, VS Code-style keys) and Flameshot are installed on first login
-
-- other apps in The Line's colours (colours only): GTK 3 / 4 through `gtk.css` (GTK 3 apps need the adw-gtk3 theme) and Qt through a Kvantum theme recoloured from KvGnomeDark; rewritten at each accent change (`session/the-line-app-theme`). Their icon theme too (Settings > Appearance; Qt apps through qt6ct, which the session uses when it is installed)
-- the launcher finds the settings: "wifi", "keyboard", "night" offer "Settings › <section>"
-- a click on another screen closes an open panel; with several screens, the notification pulse can stay on the focused one (Settings > Notifications)
-- easter eggs: `EASTER_EGGS.md`
-- settings app (SUPER+I, `settings/`): its own window, a spine of sections and a search over every setting; done so far: network, Bluetooth, sound, displays (arrangement on a snapping map, resolution, scale, rotation, main screen, on / off; changes are only drawn until Apply, then go back after 15 s unless kept), input (layout, Caps Lock, key repeat; mouse and touchpad apart), appearance (wallpaper picker per screen, accent, accent from the main screen's wallpaper, motion), workspaces (apps on their workspace, remembered floating apps, ruler), shortcuts (your app keys, The Line's keys moved or turned off, conflicts refused), power and idle (with the battery limit), notifications (do not disturb on a schedule, urgent ones through, muted apps), night light (warmth, schedule; needs hyprsunset), storage (disks, what fills your home), default apps (xdg-mime, and The Line's terminal), sign-in (howdy faces with a name, fingerprint), system (name, time, time zone, specifications), The Line's own settings, about
-
-- lock screen (SUPER+L, idle, before sleep; `modules/lock`, `services/Lock.qml`): the line glides down to the middle pulling the night over the screen, the time above it, the password typed as ticks on it; unlocking runs the accent along it and it rises back to the top, wiping the darkness up. With a face (howdy) or a fingerprint (fprintd) set up there is a button on it (and Tab) to try them first: three tries a lock, then only the password; the same switch is in Settings > Sign-in. The PAM stacks it uses are written by `session/the-line-pam` into `~/.config/the-line/pam/` (no password needed; a file you edit yourself is kept). The numpad types digits whatever NumLock says. Locked when the shell went down: it locks again as it comes back
-- login screen (`greeter/`, run by greetd under cage): two dials of ticks turning off the left edge, read on the line; signing in winds them up until they shed their ticks onto the line, which runs out to both edges before the session starts. The PAM conversation starts as soon as the greeter does, so a face or fingerprint in greetd's PAM stack signs in with no typing; the numpad types digits, and the keyboard layout is the last user's (Settings > Input) when it isn't the console's (`greeter/greeter-env`). `sudo greeter/install-greetd` puts it first in `/etc/greetd/start-greeter.sh` (qylock and eww stay as fallbacks). `QS_TESTING=1 QS_SCREEN=<screen> qs -p greeter` shows it inside a session ("test" signs in, Esc leaves)
-- screen recording (SUPER+ALT+R, `session/the-line-record`): a notification when it starts, and when it stops with where the file is
-
-- welcome story (`services/Welcome.qml`, `modules/welcome`, texts in `assets/story.txt`): at the first login every screen goes black and Kira tells The Line in twelve beats, on the real line and tiles (the launcher types itself, a real notification arrives, the gauge sweeps, the shell folds for fullscreen); offers to change reduce motion, the accent (swatches or "from the wallpaper") and Kira's voice on the spot; the wallpaper is only revealed at the end. → ← Space Enter go on and back, ↑↓ or a letter choose, Esc asks to skip. Replay: type "welcome" in the launcher, or `qs -p . ipc call line welcome` (`welcomeHere`: only the focused screen). Seen once: `~/.local/state/the-line/welcome-done`
-
-Next: step 7, the install script.
-
-## Session
-
-`session/` holds everything to log into The Line from the greeter:
-
-- `the-line.desktop`: the greeter entry, installed in `/usr/share/wayland-sessions/`
-- `the-line-session`: environment, session bus, audio, then Hyprland (`/usr/bin/the-line-session`)
-- `hyprland.lua`: The Line's Hyprland config (square, 1 px borders, the shell's curve and timings, the keys)
-- `the-line-apply`: writes the files other programs read from `config.json` (`hypridle.conf` with your idle times, `hypr/workspaces.lua`), and `~/.config/the-line/README.md`
-- `the-line-settings`: opens the settings app, or brings it forward (`the-line-settings power` opens a section)
-- `the-line-settings-helper`: the settings app's root side (hostname, time zone, automatic time, clock, battery limit, howdy faces and face sign-in), run through pkexec; `org.kira.the-line.settings.policy` goes in `/usr/share/polkit-1/actions/`
-- `the-line-shell`: runs the shell and starts it again if it crashes
-- `apps.lua`: the default app keys (just the terminal), copied to `~/.config/the-line/hypr/` on first login
-
-The shell is expected in `/usr/share/the-line` (or wherever `THE_LINE_DIR` points). Workspaces are shared out evenly between screens, left to right (2 screens: 1 and 5; 3 screens: 1, 4, 7; the main screen goes first: Settings > Displays, or `primary_monitor = "<name>"` in `custom.lua`). Your own Hyprland bits go in `~/.config/the-line/hypr/` (`monitors.lua`, `apps.lua`, `custom.lua`; The Line writes `floating.lua`); coming from Sleex, its monitors, app keys and custom general settings are copied there on the first login.
-
-### Where your settings live
-
-Everything you set lives in `~/.config/the-line/` (and state like launch counts in `~/.local/state/the-line/`); updates
-only replace `/usr/share/the-line`. Each file says in its first lines whether it is yours or generated, and
-`~/.config/the-line/README.md` (written at each login) lists them all. `config.json` is the source: the generated files
-(`hypridle.conf`, `hypr/workspaces.lua`, `hypr/input.lua`, `hypr/keys.lua`, `hypr/floating.lua`) are rewritten from it.
-Settings also edits two files that stay yours: in `hypr/apps.lua` it changes only the app-key lines it shows, in
-`hypr/monitors.lua` only the line of a screen you change there.
-
-To try it from a checkout before it is packaged:
+You need [Quickshell](https://quickshell.org) 0.3+ and [Hyprland](https://hypr.land) 0.55+ (the session's configuration is
+Lua), plus a few small programs. The installer tells you exactly what is missing:
 
 ```sh
-sudo ln -s ~/Documents/Kira-Linux/the-line /usr/share/the-line
-sudo cp session/the-line-session /usr/bin/
-sudo cp session/the-line.desktop /usr/share/wayland-sessions/
+git clone git@github.com:shinigami-os/the-line.git
+cd the-line
+./install.sh --check        # what is found, what is missing
+sudo ./install.sh           # installs under /usr; log out and pick "The Line" in your login screen
 ```
 
-## Run (development)
+| | |
+|---|---|
+| `sudo ./install.sh` | install or update (a new tree is swapped in; your settings are never touched) |
+| `sudo ./install.sh --dev` | link `/usr/share/the-line` to this checkout: what you edit is live (the shell reloads by itself) |
+| `sudo ./install.sh --greeter` | also put The Line's own login screen first in greetd (Kira's `start-greeter.sh`) |
+| `sudo ./install.sh --uninstall` | remove it; `~/.config/the-line` stays |
+| `DESTDIR=/tmp/pkg ./install.sh` | stage it for packaging (no root, no checks) |
 
-```sh
-qs -p /path/to/this/repo
-THE_LINE_SCREENS=HDMI-A-1 qs -p /path/to/this/repo   # one screen only
-```
+**Required:** `qs` (Quickshell), `Hyprland` and `start-hyprland`, `dbus-run-session`, PipeWire and WirePlumber (`wpctl`),
+`nmcli` (NetworkManager), `loginctl`, `grim`, `wl-copy` (wl-clipboard), `cliphist`, `hypridle`, `foot`, `python3`.
+**Recommended:** `brightnessctl`, `playerctl`, `qalc`, `cava`, `qt6ct`, `jq`, `slurp`, `matugen`, `mpv`.
+**Optional:** `hyprsunset` (night light), `hyprpicker`, `flameshot`, `wf-recorder`, `tesseract`, `yazi`, `howdy`
+(face sign-in), `fprintd` (fingerprint), `cage` (the login screen). Qt Multimedia (ffmpeg backend) for video wallpapers;
+Kvantum and adw-gtk3 so other apps wear The Line's colours. Fonts: Raleway and IBM Plex Mono (JetBrains Mono is the fallback).
 
-Test from another terminal:
+It runs on one screen or several (the ten workspaces are shared out between them, the main screen first). There is no
+GPU-specific code: integrated graphics is enough. It is built and tested on Kira Linux (runit); the session and the
+settings helper also handle systemd, but that is less travelled.
 
-```sh
-qs -p . ipc call line notify build "cargo build finished" "0 errors"
-qs -p . ipc call line gauge vol 0.64
-qs -p . ipc call line toggle eDP-1 tc    # notifications (tl: launcher, tm: music, tr: quick settings, tp: performance)
-qs -p . ipc call line close
-qs -p . ipc call line clockFace         # the clock easter egg
-qs -p . ipc call line search fire        # open the launcher with a search typed in
-qs -p . ipc call line wallpapers         # the wallpaper picker on the focused screen
-qs -p . ipc call line visualiser         # the music visualiser on / off
-qs -p . ipc call line welcomeHere        # the welcome story on the focused screen only
-qs -p . ipc call line lockTest 15        # a lock that opens by itself after 15 s, for trying it out
-qs -p . ipc call line say "hello"        # Kira says a line on top of the windows
-qs -p . ipc call line overview           # the workspace overview
-qs -p . ipc call line cheatsheet         # every shortcut (cheatsheetTab <n> opens a given tab)
-qs -p . ipc call line power              # the power menu
-```
+The first login tells the story of the line in a few minutes (every screen black, then Kira explaining, with offers to
+change a setting on the spot). Type `welcome` in the launcher to hear it again.
 
-## Layout
+## A tour
 
-```
-shell.qml         entry point and IPC
-services/         singletons: Theme, Anim, Config, UiState, LineState, Notifs, Audio, Brightness, SystemStats, Network, NightLight, Power, Media, Apps, Session, ClockFace, Time
-modules/common/   Tile (tile that grows into a panel), CenterDialog (dialog grown from the line), PanelItem, Reading, Toggle, LineSlider, Icon
-modules/line/     the line and the per-screen surface
-modules/tiles/    the three tiles and their panels
-modules/desktop/  wallpaper, Kira's voice
-assets/           quotes.txt (Kira's voice) and other static files
-scripts/          helpers
-```
+<p align="center">
+  <img src="docs/screenshots/launcher.jpg" alt="The launcher grown from the workspace tile" width="760">
+</p>
 
-## Cursor
+**The launcher** grows out of the workspace tile (tap Super). It finds apps (most launched first), solves sums (`qalc`),
+runs commands, and knows where every setting is ("wifi" offers *Settings › Network*). A first character narrows it:
+`=` calculate, `>` run, `:` shortcuts, `/` settings, `?` lists them. Double-tap Super for the **workspace overview**:
+ten small screens with live thumbnails; drag a window onto another workspace, click one to focus it.
 
-`cursor/build.py` draws The Line's cursor theme (24 shapes plus the usual alias names, 24 to 64 px) and writes the XCursor files, with nothing but Python and Pillow. Flat and square: a dark fill with a light 1 px outline, a blade arrow with the logo's notch, the link pointer in the accent, the busy cursor as the three loading blades. A short dash runs around the arrow, the link pointer and the text cursor in a loop, like the pulse on the line.
+<p align="center">
+  <img src="docs/screenshots/panels.jpg" alt="The clock tile grown into the notifications panel and calendar" width="760">
+</p>
 
-```sh
-python3 cursor/build.py ~/.local/share/icons/TheLine    # or /usr/share/icons/TheLine
-```
+**Tiles and panels.** Left: workspaces, the focused window, and the music that is playing (with its progress drawn on the
+line). Middle: the clock, which becomes the notifications and calendar; notifications arrive as a pulse along the line
+and a toast. Right: CPU, RAM, network, volume, battery; it opens into quick settings (Wi-Fi, Bluetooth, night light,
+keep awake, sliders, power) and a performance dashboard. Volume, brightness and keyboard backlight changes are drawn on
+the line itself.
 
-The session sets it (`XCURSOR_THEME=TheLine`). `cursor/build/preview.png` shows every cursor on dark and light.
+**Windows.** Tiling by Hyprland, with the shell's own curve and timings. Float any window (it is remembered, with its size
+and place), a resize mode on the arrows, and a **fullscreen** that plays in stages: the music part leaves, the tiles fold
+into the line, the line withdraws. Push the pointer against the top edge for 400 ms and it all comes back until the
+pointer leaves.
 
-## Keybindings
+**Music.** MPRIS players show on the left tile; the panel has the cover, a track ruler with seek and the controls.
+`SUPER+M` turns the line into a **visualiser**: the frequencies hang from it as ticks, one every 6 px on any screen
+(needs `cava`; off at every login).
 
-The Line registers Hyprland global shortcuts under the `the-line` app id: `launcher`, `notifications`, `quicksettings`, `performance`. For example:
+<p align="center">
+  <img src="docs/screenshots/wallpapers.jpg" alt="The wallpaper picker, a line across the bottom of the screen" width="760">
+</p>
 
-```lua
-hl.bind("SUPER+SPACE", hl.dsp.global("the-line:launcher"))
-hl.bind("SUPER+N", hl.dsp.global("the-line:notifications"))
-hl.bind("SUPER+A", hl.dsp.global("the-line:quicksettings"))
-hl.bind("SUPER+P", hl.dsp.global("the-line:performance"))
-```
+**Wallpapers and colours.** `SUPER+T`: the wallpapers hang from a line across the bottom and the screen previews the
+picked one, for every screen or one. Pictures, animated GIFs and videos (they stop under a fullscreen window and on
+battery). The accent can follow the wallpaper. Other apps wear the same colours: GTK 3/4 through `gtk.css` (adw-gtk3),
+Qt through a recoloured Kvantum theme, plus their icon theme (Qt through qt6ct), all rewritten at each accent change.
 
-## Config
+**A settings app** (`SUPER+I`) with a spine of sections and a search over every setting: network, Bluetooth, sound,
+displays (an arrangement map that snaps, resolution, scale, rotation, main screen; changes go back after 15 s unless
+kept), input, appearance, workspaces, shortcuts (yours, and The Line's own, moved or turned off; conflicts refused),
+power and idle (with a battery charge limit), notifications (do not disturb on a schedule), night light, storage, default
+apps, sign-in (howdy faces, fingerprint), system (name, time, time zone), and about.
 
-`~/.config/the-line/config.json`, every key optional:
+**Lock and login.** The lock screen (`SUPER+L`, idle, before sleep): the line glides to the middle pulling the night over
+the screen, the time above it, the password typed as ticks on it, and unlocking runs the accent along it before it rises
+back. A face (howdy) or a fingerprint (fprintd) can be tried first: three tries a lock, then the password. The login
+screen is the line too: two dials of ticks turning off the left edge; signing in winds them up until they shed their
+ticks onto the line. The numpad types digits whatever NumLock says.
+
+**And the rest.** A cheat sheet that reads every shortcut live (`SUPER+F1`), a power menu you hold to confirm, clipboard
+history (`SUPER+V`), an emoji picker (`SUPER+;`), a polkit dialog drawn as the line, screenshots and screen recording
+that say so when they start and stop, a notification daemon, and **Kira's voice**: on an empty workspace, quietly, she
+says something (from `assets/quotes.txt` plus your own `~/.config/the-line/quotes.txt`). There are easter eggs; finding
+them is your job (`EASTER_EGGS.md` has the spoilers).
+
+## Keys
+
+| | |
+|---|---|
+| **tap `Super`** · **double-tap** | launcher · workspace overview |
+| `Super+1…0` · `Super+Ctrl+1…0` · `Super+Shift+1…0` | go to a workspace · send the window there · send it and follow |
+| `Super+arrows` (or `U H J K`) · with `Shift` | focus · move the window |
+| `Super+F` · `Super+Alt+Space` · `Super+Y` · `Super+R` · `Super+Q` | fullscreen · float or tile · toggle split · resize mode · close |
+| `Super+N` · `Super+A` · `Super+P` | notifications and calendar · quick settings · performance |
+| `Super+T` · `Super+M` · `Super+V` · `Super+;` | wallpapers · music visualiser · clipboard · emoji |
+| `Super+I` · `Super+L` · `Super+F1` · `Ctrl+Alt+Delete` | settings · lock · every shortcut · power menu |
+| `Print` · `Super+Shift+S` · `Super+Alt+R` | screenshot · Flameshot · record an area |
+
+Every one of them can be moved or turned off in Settings › Shortcuts. In your own Hyprland config the shell's
+shortcuts are global shortcuts under the `the-line` app id: `hl.bind("SUPER+N", hl.dsp.global("the-line:notifications"))`.
+
+## Make it yours
+
+Everything you set lives in `~/.config/the-line/` (state such as launch counts in `~/.local/state/the-line/`); updates only
+replace `/usr/share/the-line`. `config.json` is the source; the files other programs read (`hypridle.conf`,
+`hypr/workspaces.lua`, `hypr/input.lua`, `hypr/keys.lua`, `hypr/floating.lua`) are generated from it, and each file says in
+its first lines whether it is yours. `~/.config/the-line/README.md`, written at each login, lists them all.
+
+Yours to edit in `~/.config/the-line/hypr/`: `monitors.lua`, `apps.lua` (your app keys), `custom.lua` (loaded last). Coming
+from Sleex, its monitors, app keys and general settings are copied there on the first login. Every key of `config.json` is
+optional:
 
 ```json
-{ "accent": "#9A5CFF", "reduceMotion": false, "motionScale": 1.0, "screens": [], "terminal": "foot",
-  "wallpaper": "/usr/share/the-line/assets/wallpapers/default.png", "wallpapers": { "DP-2": "/path/to/its/own.mp4" },
-  "wallpaperStillOnBattery": true, "primaryScreen": "", "workspaceIcons": false,
-  "kiraVoice": true, "workspaceScrollInverted": false, "levelStep": 2,
-  "clipboardMax": 200, "clipboardImages": true, "clipboardWipeOnLogin": false }
+{ "accent": "#9A5CFF", "accentFromWallpaper": false, "reduceMotion": false, "motionScale": 1.0,
+  "terminal": "foot", "primaryScreen": "", "wallpaper": "…/default.png", "wallpapers": { "DP-2": "/path/to/own.mp4" },
+  "wallpaperStillOnBattery": true, "workspaceIcons": false, "kiraVoice": true, "levelStep": 2,
+  "clipboardMax": 200, "clipboardImages": true, "clipboardWipeOnLogin": false, "unlockBiometrics": false }
 ```
 
-## Needs
+## Under the hood
 
-Quickshell 0.3 with Hyprland, PipeWire, MPRIS, UPower and Bluetooth support, Qt Multimedia (ffmpeg backend) for video wallpapers, mpv for their thumbnails, python3 (+ Pillow for the cursor), Kvantum, adw-gtk3 and qt6ct for other apps' colours and icons, cava for the music visualiser, Hyprland, NetworkManager (nmcli), brightnessctl, procps-ng top, hyprlock, loginctl, and optionally hyprsunset for night light. Fonts: Raleway and IBM Plex Mono (JetBrains Mono is the fallback).
+```
+shell.qml         entry point and the IPC (`qs -p . ipc show`)
+services/         singletons: Config, Theme, Anim, UiState, LineState, Notifs, Audio, Media, Network, Lock, Welcome, ...
+modules/          line/ (the line and the per-screen surface), tiles/ (the three tiles and their panels),
+                  desktop/ (wallpaper, pickers, dialogs, Kira's voice), lock/, welcome/, demo/, common/ (shared pieces)
+settings/         the settings app (its own window; it shares Theme, Anim and the common modules by symlink)
+greeter/          the login screen (greetd, under cage) and its installer
+session/          the session: environment, Hyprland's Lua config, the helpers, the .desktop, the polkit policy
+assets/           quotes, the story, emoji, icons, wallpapers
+cursor/           build.py draws The Line's cursor theme (Python and Pillow, nothing else)
+scripts/          build-emoji.py, and video/ (the runner that films the demo)
+install.sh        installer
+```
 
-Hyprland layer rule to avoid its own fade on the surface: `noanim` for the `the-line` namespace. The surface sits on the top layer, and on the overlay layer while its screen shows a fullscreen window.
+The shell reads from `/usr/share/the-line` (or `THE_LINE_DIR`). To work on it from a checkout, `sudo ./install.sh --dev`,
+or run it by hand:
+
+```sh
+qs -p /path/to/the-line                          # THE_LINE_SCREENS=HDMI-A-1 for one screen only
+qs -p . ipc call line notify build "cargo build finished" "0 errors"
+qs -p . ipc call line gauge vol 0.64             # the line as a volume bar
+qs -p . ipc call line toggle eDP-1 tc            # a panel: tl launcher, tm music, tc notifications, tr quick settings, tp performance
+qs -p . ipc call line search fire                # the launcher with a search typed in
+qs -p . ipc call line wallpapers                 # also: overview, cheatsheet, power, visualiser, say "hello"
+qs -p . ipc call line welcomeHere                # the welcome story on the focused screen only
+qs -p . ipc call line lockTest 15                # a lock that opens by itself after 15 s
+QS_TESTING=1 QS_SCREEN=<screen> qs -p greeter    # the login screen, inside a session ("test" signs in, Esc leaves)
+```
+
+The session (`session/`) runs from the login screen: `the-line-session` sets the environment and the buses and starts
+Hyprland with `hyprland.lua`, which starts `the-line-shell` (the shell, restarted if it crashes). Workspaces are shared out
+evenly between screens, left to right (2 screens: 1 and 5; 3 screens: 1, 4, 7; the main screen first). The Hyprland layer
+rule `no_anim` for the `the-line` namespace stops its own fade on the surface: the shell animates itself.
+
+The demo video is filmed by a script, not by hand: `scripts/video/` has the runner and the script it follows (captions and
+the pressed keys are drawn by the shell, `modules/demo/`).
+
+---
+
+Made by [OxoGhost](https://github.com/OxoGhost01) for [Kira Linux](https://kira-linux.com).
