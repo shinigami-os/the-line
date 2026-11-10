@@ -1,0 +1,175 @@
+# The Line: demo video, 2 minutes at most, captions only (no voice).
+# Run: scripts/video/run.py scripts/video/demo.script   (--dry-run first: it prints the estimated length)
+#
+# One command per line, `#` starts a comment. `scene <n> "<title>" <target seconds>` starts a scene (each one can be
+# re-filmed alone: run.py --scene 3). Keep every pause short: someone watching has little time to take a feature in.
+#
+#   wait <s>                    pause
+#   caption "<text>" <s>        the lower caption, for <s> seconds (does not wait)
+#   key <COMBO>                 a shortcut of The Line / Hyprland: SUPER+N, SUPER+SHIFT+LEFT ... (shown as key caps)
+#   tap-super / double-tap-super  the launcher / the workspace overview
+#   type "<text>"               typed with a human rhythm into whatever has the keyboard
+#   press <Key>                 one key: Return, Escape, Right ... (shown as a key cap)
+#   ws <n>                      go to workspace n (shown as SUPER+n)
+#   run [@ws] <command...>      start a program (on workspace ws); only these windows are closed by `reset`
+#   settings <section>          the settings app on a page (network, displays, appearance, shortcuts, line, about ...)
+#   ipc <function> <args...>    qs -p ... ipc call line ... (notify, gauge, say ...)
+#   shell <command...>          any shell command (playerctl ...)
+#   glide <x> <y> <ms>          move the pointer smoothly (pixels of the filmed screen)
+#   hold-pointer-top <ms>       push the pointer against the top edge (the fullscreen peek)
+#   mark <name>                 a cut point in the timeline file
+#   reset [ws]                  close what the script opened, close the panels, go to workspace ws (default 1)
+#   home <ws>                   (before the first scene) every run starts on this workspace and ends where it began
+#
+# Before a take: the music player ready (paused), nothing private on screen. The take runs on workspaces 3, 5 and 8 of the
+# filmed screen (they must not exist on another screen); workspace 1 shows its icons on the line.
+
+home 3
+
+scene 1 "The line" 9
+caption "The Line: a desktop shell built on one line" 3.5
+wait 2.2
+ws 5
+wait 0.6
+ws 8
+wait 0.6
+ws 3
+wait 0.6
+
+scene 2 "Launcher" 15
+caption "tap Super: apps, sums, commands, settings" 3.5
+tap-super
+wait 0.6
+type "fir"
+wait 1.0
+press Escape
+wait 0.3
+tap-super
+wait 0.5
+type "= 2^10"
+wait 1.0
+press Escape
+wait 0.3
+tap-super
+wait 0.5
+type "?"
+wait 1.2
+press Escape
+wait 0.3
+tap-super
+wait 0.5
+type "wifi"
+wait 1.0
+press Escape
+
+scene 3 "Windows tile" 19
+caption "windows tile on their own" 3
+run@3 foot
+wait 0.2
+run foot
+wait 0.3
+run foot
+wait 0.7
+caption "Super + arrows move between them" 3
+key SUPER+LEFT
+wait 0.6
+key SUPER+RIGHT
+wait 0.6
+key SUPER+SHIFT+LEFT
+wait 0.9
+key SUPER+Y
+wait 0.9
+caption "float any window; it is remembered" 3
+key SUPER+ALT+SPACE
+wait 1.0
+key SUPER+ALT+SPACE
+wait 0.7
+key SUPER+Q
+wait 0.5
+key SUPER+Q
+wait 0.5
+
+scene 4 "Terminal" 7
+type "fetch"
+press Return
+wait 2.4
+
+scene 5 "Fullscreen" 9
+caption "fullscreen: the line steps aside; push the pointer at the top and it is back" 4.5
+key SUPER+F
+wait 1.8
+hold-pointer-top 900
+glide 960 540 400
+wait 0.5
+key SUPER+F
+wait 0.6
+key SUPER+Q
+wait 0.4
+
+scene 6 "Tiles" 16
+caption "notifications and calendar, quick settings, the machine" 4.5
+ipc notify "The Line" "Hello from the middle" "this is a notification"
+wait 1.8
+key SUPER+N
+wait 1.6
+key SUPER+N
+wait 0.3
+key SUPER+A
+wait 1.6
+key SUPER+A
+wait 0.3
+key SUPER+P
+wait 1.8
+key SUPER+P
+wait 0.3
+caption "volume and brightness are drawn on the line itself" 3
+ipc gauge vol 0.2
+wait 0.6
+ipc gauge vol 0.7
+wait 0.6
+ipc gauge bri 0.4
+wait 1.0
+
+scene 7 "Music" 9
+shell playerctl play
+wait 1.2
+caption "music has its own part of the line; Super + M, and the frequencies hang from it" 4.5
+key SUPER+M
+wait 4.0
+key SUPER+M
+shell playerctl pause
+
+scene 8 "Look" 10
+caption "wallpapers are picked on the screen itself" 3
+key SUPER+T
+wait 0.9
+press Right
+wait 0.8
+press Right
+wait 0.8
+press Escape
+wait 0.5
+caption "and the other apps wear the same colours" 3
+run pcmanfm-qt
+wait 1.6
+key SUPER+Q
+
+scene 9 "Shortcuts" 6
+caption "forget the shortcuts: Super + F1 lists them all" 3.5
+key SUPER+F1
+wait 2.6
+key SUPER+F1
+
+scene 10 "Settings" 16
+caption "and a real settings app" 3
+settings appearance
+wait 1.4
+settings displays
+wait 1.2
+settings shortcuts
+wait 1.2
+settings line
+wait 1.2
+settings about
+caption "github.com/shinigami-os/the-line" 4
+wait 3.6
