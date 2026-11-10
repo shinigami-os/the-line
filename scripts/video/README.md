@@ -9,6 +9,11 @@ the shell itself (`services/Demo.qml`, `modules/demo/`), so they are in the reco
     run.py demo.script                  film everything  ->  ~/Videos/the-line-demo/demo-takeNN.mp4 (+ .timeline.txt)
     run.py demo.script --scene 3,4      film only these scenes (each one is a restart point)
 
+- **It starts the recording itself.** In a terminal: `python3 ~/Documents/Kira-Linux/the-line/scripts/video/run.py ~/Documents/Kira-Linux/the-line/scripts/video/demo.script`
+  (3 s countdown, then `wf-recorder` on the primary screen, then the scenes, then it stops and prints the timeline). The terminal can be on
+  another screen: the runner takes the keyboard on the filmed screen while it runs, so to stop it early use `pkill -INT -f video/run.py`
+  from anywhere (Ctrl+C in its terminal would go nowhere: that terminal does not have the keyboard).
+- Music: `playerctl play` is the first command of the video and `playerctl pause` the last (nothing else touches the player).
 - The script language is described at the top of `demo.script`. Every pause there is short on purpose.
 - Run it from a terminal of the filmed session (it uses `hyprctl`, `wtype`, `qs`, `wf-recorder`, `playerctl`).
 - Shortcuts are sent by name (`key SUPER+N`), not typed: Hyprland ignores Super from a virtual keyboard. The table

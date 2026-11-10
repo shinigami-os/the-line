@@ -17,6 +17,9 @@
 #   shell <command...>          any shell command (playerctl ...)
 #   glide <x> <y> <ms>          move the pointer smoothly (pixels of the filmed screen)
 #   hold-pointer-top <ms>       push the pointer against the top edge (the fullscreen peek)
+#   resize <left|right|up|down> <n>   the resize mode's arrows, n steps of 40 px (after `key SUPER+R`, ends with resize-end)
+#   notify-later <min> <max> "<title>" "<body>"...   a notification at a random moment in min..max seconds from now
+#                               (one of the bodies at random); the scene goes on meanwhile
 #   mark <name>                 a cut point in the timeline file
 #   reset [ws]                  close what the script opened, close the panels, go to workspace ws (default 1)
 #   home <ws>                   (before the first scene) every run starts on this workspace and ends where it began
@@ -26,150 +29,169 @@
 
 home 3
 
-scene 1 "The line" 9
+scene 1 "The line" 12
+shell playerctl play
+notify-later 2 6 "A random notification" "Hello from the line" "Nothing important, really" "Someone, somewhere, says hi" "Your coffee is ready (it is not)"
 caption "The Line: a desktop shell built on one line" 3.5
-wait 2.2
+wait 2.9
 ws 5
-wait 0.6
+wait 0.8
 ws 8
-wait 0.6
+wait 0.8
 ws 3
-wait 0.6
+wait 0.8
 
 scene 2 "Launcher" 15
 caption "tap Super: apps, sums, commands, settings" 3.5
 tap-super
-wait 0.6
+wait 0.8
 type "fir"
-wait 1.0
+wait 1.3
 press Escape
-wait 0.3
+wait 0.4
 tap-super
-wait 0.5
+wait 0.6
 type "= 2^10"
-wait 1.0
+wait 1.3
 press Escape
-wait 0.3
+wait 0.4
 tap-super
-wait 0.5
+wait 0.6
 type "?"
-wait 1.2
+wait 1.6
 press Escape
-wait 0.3
+wait 0.4
 tap-super
-wait 0.5
+wait 0.6
 type "wifi"
-wait 1.0
+wait 1.3
 press Escape
 
-scene 3 "Windows tile" 19
+scene 3 "Windows tile" 30
 caption "windows tile on their own" 3
 run@3 foot
-wait 0.2
+wait 0.4
 run foot
-wait 0.3
+wait 0.5
 run foot
-wait 0.7
+wait 0.5
+run foot
+wait 0.5
+run foot
+wait 1.0
 caption "Super + arrows move between them" 3
 key SUPER+LEFT
-wait 0.6
+wait 0.8
+key SUPER+UP
+wait 0.8
 key SUPER+RIGHT
-wait 0.6
-key SUPER+SHIFT+LEFT
-wait 0.9
-key SUPER+Y
+wait 0.8
+caption "Super + R: resize with the arrows, Esc to leave" 4.5
+key SUPER+R
+wait 0.8
+resize left 6
+wait 0.4
+resize up 4
+wait 0.4
+resize down 8
+wait 0.4
+resize right 3
+wait 0.7
+resize-end
 wait 0.9
 caption "float any window; it is remembered" 3
 key SUPER+ALT+SPACE
-wait 1.0
+wait 1.2
 key SUPER+ALT+SPACE
-wait 0.7
+wait 0.9
 key SUPER+Q
 wait 0.5
 key SUPER+Q
 wait 0.5
+key SUPER+Q
+wait 0.5
+key SUPER+Q
+wait 0.6
 
 scene 4 "Terminal" 7
 type "fetch"
 press Return
-wait 2.4
+wait 3.1
 
 scene 5 "Fullscreen" 9
 caption "fullscreen: the line steps aside; push the pointer at the top and it is back" 4.5
 key SUPER+F
-wait 1.8
+wait 2.3
 hold-pointer-top 900
 glide 960 540 400
-wait 0.5
-key SUPER+F
 wait 0.6
+key SUPER+F
+wait 0.8
 key SUPER+Q
-wait 0.4
+wait 0.5
 
 scene 6 "Tiles" 16
 caption "notifications and calendar, quick settings, the machine" 4.5
 ipc notify "The Line" "Hello from the middle" "this is a notification"
-wait 1.8
+wait 2.3
 key SUPER+N
-wait 1.6
+wait 2.1
 key SUPER+N
-wait 0.3
+wait 0.4
 key SUPER+A
-wait 1.6
+wait 2.1
 key SUPER+A
-wait 0.3
+wait 0.4
 key SUPER+P
-wait 1.8
+wait 2.3
 key SUPER+P
-wait 0.3
+wait 0.4
 caption "volume and brightness are drawn on the line itself" 3
 ipc gauge vol 0.2
-wait 0.6
+wait 0.8
 ipc gauge vol 0.7
-wait 0.6
+wait 0.8
 ipc gauge bri 0.4
-wait 1.0
+wait 1.3
 
 scene 7 "Music" 9
-shell playerctl play
-wait 1.2
 caption "music has its own part of the line; Super + M, and the frequencies hang from it" 4.5
 key SUPER+M
-wait 4.0
+wait 5.2
 key SUPER+M
-shell playerctl pause
+wait 0.8
 
 scene 8 "Look" 10
 caption "wallpapers are picked on the screen itself" 3
 key SUPER+T
-wait 0.9
+wait 1.2
 press Right
-wait 0.8
+wait 1.0
 press Right
-wait 0.8
+wait 1.0
 press Escape
-wait 0.5
+wait 0.6
 caption "and the other apps wear the same colours" 3
 run pcmanfm-qt
-wait 1.6
+wait 2.1
 key SUPER+Q
 
 scene 9 "Shortcuts" 6
 caption "forget the shortcuts: Super + F1 lists them all" 3.5
 key SUPER+F1
-wait 2.6
+wait 3.4
 key SUPER+F1
 
-scene 10 "Settings" 16
+scene 10 "Settings" 20
 caption "and a real settings app" 3
 settings appearance
-wait 1.4
+wait 1.8
 settings displays
-wait 1.2
+wait 1.6
 settings shortcuts
-wait 1.2
+wait 1.6
 settings line
-wait 1.2
+wait 1.6
 settings about
-caption "github.com/shinigami-os/the-line" 4
-wait 3.6
+wait 5.9
+shell playerctl pause

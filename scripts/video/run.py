@@ -16,11 +16,13 @@ import argparse
 import glob
 import json
 import os
+import random
 import shlex
 import signal
 import socket
 import subprocess
 import sys
+import threading
 import time
 
 HOME = ["1"]   # the workspace every run starts on (`home` in the script)
@@ -105,6 +107,8 @@ def shortcut(combo):
             return lambda: dispatch("hl.dsp.window.fullscreen()")
         if key == "Q":
             return lambda: dispatch("hl.dsp.window.close()")
+        if key == "R":
+            return lambda: dispatch('hl.dsp.submap("resize")')
         if key == "Y":
             return lambda: dispatch('hl.dsp.layout("togglesplit")')
         if key in ARROWS:
@@ -121,7 +125,7 @@ def shortcut(combo):
 
 
 # These act on the focused window: only ever on a window the script opened (never on yours).
-WINDOW_KEYS = {"SUPER+Q", "SUPER+F", "SUPER+Y", "SUPER+SHIFT+LEFT", "SUPER+SHIFT+RIGHT", "SUPER+SHIFT+UP",
+WINDOW_KEYS = {"SUPER+R", "SUPER+Q", "SUPER+F", "SUPER+Y", "SUPER+SHIFT+LEFT", "SUPER+SHIFT+RIGHT", "SUPER+SHIFT+UP",
                "SUPER+SHIFT+DOWN", "SUPER+ALT+SPACE"}
 KEY_LABELS = {"RETURN": "ENTER", "ESCAPE": "ESC", "BACKSPACE": "BKSP", "SPACE": "SPACE"}
 
@@ -224,6 +228,19 @@ class Runner:
         self.show_keys(KEY_LABELS.get(name.upper(), name.upper()))
         sh(["wtype", "-k", name])
 
+    def resize(self, direction, steps):
+        """The resize mode's arrow keys (40 px a step, as in session/hyprland.lua), one step at a time."""
+        dx, dy = {"left": (-40, 0), "right": (40, 0), "up": (0, -40), "down": (0, 40)}[direction]
+        self.show_keys({"left": "←", "right": "→", "up": "↑", "down": "↓"}[direction])
+        for _ in range(steps):
+            dispatch("hl.dsp.window.resize({ x = %d, y = %d, relative = true })" % (dx, dy))
+            time.sleep(0.07)
+
+    def notify_later(self, low, high, title, bodies):
+        """A notification at a random moment in the next low..high seconds, whatever the scene is doing then."""
+        delay = random.uniform(low, high)
+        threading.Timer(delay, lambda: ipc("notify", "The Line", title, random.choice(bodies))).start()
+
     def type(self, text):
         sh(["wtype", "-d", "75", text])
 
@@ -306,6 +323,14 @@ class Runner:
             self.type(a[0])
         elif v == "press":
             self.press(a[0])
+        elif v == "resize":
+            if self.focused_is_ours():
+                self.resize(a[0], int(a[1]))
+        elif v == "resize-end":
+            self.show_keys("ESC")
+            dispatch('hl.dsp.submap("reset")')
+        elif v == "notify-later":
+            self.notify_later(float(a[0]), float(a[1]), a[2], a[3:])
         elif v == "ws":
             self.show_keys("SUPER+" + ("0" if a[0] == "10" else a[0]))
             self.goto(a[0])
@@ -411,6 +436,7 @@ def main():
         if recorder:
             sh(["pkill", "-INT", "-x", "wf-recorder"])
             recorder.wait(timeout=20)
+        dispatch('hl.dsp.submap("reset")')
         runner.reset(str(back))
 
     total = sum(d for _, d in report)
