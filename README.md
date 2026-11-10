@@ -194,6 +194,11 @@ rule `no_anim` for the `the-line` namespace stops its own fade on the surface: t
 The demo video is filmed by a script, not by hand: `scripts/video/` has the runner and the script it follows (captions and
 the pressed keys are drawn by the shell, `modules/demo/`).
 
+## License
+
+The Line is free software under the [GNU General Public License v3.0 or later](LICENSE): you can use, study, change and
+share it, and what you share stays under the same terms. Copyright © 2026 OxoGhost.
+
 ---
 
 Made by [OxoGhost](https://github.com/OxoGhost01) for [Kira Linux](https://kira-linux.com).
