@@ -93,7 +93,7 @@ Singleton {
         command: ["sh", "-c", [
             "echo hostname=$(cat /etc/hostname 2>/dev/null)",
             "echo timezone=$(readlink /etc/localtime | sed 's|.*/zoneinfo/||')",
-            "[ -f /etc/sv/chronyd/down ] && echo ntp=off || echo ntp=on",
+            "echo ntp=$('" + root.helper + "' ntp status)",
             "echo release=$(. /etc/kira-release 2>/dev/null; echo ${KIRA_BASE_VERSION:-})",
             "echo kernel=$(uname -r)",
             "echo cpu=$(grep -m1 'model name' /proc/cpuinfo | cut -d: -f2-)",

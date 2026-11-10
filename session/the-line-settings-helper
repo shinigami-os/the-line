@@ -3,7 +3,8 @@
 # Only these verbs, every argument checked before anything is touched:
 #   hostname NAME                 /etc/hostname, /etc/hosts (127.0.1.1), the running hostname
 #   timezone Region/City          /etc/localtime (and /etc/timezone)
-#   ntp on|off                    chronyd: started and enabled, or stopped and kept down (runit's down file)
+#   ntp on|off|status             automatic time: chronyd under runit (started and enabled, or stopped and kept down),
+#                                 else systemd's timedatectl. status prints on or off and needs no root
 #   time "YYYY-MM-DD HH:MM[:SS]"  the clock, then the hardware clock (only with ntp off)
 #   charge-limit 50..100          the battery stops charging there; kept across reboots by a udev rule
 #   face add NAME|remove ID|clear the calling user's howdy face models (NAME: 24 characters, no comma)
@@ -13,6 +14,33 @@ set -u
 die() {
     echo "$*" >&2
     exit 1
+}
+
+# Automatic time is chronyd under runit (Kira), or systemd's.
+ntp_state() {
+    if [ -d /etc/sv/chronyd ]; then
+        [ -f /etc/sv/chronyd/down ] && echo off || echo on
+    elif command -v timedatectl >/dev/null 2>&1; then
+        [ "$(timedatectl show -p NTP --value 2>/dev/null)" = yes ] && echo on || echo off
+    else
+        echo off
+    fi
+}
+
+ntp_set() {
+    if [ -d /etc/sv/chronyd ]; then
+        if [ "$1" = on ]; then
+            rm -f /etc/sv/chronyd/down
+            sv up chronyd
+        else
+            touch /etc/sv/chronyd/down
+            sv down chronyd
+        fi
+    elif command -v timedatectl >/dev/null 2>&1; then
+        timedatectl set-ntp "$([ "$1" = on ] && echo true || echo false)"
+    else
+        die "No time service known here"
+    fi
 }
 
 # The user who asked (pkexec says who), for howdy.
@@ -41,21 +69,15 @@ timezone)
     ;;
 ntp)
     case "${2:-}" in
-    on)
-        rm -f /etc/sv/chronyd/down
-        sv up chronyd
-        ;;
-    off)
-        touch /etc/sv/chronyd/down
-        sv down chronyd
-        ;;
-    *) die "ntp on|off" ;;
+    status) ntp_state ;;
+    on | off) ntp_set "$2" ;;
+    *) die "ntp on|off|status" ;;
     esac
     ;;
 time)
     t="${2:-}"
     printf '%s' "$t" | grep -Eq '^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}(:[0-9]{2})?$' || die "Write it as 2026-11-08 16:30"
-    [ -f /etc/sv/chronyd/down ] || die "Turn off the automatic time first"
+    [ "$(ntp_state)" = off ] || die "Turn off the automatic time first"
     date -s "$t" >/dev/null || die "That date doesn't exist"
     hwclock -w 2>/dev/null
     ;;

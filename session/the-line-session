@@ -47,14 +47,17 @@ while [ ! -S /var/run/dbus/system_bus_socket ] && [ $i -lt 15 ]; do
     i=$((i + 1))
 done
 
-# Audio and the per-user runit tree need the session bus, so they start inside it.
+# Audio (unless something already runs it) and, where there is runit, the per-user service tree need the session bus,
+# so they start inside it.
 exec dbus-run-session -- sh -c '
-    pipewire &
-    wireplumber &
-    pipewire-pulse &
-    mkdir -p "$HOME/.local/service"
-    pkill -HUP -f "runsvdir $HOME/.local/service" && sleep 1
-    runsvdir "$HOME/.local/service" >/dev/null 2>&1 &
-    trap "kill -HUP $! 2>/dev/null" EXIT TERM HUP
+    for p in pipewire wireplumber pipewire-pulse; do
+        pgrep -u "$(id -u)" -x "$p" >/dev/null || "$p" &
+    done
+    if command -v runsvdir >/dev/null; then
+        mkdir -p "$HOME/.local/service"
+        pkill -HUP -f "runsvdir $HOME/.local/service" && sleep 1
+        runsvdir "$HOME/.local/service" >/dev/null 2>&1 &
+        trap "kill -HUP $! 2>/dev/null" EXIT TERM HUP
+    fi
     start-hyprland -- --config "$THE_LINE_DIR/session/hyprland.lua"
 '
