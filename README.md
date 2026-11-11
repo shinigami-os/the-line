@@ -31,7 +31,13 @@ while that page is open.
 
 ## Install
 
-You need [Quickshell](https://quickshell.org) 0.3+ and [Hyprland](https://hypr.land) 0.55+ (the session's configuration is
+On Kira Linux it is one command, which installs The Line with Hyprland, Quickshell and the programs it relies on:
+
+```sh
+sudo flux install kira-the-line
+```
+
+Elsewhere you need [Quickshell](https://quickshell.org) 0.3+ and [Hyprland](https://hypr.land) 0.55+ (the session's configuration is
 Lua), plus a few small programs. The installer tells you exactly what is missing:
 
 ```sh
