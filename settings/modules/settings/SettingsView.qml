@@ -951,4 +951,141 @@ Item {
             }
         }
     }
+
+    // ------------------------------------------------------------------ keep the screens?
+
+    // After the screens changed: the whole window waits for an answer. It dims, a line draws itself across its middle,
+    // and the time left runs out along it (the accent shrinks to the centre); the question stands on it. Nothing under
+    // it can be clicked, and the window can't be closed until Keep or Go back (shell.qml).
+    Item {
+        id: keepScreens
+
+        readonly property real mid: Math.round(height / 2)
+        property real reach: Displays.pending ? 1 : 0
+        property real remaining: Displays.pending ? Math.max(0, Displays.countdown) / 15 : 1
+
+        anchors.fill: parent
+        visible: opacity > 0
+        opacity: Displays.pending ? 1 : 0
+
+        Behavior on opacity {
+            NumberAnimation { duration: Displays.pending ? Anim.base : Anim.exitFade }
+        }
+        Behavior on reach {
+            NumberAnimation { duration: Anim.line; easing.type: Anim.easing }
+        }
+        Behavior on remaining {
+            NumberAnimation { duration: 1000 }
+        }
+
+        // nothing under it is reached: clicks, the wheel, hovers
+        MouseArea {
+            anchors.fill: parent
+            hoverEnabled: true
+            acceptedButtons: Qt.AllButtons
+            onWheel: wheel => wheel.accepted = true
+        }
+        Rectangle {
+            anchors.fill: parent
+            color: Theme.bg
+            opacity: 0.9
+        }
+
+        // the line, from both edges
+        Rectangle {
+            y: keepScreens.mid
+            width: Math.ceil(keepScreens.width / 2 * keepScreens.reach)
+            height: 1
+            color: Theme.borderStrong
+        }
+        Rectangle {
+            x: keepScreens.width - width
+            y: keepScreens.mid
+            width: Math.ceil(keepScreens.width / 2 * keepScreens.reach)
+            height: 1
+            color: Theme.borderStrong
+        }
+        // the time left, from the middle out
+        Rectangle {
+            x: keepScreens.width / 2 - width
+            y: keepScreens.mid - 1
+            width: keepScreens.width / 2 * keepScreens.reach * keepScreens.remaining
+            height: 3
+            color: Theme.accent
+        }
+        Rectangle {
+            x: keepScreens.width / 2
+            y: keepScreens.mid - 1
+            width: keepScreens.width / 2 * keepScreens.reach * keepScreens.remaining
+            height: 3
+            color: Theme.accent
+        }
+
+        Text {
+            anchors.horizontalCenter: parent.horizontalCenter
+            y: keepScreens.mid - height - 22
+            text: "Keep these display settings?"
+            font.family: Theme.fontUi
+            font.pixelSize: 28
+            font.weight: Font.Light
+            color: Theme.text
+            opacity: keepScreens.reach
+        }
+
+        Column {
+            anchors.horizontalCenter: parent.horizontalCenter
+            y: keepScreens.mid + 22
+            spacing: 22
+            opacity: keepScreens.reach
+
+            Text {
+                anchors.horizontalCenter: parent.horizontalCenter
+                text: "Going back to the previous ones in " + Math.max(0, Displays.countdown) + " s"
+                font.family: Theme.fontMono
+                font.pixelSize: 12
+                color: Theme.muted
+            }
+
+            Row {
+                anchors.horizontalCenter: parent.horizontalCenter
+                spacing: 40
+
+                Repeater {
+                    model: [
+                        { key: "↵", text: "Keep them", keep: true },
+                        { key: "Esc", text: "Go back", keep: false }
+                    ]
+
+                    Row {
+                        id: answer
+
+                        required property var modelData
+
+                        spacing: 10
+
+                        KeyCap {
+                            anchors.verticalCenter: parent.verticalCenter
+                            label: answer.modelData.key
+                            lit: answer.modelData.keep
+                        }
+                        Text {
+                            anchors.verticalCenter: parent.verticalCenter
+                            text: answer.modelData.text
+                            font.family: Theme.fontUi
+                            font.pixelSize: 15
+                            font.weight: answer.modelData.keep ? Font.DemiBold : Font.Medium
+                            color: answer.modelData.keep ? Theme.accent : Theme.text
+                        }
+
+                        HoverHandler {
+                            cursorShape: Qt.PointingHandCursor
+                        }
+                        TapHandler {
+                            onTapped: answer.modelData.keep ? Displays.keep() : Displays.revert()
+                        }
+                    }
+                }
+            }
+        }
+    }
 }

@@ -15,6 +15,16 @@ ShellRoot {
     Binding { target: Theme; property: "accent"; value: Config.accent }
     Binding { target: Anim; property: "scale"; value: Config.motionScale }
     Binding { target: Anim; property: "reduce"; value: Config.reduceMotion }
+    // The screens just changed: the window comes forward to ask whether to keep them (it may have moved with them).
+    Connections {
+        target: Displays
+
+        function onPendingChanged() {
+            if (Displays.pending)
+                Quickshell.execDetached(["hyprctl", "dispatch", "hl.dsp.focus({ window = \"class:the-line-settings\" })"]);
+        }
+    }
+
     // Created up front: it watches the "accent from the wallpaper" setting.
     readonly property var accent: Accent
 
@@ -30,6 +40,11 @@ ShellRoot {
         onVisibleChanged: {
             if (visible)
                 return;
+            // a screen change waiting to be kept or not: the window stays until it is answered
+            if (Displays.pending) {
+                visible = true;
+                return;
+            }
             if (Displays.dirty && !Displays.pending) {
                 visible = true;
                 view.quit();
