@@ -7,7 +7,8 @@ import qs.services
 Column {
     id: cal
 
-    property date today: Time.now
+    // rebuilt when the day changes, not at every tick of the clock
+    readonly property date today: { Time.today; return new Date(); }
     property int monthOffset: 0
 
     readonly property date first: new Date(today.getFullYear(), today.getMonth() + monthOffset, 1)

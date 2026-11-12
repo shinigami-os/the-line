@@ -107,17 +107,20 @@ Singleton {
         blockLoading: true
     }
 
-    Timer {
-        running: true
-        repeat: true
-        triggeredOnStart: true
-        interval: 1000
-        onTriggered: {
-            procStat.reload();
-            procMem.reload();
-            procLoad.reload();
-            procUptime.reload();
-            root.sample();
+    // Sampled on the clock's own tick, not on a timer of its own: the new figures land in the same frame as the
+    // new second, so the line redraws once a second instead of twice.
+    function tick() {
+        procStat.reload();
+        procMem.reload();
+        procLoad.reload();
+        procUptime.reload();
+        root.sample();
+    }
+    Component.onCompleted: tick()
+    Connections {
+        target: Time
+        function onNowChanged() {
+            root.tick();
         }
     }
 

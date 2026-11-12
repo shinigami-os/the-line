@@ -7,8 +7,20 @@ Item {
     id: clock
 
     property real size: 140
+    // Ticks only while it can be seen (see AnalogClock).
+    property bool live: true
+    property date shown   // set, never bound: a binding to Time.now would tick whether shown or not
+    Component.onCompleted: shown = Time.now
+    Connections {
+        target: Time
+        enabled: clock.live
+        function onNowChanged() {
+            clock.shown = Time.now;
+        }
+    }
+    onLiveChanged: if (live) shown = Time.now
 
-    readonly property string digits: Qt.formatTime(Time.now, "HHmmss")
+    readonly property string digits: Qt.formatTime(shown, "HHmmss")
     readonly property var bitsUsed: [2, 4, 3, 4, 3, 4]
     readonly property real cell: 14
     readonly property real gap: 6

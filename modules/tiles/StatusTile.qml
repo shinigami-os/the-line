@@ -137,12 +137,14 @@ Tile {
                     anchors.verticalCenter: parent.verticalCenter
                     label: "CPU"
                     value: Math.round(SystemStats.cpu * 100) + "%"
+                    reserve: "100%"
                 }
                 Reading {
                     id: swapR
                     anchors.verticalCenter: parent.verticalCenter
                     label: "SWAP"
                     value: Math.round(SystemStats.swap * 100) + "%"
+                    reserve: "100%"
                     wide: SystemStats.formatKiB(SystemStats.swapUsedKiB)
                     expanded: tile.kind === "tp"
                 }
@@ -151,6 +153,7 @@ Tile {
                     anchors.verticalCenter: parent.verticalCenter
                     label: "RAM"
                     value: Math.round(SystemStats.ram * 100) + "%"
+                    reserve: "100%"
                     wide: SystemStats.formatKiB(SystemStats.ramUsedKiB) + " / " + SystemStats.formatKiB(SystemStats.ramTotalKiB)
                     expanded: tile.kind === "tp"
                 }
@@ -201,6 +204,7 @@ Tile {
                     anchors.verticalCenter: parent.verticalCenter
                     label: "VOL"
                     value: Audio.muted ? "mute" : tile.volumePct + "%"
+                    reserve: "100%"
                     valueColor: tile.volumeHot ? Theme.accent : (Audio.muted ? Theme.muted : Theme.text)
                 }
                 Reading {
@@ -208,6 +212,7 @@ Tile {
                     anchors.verticalCenter: parent.verticalCenter
                     label: "BAT"
                     value: tile.batteryPct + "%"
+                    reserve: "100%"
                     wide: tile.batteryPct + "%" + (tile.charging ? " · charging" : (tile.timeLeft() !== "" ? " · " + tile.timeLeft() : ""))
                     expanded: tile.kind === "tr"
                     valueColor: tile.charging ? Theme.accent : (tile.batteryPct <= 15 ? Theme.error : Theme.text)

@@ -171,14 +171,12 @@ Item {
     Rectangle {
         x: 16 + Theme.wsBlockW
         y: 10
-        width: Media.progress * Theme.musicW
+        // whole pixels, no animation: it redraws only when it really moves (an animation here redrew every
+        // screen without pause while music played)
+        width: Math.round(Media.progress * Theme.musicW)
         height: 1
         color: Theme.accent
         opacity: Media.active && line.musicShown ? 0.85 : 0
-
-        Behavior on width {
-            NumberAnimation { duration: 1000 }
-        }
         Behavior on opacity {
             NumberAnimation { duration: Anim.base }
         }
@@ -193,8 +191,10 @@ Item {
         // Easter egg: long idle on an empty desktop, it blinks "kira" in Morse (Eggs).
         opacity: !line.markerShown ? 0 : Eggs.morsePlaying && line.quietDesktop && !Eggs.morseLit ? 0.12 : 1
 
+        // (the Morse blinks are cut, not faded: a fade is an animation, and any animation redraws every window)
         Behavior on opacity {
-            NumberAnimation { duration: Eggs.morsePlaying ? 60 : Anim.base }
+            enabled: !Eggs.morsePlaying
+            NumberAnimation { duration: Anim.base }
         }
 
         // Centred over the active cell of the workspace ruler (tile at 16, ruler 13 px in).

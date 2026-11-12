@@ -13,20 +13,43 @@ Item {
     property bool expanded: false
     property color valueColor: Theme.text
     property real minWidth: 30
+    // The widest value it will ever show ("100%"): the reading keeps that width, so a value changing every second
+    // never resizes it (nor the tile around it, which would animate on every screen).
+    property string reserve: ""
 
     default property alias decoration: deco.data
 
     readonly property real _decoW: deco.childrenRect.width > 0 ? deco.childrenRect.width + 5 : 0
 
     // Width at rest, whatever the current state: lets a tile size itself without following the expansion.
-    readonly property real compactWidth: Math.max(minWidth, labelText.implicitWidth, _decoW + valueText.implicitWidth)
+    readonly property real compactWidth: Math.max(minWidth, labelText.implicitWidth, _decoW + Math.max(valueText.implicitWidth, reserveText.implicitWidth))
 
     width: expanded ? Math.max(minWidth, labelText.implicitWidth, _decoW + wideText.implicitWidth) : compactWidth
     height: 27
     clip: true
 
+    // Only opening and closing animate the width: a new value takes its width at once.
+    property bool resizing: false
+    onExpandedChanged: {
+        resizing = true;
+        resizeEnd.restart();
+    }
+    Timer {
+        id: resizeEnd
+        interval: Anim.panel + 40
+        onTriggered: reading.resizing = false
+    }
     Behavior on width {
+        enabled: reading.resizing
         NumberAnimation { duration: Anim.panel; easing.type: Anim.easing }
+    }
+
+    Text {
+        id: reserveText
+        visible: false
+        text: reading.reserve
+        font.family: Theme.fontMono
+        font.pixelSize: 12
     }
 
     Text {

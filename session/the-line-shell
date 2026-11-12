@@ -6,7 +6,9 @@ dir="${THE_LINE_DIR:-/usr/share/the-line}"
 crashes=0
 since=$(date +%s)
 while :; do
-    QT_QPA_PLATFORM=wayland qs -p "$dir"
+    # The basic render loop: with Qt's threaded default, an animation in one window (a hover, a panel, the clock)
+    # made every other window of the shell redraw too, on every screen: the compositor then recomposited them all.
+    QT_QPA_PLATFORM=wayland QSG_RENDER_LOOP=basic qs -p "$dir"
     code=$?
     [ "$code" -lt 128 ] && exit "$code"   # quit normally (not killed by a signal)
     now=$(date +%s)

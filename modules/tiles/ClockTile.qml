@@ -277,6 +277,7 @@ Tile {
                 // Analog by default; today's date in the calendar swaps in the binary clock.
                 AnalogClock {
                     size: 140
+                    live: tile.open && !ClockFace.binary
                     opacity: ClockFace.binary ? 0 : 1
 
                     Behavior on opacity {
@@ -285,6 +286,7 @@ Tile {
                 }
                 BinaryClock {
                     size: 140
+                    live: tile.open && ClockFace.binary
                     opacity: ClockFace.binary ? 1 : 0
 
                     Behavior on opacity {

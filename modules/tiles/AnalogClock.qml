@@ -8,10 +8,23 @@ Item {
     id: clock
 
     property real size: 140
+    // Ticks only while it can be seen: a hidden clock that still turned its hands every second redrew every window
+    // of the shell, on every screen. Back on, it catches up with one turn.
+    property bool live: true
+    property date shown   // set, never bound: a binding to Time.now would tick whether shown or not
+    Component.onCompleted: shown = Time.now
+    Connections {
+        target: Time
+        enabled: clock.live
+        function onNowChanged() {
+            clock.shown = Time.now;
+        }
+    }
+    onLiveChanged: if (live) shown = Time.now
 
-    readonly property int h: Time.now.getHours() % 12
-    readonly property int m: Time.now.getMinutes()
-    readonly property int sec: Time.now.getSeconds()
+    readonly property int h: shown.getHours() % 12
+    readonly property int m: shown.getMinutes()
+    readonly property int sec: shown.getSeconds()
     readonly property real c: size / 2
 
     width: size

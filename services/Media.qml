@@ -66,11 +66,13 @@ Singleton {
     readonly property string loopLabel: !player?.loopSupported ? "" : (player.loopState === MprisLoopState.Track ? "loop · track"
         : (player.loopState === MprisLoopState.Playlist ? "loop · all" : "loop · off"))
 
-    // MPRIS doesn't push the position; ask for it once a second while playing.
-    Timer {
-        running: root.playing
-        repeat: true
-        interval: 1000
-        onTriggered: root.player.positionChanged()
+    // MPRIS doesn't push the position; ask for it once a second while playing, on the clock's own tick, so the
+    // track time and the progress land in the same frame as the new second.
+    Connections {
+        target: Time
+        enabled: root.playing
+        function onNowChanged() {
+            root.player.positionChanged();
+        }
     }
 }

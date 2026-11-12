@@ -202,7 +202,9 @@ Column {
             height: 1
             color: Theme.accent
 
+            // smooth only while the panel is open: a hidden panel animating every second redrew every screen
             Behavior on width {
+                enabled: panel.shown
                 NumberAnimation { duration: 1000 }
             }
         }
@@ -246,6 +248,7 @@ Column {
             color: Theme.accent
 
             Behavior on x {
+                enabled: panel.shown
                 NumberAnimation { duration: 1000 }
             }
         }
