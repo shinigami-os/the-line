@@ -35,7 +35,7 @@ Tile {
 
     anchorSide: "right"
     // Rest width from the compact readings, so it doesn't follow the expansion while closing.
-    restW: 12 + 36 + 10 + cpuR.compactWidth + 10 + swapR.compactWidth + 10 + ramR.compactWidth
+    restW: 12 + 36 + 10 + cpuR.compactWidth + 10 + swapR.compactWidth + 10 + ramR.compactWidth + (tempR.available ? 10 + tempR.compactWidth : 0)
         + 12 + 1 + 12 + netR.compactWidth + 10 + volR.compactWidth + 10 + batR.compactWidth + 12
     openW: kind === "tp" ? 460 : 400
     openH: Theme.tileHeight + (kind === "tp" ? 12 + performance.implicitHeight + 12 : 348)
@@ -157,6 +157,19 @@ Tile {
                     reserve: "100%"
                     wide: SystemStats.formatKiB(SystemStats.ramUsedKiB) + " / " + SystemStats.formatKiB(SystemStats.ramTotalKiB)
                     expanded: tile.kind === "tp"
+                }
+                // The CPU's temperature (and the GPU's, where it can be read for free). The open dashboard lists them all,
+                // so the tile leaves it to it.
+                Reading {
+                    id: tempR
+                    readonly property bool available: !isNaN(SystemStats.cpuTemp)
+                    readonly property bool hasGpu: !isNaN(SystemStats.gpuTemp)
+                    anchors.verticalCenter: parent.verticalCenter
+                    visible: available && tile.kind !== "tp"
+                    label: "TEMP"
+                    value: Math.round(SystemStats.cpuTemp) + "°" + (hasGpu ? "/" + Math.round(SystemStats.gpuTemp) + "°" : "")
+                    reserve: hasGpu ? "100°/100°" : "100°"
+                    valueColor: Math.max(SystemStats.cpuTemp, hasGpu ? SystemStats.gpuTemp : 0) >= 85 ? Theme.error : Theme.text
                 }
             }
 

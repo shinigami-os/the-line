@@ -3,7 +3,7 @@ import TheLine.Ui
 import QtQuick.Shapes
 import qs.services
 
-// The performance dashboard: CPU graph and per-core load, memory, busiest processes.
+// The performance dashboard: CPU graph and per-core load, memory, temperatures, busiest processes.
 Column {
     id: panel
 
@@ -175,9 +175,95 @@ Column {
         }
     }
 
+    // Temperatures: every sensor, grouped (CPU, GPU, disks, board, Wi-Fi), warm ones in the accent, hot ones in coral.
+    PanelItem {
+        id: temps
+        readonly property var groups: {
+            const out = [];
+            for (const t of SystemStats.temps) {
+                if (!out.length || out[out.length - 1].name !== t.group)
+                    out.push({ name: t.group, items: [] });
+                out[out.length - 1].items.push(t);
+            }
+            return out;
+        }
+        visible: groups.length > 0
+        order: 4
+        shown: panel.shown
+        width: panel.width
+        height: tempCol.y + tempCol.implicitHeight
+
+        Label {
+            x: 4
+            text: "TEMPERATURES"
+        }
+        Column {
+            id: tempCol
+            y: 18
+            width: parent.width
+            spacing: 4
+
+            Repeater {
+                model: temps.groups
+
+                Row {
+                    id: group
+                    required property var modelData
+                    width: tempCol.width
+                    spacing: 0
+
+                    Text {
+                        width: 54
+                        leftPadding: 4
+                        text: group.modelData.name
+                        font.family: Theme.fontUi
+                        font.pixelSize: 12
+                        font.weight: Font.Medium
+                        color: Theme.text
+                    }
+                    Flow {
+                        width: group.width - 54
+                        spacing: 0
+
+                        Repeater {
+                            model: group.modelData.items
+
+                            Item {
+                                id: cell
+                                required property var modelData
+                                readonly property bool hot: modelData.c >= (isNaN(modelData.crit) ? 90 : modelData.crit - 10)
+                                width: Math.floor((tempCol.width - 54) / 4)
+                                height: 18
+
+                                Text {
+                                    width: parent.width - 34
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    text: cell.modelData.label
+                                    elide: Text.ElideRight
+                                    font.family: Theme.fontUi
+                                    font.pixelSize: 11
+                                    color: Theme.muted
+                                }
+                                Text {
+                                    anchors.right: parent.right
+                                    anchors.rightMargin: 8
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    text: cell.modelData.c + "°"
+                                    font.family: Theme.fontMono
+                                    font.pixelSize: 11
+                                    color: cell.hot ? Theme.error : cell.modelData.c >= 70 ? Theme.accent : Theme.text
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     // Busiest processes.
     PanelItem {
-        order: 4
+        order: 5
         shown: panel.shown
         width: panel.width
         height: 16 + 5 * 22
@@ -240,7 +326,7 @@ Column {
 
     // Footer.
     PanelItem {
-        order: 5
+        order: 6
         shown: panel.shown
         width: panel.width
         height: 20

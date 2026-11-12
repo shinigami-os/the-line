@@ -5,7 +5,8 @@ import TheLine.Ui
 import Quickshell
 import Quickshell.Io
 
-// CPU, memory, load and processes. /proc is read once a second; the process list (top) only while `watching`.
+// CPU, memory, load, temperatures and processes. /proc is read once a second, the sensors every two seconds; the
+// process list (top) only while `watching`.
 Singleton {
     id: root
 
@@ -23,6 +24,12 @@ Singleton {
     property real uptime: 0    // seconds
     property var cpuHistory: new Array(historyLength).fill(0)
     property var processes: [] // [{ name, cpu, mem }], busiest first
+
+    // Temperatures, °C (NaN when there is no such sensor). A GPU is only read where its sensor costs nothing: an
+    // NVIDIA card asleep would be woken up by asking it, so it is left alone.
+    property real cpuTemp: NaN
+    property real gpuTemp: NaN
+    property var temps: []     // [{ group: "CPU", label: "Core 0", c: 41, crit: 100 }], grouped, CPU first
 
     // The dashboard sets this while it is open.
     property bool watching: false
@@ -117,11 +124,16 @@ Singleton {
         procUptime.reload();
         root.sample();
     }
-    Component.onCompleted: tick()
+    Component.onCompleted: {
+        tick();
+        sensors.running = true;
+    }
     Connections {
         target: Time
         function onNowChanged() {
             root.tick();
+            if (Time.now.getSeconds() % 2 === 0 && !sensors.running)
+                sensors.running = true;
         }
     }
 
@@ -149,5 +161,48 @@ Singleton {
         triggeredOnStart: true
         interval: 2500
         onTriggered: if (!top.running) top.running = true
+    }
+
+    // Every hwmon sensor: "chip|label|millidegrees|crit millidegrees" per line.
+    readonly property var groups: ({ coretemp: "CPU", k10temp: "CPU", zenpower: "CPU", cpu_thermal: "CPU", amdgpu: "GPU",
+        radeon: "GPU", nouveau: "GPU", nvme: "Disk", drivetemp: "Disk", acpitz: "Board", pch_cometlake: "Board" })
+    readonly property var groupOrder: ["CPU", "GPU", "Disk", "Board", "Wi-Fi"]
+
+    Process {
+        id: sensors
+        command: ["sh", "-c", "for h in /sys/class/hwmon/hwmon*; do n=$(cat \"$h/name\" 2>/dev/null); for t in \"$h\"/temp*_input; do [ -r \"$t\" ] || continue; b=${t%_input}; echo \"$n|$(cat \"${b}_label\" 2>/dev/null)|$(cat \"$t\" 2>/dev/null)|$(cat \"${b}_crit\" 2>/dev/null)\"; done; done"]
+        stdout: StdioCollector {
+            onStreamFinished: {
+                const out = [];
+                let cpu = NaN, cpuRank = 9, gpu = NaN;
+                for (const line of text.split("\n")) {
+                    const [chip, label, milli, crit] = line.split("|");
+                    const c = Number(milli) / 1000;
+                    if (!chip || !isFinite(c) || milli === "" || c <= 0)
+                        continue;
+                    const group = root.groups[chip] ?? (chip.startsWith("iwlwifi") ? "Wi-Fi" : chip);
+                    // a sensor with no label of its own is named after what it measures, not its driver
+                    const name = label.replace(/^Package id \d+$/, "Package") || ({ acpitz: "ACPI", nvme: "Drive" })[chip]
+                        || (chip.startsWith("iwlwifi") ? "Card" : chip);
+                    out.push({ group: group, label: name, c: Math.round(c), crit: crit ? Number(crit) / 1000 : NaN });
+                    // the CPU's one figure: the package (Intel), Tctl / Tdie (AMD), else the first CPU sensor, else the board
+                    const rank = /^Package/.test(label) || /^T(ctl|die)$/.test(label) ? 0 : group === "CPU" ? 1 : chip === "acpitz" ? 2 : 9;
+                    if (rank < cpuRank) {
+                        cpuRank = rank;
+                        cpu = c;
+                    }
+                    if (group === "GPU" && (isNaN(gpu) || /edge|junction/.test(label)))
+                        gpu = Math.max(isNaN(gpu) ? 0 : gpu, c);
+                }
+                const order = g => { const i = root.groupOrder.indexOf(g); return i < 0 ? 99 : i; };
+                // cores in their own order (Core 2 before Core 10)
+                const num = l => Number((l.match(/\d+/) ?? ["0"])[0]);
+                out.sort((a, b) => order(a.group) - order(b.group) || a.group.localeCompare(b.group)
+                    || (/^Package/.test(b.label) - /^Package/.test(a.label)) || num(a.label) - num(b.label));
+                root.temps = out;
+                root.cpuTemp = cpu;
+                root.gpuTemp = gpu;
+            }
+        }
     }
 }
