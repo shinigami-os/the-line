@@ -1,0 +1,227 @@
+# The Line, filmed feature by feature for kira-linux.com: one clip per scene, cropped to what it shows.
+# Made for a 2560x1440 screen at scale 1 (the laptop's eDP-1); regions are pixels of that screen.
+#   run.py website-clips.script --screen eDP-1 --out <dir>      (then encode them for the web)
+# `clip <name> x y w h` films that region until `clip-end` (or the next clip); `clip-window <name> <margin>` films the
+# focused window; `still <name> x y w h` is a screenshot. Nothing here touches the music or your windows.
+
+home 6
+
+scene 1 "The line" 10
+still desktop 0 0 2560 1440
+clip line 0 0 2560 180
+wait 1
+ipc notify "The Line" "Hello from the middle" "a notification runs along the line"
+wait 4.5
+ipc gauge vol 0.25
+wait 0.8
+ipc gauge vol 0.7
+wait 0.8
+ipc gauge bri 0.45
+wait 2
+clip-end
+
+scene 2 "Launcher" 16
+clip launcher 0 0 620 540
+wait 0.6
+tap-super
+wait 0.8
+type "fir"
+wait 1.6
+still launcher 0 0 620 540
+press Escape
+wait 0.5
+tap-super
+wait 0.6
+type "= 2^10 / 4"
+wait 1.6
+press Escape
+wait 0.5
+tap-super
+wait 0.6
+type "?"
+wait 2
+press Escape
+wait 0.5
+tap-super
+wait 0.6
+type "wifi"
+wait 1.6
+press Escape
+wait 0.6
+clip-end
+
+scene 3 "Overview" 12
+run@5 foot
+run@8 foot
+ws 6
+wait 0.6
+clip overview 0 0 960 350
+wait 0.5
+double-tap-super
+wait 1.6
+still overview 0 0 960 350
+drag-window 5 8 1100
+wait 1.4
+double-tap-super
+wait 0.8
+clip-end
+reset 6
+
+scene 4 "Notifications" 9
+clip notifications 880 0 800 470
+wait 0.5
+ipc notify "The Line" "build finished" "0 errors, 2 warnings nobody will read"
+wait 3
+key SUPER+N
+wait 2.6
+still notifications 880 0 800 470
+key SUPER+N
+wait 0.8
+clip-end
+
+scene 5 "Quick settings" 10
+clip quicksettings 2040 0 520 480
+wait 0.5
+key SUPER+A
+wait 2.4
+still quicksettings 2040 0 520 480
+key SUPER+A
+wait 0.5
+key SUPER+P
+wait 2.8
+still performance 2040 0 520 480
+key SUPER+P
+wait 0.8
+clip-end
+
+scene 6 "Tiling" 18
+clip tiling 0 0 2560 1440
+wait 0.5
+run@6 foot
+wait 0.3
+run foot
+wait 0.4
+run foot
+wait 0.4
+run foot
+wait 1
+key SUPER+LEFT
+wait 0.7
+key SUPER+UP
+wait 0.7
+key SUPER+R
+wait 0.6
+resize right 6
+wait 0.3
+resize down 4
+wait 0.6
+resize-end
+wait 0.6
+key SUPER+ALT+SPACE
+wait 1.2
+still tiling 0 0 2560 1440
+key SUPER+ALT+SPACE
+wait 0.9
+clip-end
+reset 6
+
+scene 7 "Fullscreen" 10
+run@6 foot
+wait 0.5
+clip fullscreen 0 0 2560 1440
+wait 0.5
+key SUPER+F
+wait 2.2
+hold-pointer-top 1000
+glide 1280 720 500
+wait 1
+key SUPER+F
+wait 1.2
+clip-end
+reset 6
+
+scene 8 "Visualiser" 9
+clip visualiser 0 0 2560 260
+wait 0.5
+key SUPER+M
+wait 6
+key SUPER+M
+wait 1
+clip-end
+
+scene 9 "Wallpapers" 9
+clip wallpapers 0 0 2560 1440
+wait 0.4
+key SUPER+T
+wait 1.2
+press Right
+wait 1
+press Right
+wait 1
+press Right
+wait 1.1
+still wallpapers 0 0 2560 1440
+press Escape
+wait 0.8
+clip-end
+
+scene 10 "Shortcuts" 6
+clip cheatsheet 0 0 2560 1440
+wait 0.4
+key SUPER+F1
+wait 3
+still cheatsheet 0 0 2560 1440
+key SUPER+F1
+wait 0.6
+clip-end
+
+scene 11 "Settings" 14
+settings appearance
+wait 0.6
+clip-window settings 24
+wait 1.4
+settings displays
+wait 1.6
+settings shortcuts
+wait 1.6
+settings line
+wait 1.6
+settings about
+wait 1.6
+clip-end
+reset 6
+
+scene 12 "Voice" 12
+ws 6
+clip voice 0 1300 1000 140
+wait 12
+clip-end
+
+scene 13 "Story" 14
+clip story 0 0 2560 1440
+ipc welcomeHere
+wait 3.5
+press Right
+wait 2.4
+press Right
+wait 2.4
+press Right
+wait 2.6
+still story 0 0 2560 1440
+press Escape
+wait 0.8
+press Return
+wait 4.5
+clip-end
+
+scene 14 "Login" 12
+shell QS_TESTING=1 QS_SCREEN=eDP-1 setsid qs -p /usr/share/the-line/greeter >/dev/null 2>&1 &
+wait 2.5
+clip login 0 0 2560 1440
+wait 2
+type "test"
+wait 0.6
+press Return
+wait 5
+clip-end
+shell pkill -f qs.-p./usr/share/the-line/gree[t]er

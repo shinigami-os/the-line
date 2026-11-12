@@ -197,6 +197,8 @@ def estimate(step):
         return 0.25 + 0.075 * len(a[0])
     if v == "glide":
         return int(a[2]) / 1000
+    if v in ("clip", "clip-window", "clip-end"):
+        return 0.8
     if v == "drag-window":
         return 2.1 + int(a[2]) / 1000
     if v == "hold-pointer-top":
@@ -219,6 +221,8 @@ class Runner:
         self.owned = set()          # addresses of the windows the script opened (reset closes only those)
         self.t0 = time.time()
         self.log = []               # (seconds, kind, text)
+        self.clip_dir = None        # where clip / still write (a clips script, recording): None = they do nothing
+        self.clip = None            # the wf-recorder of the clip being filmed
 
     def now(self):
         return time.time() - self.t0
@@ -289,6 +293,36 @@ class Runner:
 
     def type(self, text):
         sh(["wtype", "-d", "75", text])
+
+    # clips: one region of the screen per file, for the website (instead of the whole screen)
+    def region(self, x, y, w, h):
+        return "%d,%d %dx%d" % (self.mon["x"] + x, self.mon["y"] + y, w, h)
+
+    def clip_start(self, name, x, y, w, h):
+        if not self.clip_dir:
+            return
+        self.clip_end()
+        self.clip = subprocess.Popen(host(["wf-recorder", "-g", self.region(x, y, w, h), "-r", "60", "-x", "yuv420p",
+                                           "-p", "preset=veryfast", "-p", "crf=16", "-y", "-f",
+                                           "%s/%s.mp4" % (self.clip_dir, name)]),
+                                     stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        time.sleep(0.8)
+
+    def clip_window(self, name, margin):
+        """The focused window and a margin around it."""
+        w = json.loads(sh(["hyprctl", "activewindow", "-j"]).stdout)
+        x, y = w["at"][0] - self.mon["x"] - margin, w["at"][1] - self.mon["y"] - margin
+        self.clip_start(name, max(0, x), max(0, y), w["size"][0] + 2 * margin, w["size"][1] + 2 * margin)
+
+    def clip_end(self):
+        if self.clip:
+            sh(["pkill", "-INT", "-x", "wf-recorder"])
+            self.clip.wait(timeout=20)
+            self.clip = None
+
+    def still(self, name, x, y, w, h):
+        if self.clip_dir:
+            sh(["grim", "-g", self.region(x, y, w, h), "%s/%s.png" % (self.clip_dir, name)])
 
     # the pointer
     def pointer(self):
@@ -400,6 +434,14 @@ class Runner:
             x, _ = self.pointer()
             self.glide(x - self.mon["x"], 0, 500)
             time.sleep(int(a[0]) / 1000)
+        elif v == "clip":
+            self.clip_start(a[0], *[int(n) for n in a[1:5]])
+        elif v == "clip-window":
+            self.clip_window(a[0], int(a[1]) if len(a) > 1 else 0)
+        elif v == "clip-end":
+            self.clip_end()
+        elif v == "still":
+            self.still(a[0], *[int(n) for n in a[1:5]])
         elif v == "mark":
             self.note("mark", a[0])
         elif v == "reset":
@@ -465,7 +507,11 @@ def main():
         time.sleep(1)
     ipc("keycast", "true")
     runner.reset(HOME[0])
-    if not opts.no_record:
+    # a clips script films regions into --out, one file each (clip / still), never the whole screen
+    clips = any(st.verb in ("clip", "clip-window", "still") for sc in scenes for st in sc.steps)
+    if clips and not opts.no_record:
+        runner.clip_dir = opts.out
+    elif not opts.no_record:
         sound = [] if opts.no_audio else ["--audio=" + audio_source(opts.audio_source)]
         if sound:
             print("sound: " + sound[0][8:])
@@ -486,6 +532,7 @@ def main():
     except KeyboardInterrupt:
         print("\nstopped")
     finally:
+        runner.clip_end()
         if recorder:
             sh(["pkill", "-INT", "-x", "wf-recorder"])
             recorder.wait(timeout=20)
