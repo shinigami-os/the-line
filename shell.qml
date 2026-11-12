@@ -2,6 +2,7 @@
 //@ pragma Env QT_QUICK_CONTROLS_STYLE=Basic
 
 import QtQuick
+import TheLine.Ui
 import Quickshell
 import Quickshell.Io
 import Quickshell.Hyprland
@@ -13,6 +14,11 @@ import qs.services
 
 ShellRoot {
     id: root
+
+    // The design language (TheLine.Ui) follows this user's choices.
+    Binding { target: Theme; property: "accent"; value: Config.accent }
+    Binding { target: Anim; property: "scale"; value: Config.motionScale }
+    Binding { target: Anim; property: "reduce"; value: Config.reduceMotion }
 
     readonly property var screens: Quickshell.screens.filter(s => Config.screenFilter.length === 0 || Config.screenFilter.includes(s.name))
 

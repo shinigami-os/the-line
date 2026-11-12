@@ -127,6 +127,12 @@ check_deps() {
     check_list recommended "$recommended"
     check_list optional "$optional"
 
+    # The Line's design language, a QML module of its own (github.com/shinigami-os/the-line-ui)
+    qml=$(qtpaths6 --query QT_INSTALL_QML 2>/dev/null || echo /usr/lib/qt6/qml)
+    if [ ! -f "$qml/TheLine/Ui/qmldir" ]; then
+        say "  ${red}-${plain} TheLine.Ui$dim  the design language: git clone https://github.com/shinigami-os/the-line-ui, then copy its TheLine/ into $qml$plain"
+        missing_required=$((missing_required + 1))
+    fi
     if have qs; then
         v=$(version_of qs --version)
         if [ -n "$v" ] && ! version_ge "$v" 0.3; then

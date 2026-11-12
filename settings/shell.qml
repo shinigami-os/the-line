@@ -1,6 +1,7 @@
 //@ pragma AppId the-line-settings
 
 import QtQuick
+import TheLine.Ui
 import Quickshell
 import Quickshell.Io
 import qs.modules.settings
@@ -9,6 +10,11 @@ import qs.services
 // The Line's settings app: its own process and window (app-id "the-line-settings"), sharing Theme, Anim, Config and
 // the common components with the shell. Started by session/the-line-settings (SUPER+I, the launcher).
 ShellRoot {
+
+    // The design language (TheLine.Ui) follows this user's choices.
+    Binding { target: Theme; property: "accent"; value: Config.accent }
+    Binding { target: Anim; property: "scale"; value: Config.motionScale }
+    Binding { target: Anim; property: "reduce"; value: Config.reduceMotion }
     // Created up front: it watches the "accent from the wallpaper" setting.
     readonly property var accent: Accent
 

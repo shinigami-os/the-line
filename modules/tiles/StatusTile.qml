@@ -1,8 +1,9 @@
 import QtQuick
+import Quickshell
+import TheLine.Ui
 import QtQuick.Shapes
 import Quickshell.Bluetooth
 import Quickshell.Services.UPower
-import qs.modules.common
 import qs.services
 
 // Top-right tile: a performance summary and the system status, both as labelled readings.

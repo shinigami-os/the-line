@@ -1,5 +1,5 @@
 import QtQuick
-import qs.modules.common
+import TheLine.Ui
 import qs.services
 
 // Top-centre tile: clock and date. Notifications arrive here (toast) and it grows into the notifications panel.

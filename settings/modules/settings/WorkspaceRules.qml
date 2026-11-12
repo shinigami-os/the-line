@@ -1,9 +1,9 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
+import TheLine.Ui
 import Quickshell
 import Quickshell.Hyprland
-import qs.modules.common
 import qs.services
 
 // Settings > Workspaces > Apps on their workspace. One line per app, with a ruler of the ten workspaces (the one it

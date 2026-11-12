@@ -1,4 +1,5 @@
 import QtQuick
+import TheLine.Ui
 import qs.services
 
 // Month calendar. Weeks start on Monday, ISO week numbers on the left, six rows so the height never changes.

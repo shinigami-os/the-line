@@ -1,4 +1,5 @@
 import QtQuick
+import TheLine.Ui
 import qs.services
 
 // Black over a screen while the welcome story runs. On the story screen it sits under the line and the tiles; on the

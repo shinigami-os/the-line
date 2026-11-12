@@ -1,5 +1,5 @@
 import QtQuick
-import qs.modules.common
+import TheLine.Ui
 import qs.services
 
 // The power menu (CTRL+ALT+Delete; the power button opens it on Power off). Grown from the line like the other

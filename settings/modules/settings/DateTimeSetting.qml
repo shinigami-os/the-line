@@ -1,5 +1,5 @@
 import QtQuick
-import qs.modules.common
+import TheLine.Ui
 import qs.services
 
 // Settings > System > Date and time: the clock, live. With the automatic time off, Enter opens a field with the

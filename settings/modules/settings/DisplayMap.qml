@@ -1,6 +1,7 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
+import TheLine.Ui
 import qs.services
 
 // Settings > Displays > Arrangement: the screens as planned, drawn small with room around them. The selected one is

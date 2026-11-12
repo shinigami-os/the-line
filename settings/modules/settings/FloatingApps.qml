@@ -1,6 +1,7 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
+import TheLine.Ui
 import Quickshell
 import Quickshell.Io
 import qs.services

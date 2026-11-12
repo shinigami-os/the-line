@@ -1,7 +1,7 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
-import qs.modules.common
+import TheLine.Ui
 import qs.services
 
 // Settings > Network > Networks around: scanned while the section is open. The connected one is lit; signal is

@@ -1,4 +1,6 @@
 import QtQuick
+import Quickshell
+import TheLine.Ui
 import Quickshell.Widgets
 import qs.services
 

@@ -1,4 +1,5 @@
 import QtQuick
+import TheLine.Ui
 import qs.services
 
 // While the wallpaper picker is open on this screen, the wallpaper under its marker covers the screen behind the

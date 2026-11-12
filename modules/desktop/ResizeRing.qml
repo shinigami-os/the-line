@@ -1,4 +1,6 @@
 import QtQuick
+import Quickshell
+import TheLine.Ui
 import QtQuick.Shapes
 import Quickshell.Hyprland
 import qs.services

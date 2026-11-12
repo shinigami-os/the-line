@@ -1,4 +1,5 @@
 import QtQuick
+import TheLine.Ui
 import qs.services
 
 // Keys drawn as caps, like the cheat sheet's: a combo ("SUPER+SHIFT+S") or caps already named (["Super", "Ctrl"]).

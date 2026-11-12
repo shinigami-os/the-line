@@ -1,6 +1,7 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
+import TheLine.Ui
 import qs.services
 
 // One screen of the lock (LockScreen). The line across the middle, the time above it, who and the date below; the

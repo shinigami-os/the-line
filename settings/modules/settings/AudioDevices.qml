@@ -1,6 +1,7 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
+import TheLine.Ui
 import qs.services
 
 // Settings > Sound > Plays on / Listens on: every output (or input), the default one lit. Enter picks it.

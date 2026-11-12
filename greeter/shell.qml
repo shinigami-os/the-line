@@ -2,6 +2,7 @@
 //@ pragma Env QT_QUICK_CONTROLS_STYLE=Basic
 
 import QtQuick
+import TheLine.Ui
 import Quickshell
 import Quickshell.Wayland
 import qs.services
@@ -11,6 +12,11 @@ import qs.services
 // QS_WINDOW=1 does the same but talks to the greetd of GREETD_SOCK (a fake one, to try the whole path).
 ShellRoot {
     id: root
+
+    // The design language (TheLine.Ui) follows this user's choices.
+    Binding { target: Theme; property: "accent"; value: Config.accent }
+    Binding { target: Anim; property: "scale"; value: Config.motionScale }
+    Binding { target: Anim; property: "reduce"; value: Config.reduceMotion }
 
     readonly property var testScreen: Quickshell.screens.find(s => s.name === Quickshell.env("QS_SCREEN")) ?? Quickshell.screens[0]
 

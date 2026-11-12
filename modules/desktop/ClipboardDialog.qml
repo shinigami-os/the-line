@@ -1,5 +1,5 @@
 import QtQuick
-import qs.modules.common
+import TheLine.Ui
 import qs.services
 
 // Clipboard history (SUPER+V), grown from the line. Text in mono, images as thumbnails. Enter copies the chosen

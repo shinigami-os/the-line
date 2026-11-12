@@ -1,4 +1,5 @@
 import QtQuick
+import TheLine.Ui
 import qs.services
 
 // Settings > About: the name, drawn large over a line that runs out from it, and the version.

@@ -1,5 +1,5 @@
 import QtQuick
-import qs.modules.common
+import TheLine.Ui
 import qs.services
 
 // Settings > Power & idle > Stop charging at: 50 to 100 %, by 5. Only batteries whose driver offers it

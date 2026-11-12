@@ -1,4 +1,5 @@
 import QtQuick
+import TheLine.Ui
 import qs.services
 
 // One line of a list inside a setting (networks, devices, apps): a name, a muted detail, something on the right;

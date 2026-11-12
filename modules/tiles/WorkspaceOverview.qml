@@ -1,8 +1,8 @@
 import QtQuick
+import TheLine.Ui
 import Quickshell
 import Quickshell.Hyprland
 import Quickshell.Wayland
-import qs.modules.common
 import qs.services
 
 // Where everything is: the ten workspaces as small screens, two rows of five, each window drawn as a live

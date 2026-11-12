@@ -1,4 +1,5 @@
 import QtQuick
+import TheLine.Ui
 import qs.services
 
 // The line and everything that happens on it: music progress, workspace marker, level gauge, notification pulse.
@@ -169,11 +170,11 @@ Item {
 
     // Music progress: on the line, exactly above the music part of the top-left tile. Creeps forward each second.
     Rectangle {
-        x: 16 + Theme.wsBlockW
+        x: 16 + Geometry.wsBlockW
         y: 10
         // whole pixels, no animation: it redraws only when it really moves (an animation here redrew every
         // screen without pause while music played)
-        width: Math.round(Media.progress * Theme.musicW)
+        width: Math.round(Media.progress * Geometry.musicW)
         height: 1
         color: Theme.accent
         opacity: Media.active && line.musicShown ? 0.85 : 0
@@ -198,7 +199,7 @@ Item {
         }
 
         // Centred over the active cell of the workspace ruler (tile at 16, ruler 13 px in).
-        x: 16 + 13 + Theme.wsCell / 2 - 7 + (Math.max(1, Math.min(10, line.workspace)) - 1) * Theme.wsCell
+        x: 16 + 13 + Geometry.wsCell / 2 - 7 + (Math.max(1, Math.min(10, line.workspace)) - 1) * Geometry.wsCell
 
         Behavior on x {
             NumberAnimation { duration: Anim.workspace; easing.type: Anim.easing }

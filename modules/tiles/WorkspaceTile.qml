@@ -1,9 +1,9 @@
 import QtQuick
+import TheLine.Ui
 import QtQuick.Shapes
 import Quickshell
 import Quickshell.Hyprland
 import Quickshell.Widgets
-import qs.modules.common
 import qs.services
 
 // Top-left tile: ten workspace numerals hung under ticks on the line, and the window title under them.
@@ -167,7 +167,7 @@ Tile {
     readonly property string kind: ["tl", "tm", "tw"].find(k => UiState.isOpen(screenName, k)) ?? ""
 
     anchorSide: "left"
-    restW: Theme.wsBlockW + (musicShown ? Theme.musicW : 0)
+    restW: Geometry.wsBlockW + (musicShown ? Geometry.musicW : 0)
     openW: kind === "tw" ? 26 + 5 * 168 + 4 * 10 : 560
     // Launcher: search field, section label, one row per result, footer.
     openH: Theme.tileHeight + (kind === "tw" ? 12 + overviewPanel.implicitH + 12
@@ -215,11 +215,11 @@ Tile {
                     readonly property bool active: n === tile.workspace
                     readonly property bool busy: tile.occupied(n)
 
-                    width: Theme.wsCell
+                    width: Geometry.wsCell
                     height: 20
 
                     Rectangle {
-                        x: Theme.wsCell / 2 - 1
+                        x: Geometry.wsCell / 2 - 1
                         width: 1
                         height: cell.active ? 0 : (cell.busy ? 7 : 4)
                         color: cell.busy ? Theme.muted : Theme.borderStrong
@@ -277,7 +277,7 @@ Tile {
             id: titleRow
             x: 13
             y: 22
-            width: tile.open && !Media.active ? tile.width - 26 - who.width - 12 : Theme.wsBlockW - 26
+            width: tile.open && !Media.active ? tile.width - 26 - who.width - 12 : Geometry.wsBlockW - 26
             spacing: 8
             clip: true
 
@@ -332,8 +332,8 @@ Tile {
     Item {
         id: music
 
-        x: Theme.wsBlockW
-        width: tile.open ? tile.width - Theme.wsBlockW : Theme.musicW
+        x: Geometry.wsBlockW
+        width: tile.open ? tile.width - Geometry.wsBlockW : Geometry.musicW
         height: Theme.tileHeight - 1
         clip: true
 

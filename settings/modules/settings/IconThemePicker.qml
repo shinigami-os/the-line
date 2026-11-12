@@ -1,4 +1,5 @@
 import QtQuick
+import TheLine.Ui
 import qs.services
 
 // Settings > Appearance > Icon theme: the theme in use, ← → to step through the installed ones (IconThemes).

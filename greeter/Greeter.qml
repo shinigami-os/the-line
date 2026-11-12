@@ -1,6 +1,8 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
+import Quickshell
+import TheLine.Ui
 import qs.services
 
 // The login screen. Black; two dials of ticks (minutes, seconds) come out of the left edge and turn with the time,

@@ -1,7 +1,7 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
-import qs.modules.common
+import TheLine.Ui
 import qs.services
 
 // Settings > Sound > Apps playing: one line per app with its own volume, a line slider. ↑↓ apps, ←→ volume,

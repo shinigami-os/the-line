@@ -1,6 +1,7 @@
 pragma Singleton
 
 import QtQuick
+import TheLine.Ui
 import Quickshell
 
 // Every section and every setting of the app, declared once: the spine, the rows and the search are built from here.

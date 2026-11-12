@@ -1,8 +1,9 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
+import Quickshell
+import TheLine.Ui
 import Quickshell.Io
-import qs.modules.common
 import qs.services
 
 // Settings > Input > Keyboard layout: the layout in use; Enter searches every layout and variant xkb knows

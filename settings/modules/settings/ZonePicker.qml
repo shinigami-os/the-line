@@ -1,7 +1,7 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
-import qs.modules.common
+import TheLine.Ui
 import qs.services
 
 // Settings > System > Time zone: the zone in use and the local time there; Enter searches every zone

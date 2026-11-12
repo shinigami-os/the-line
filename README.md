@@ -55,7 +55,7 @@ sudo ./install.sh           # installs under /usr; log out and pick "The Line" i
 | `sudo ./install.sh --uninstall` | remove it; `~/.config/the-line` stays |
 | `DESTDIR=/tmp/pkg ./install.sh` | stage it for packaging (no root, no checks) |
 
-**Required:** `qs` (Quickshell), `Hyprland` and `start-hyprland`, `dbus-run-session`, PipeWire and WirePlumber (`wpctl`),
+**Required:** [The Line UI](https://github.com/shinigami-os/the-line-ui) (the design language, a QML module of its own: `kira-the-line-ui` on Kira), `qs` (Quickshell), `Hyprland` and `start-hyprland`, `dbus-run-session`, PipeWire and WirePlumber (`wpctl`),
 `nmcli` (NetworkManager), `loginctl`, `grim`, `wl-copy` (wl-clipboard), `cliphist`, `hypridle`, `foot`, `python3`.
 **Recommended:** `brightnessctl`, `playerctl`, `qalc`, `cava`, `qt6ct`, `jq`, `slurp`, `matugen`, `mpv`.
 **Optional:** `hyprsunset` (night light), `hyprpicker`, `flameshot`, `wf-recorder`, `tesseract`, `yazi`, `howdy`
@@ -164,11 +164,11 @@ optional:
 ## Under the hood
 
 ```
-shell.qml         entry point and the IPC (`qs -p . ipc show`)
+shell.qml         entry point and the IPC (`qs -p . ipc show`); the colours, motion and shared parts come from TheLine.Ui
 services/         singletons: Config, Theme, Anim, UiState, LineState, Notifs, Audio, Media, Network, Lock, Welcome, ...
 modules/          line/ (the line and the per-screen surface), tiles/ (the three tiles and their panels),
-                  desktop/ (wallpaper, pickers, dialogs, Kira's voice), lock/, welcome/, demo/, common/ (shared pieces)
-settings/         the settings app (its own window; it shares Theme, Anim and the common modules by symlink)
+                  desktop/ (wallpaper, pickers, dialogs, Kira's voice), lock/, welcome/, demo/
+settings/         the settings app (its own window)
 greeter/          the login screen (greetd, under cage) and its installer
 session/          the session: environment, Hyprland's Lua config, the helpers, the .desktop, the polkit policy
 assets/           quotes, the story, emoji, icons, wallpapers

@@ -1,5 +1,5 @@
 import QtQuick
-import qs.modules.common
+import TheLine.Ui
 import qs.services
 
 // The emoji picker (SUPER+semicolon), grown from the line: the recent ones first, then everything; type to search

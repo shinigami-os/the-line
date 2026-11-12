@@ -1,8 +1,8 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
+import TheLine.Ui
 import Quickshell
-import qs.modules.common
 import qs.services
 
 // The wallpaper picker (SUPER+T). A line draws itself across the bottom of the screen from both edges, and the

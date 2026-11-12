@@ -1,7 +1,7 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
-import qs.modules.common
+import TheLine.Ui
 import qs.services
 
 // The settings app: a line across the top, the spine coming down from it with every section as a tick, and the

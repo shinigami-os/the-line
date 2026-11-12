@@ -1,5 +1,5 @@
 import QtQuick
-import qs.modules.common
+import TheLine.Ui
 import qs.services
 
 // A setting typed by hand (the computer's name): its value, and Enter opens a field with it, Enter saves, Esc

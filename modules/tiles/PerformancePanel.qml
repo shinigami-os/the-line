@@ -1,6 +1,6 @@
 import QtQuick
+import TheLine.Ui
 import QtQuick.Shapes
-import qs.modules.common
 import qs.services
 
 // The performance dashboard: CPU graph and per-core load, memory, busiest processes.

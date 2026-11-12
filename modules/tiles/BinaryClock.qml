@@ -1,4 +1,5 @@
 import QtQuick
+import TheLine.Ui
 import qs.services
 
 // Binary-coded decimal clock: one column per digit (HH MM SS), bits 8 4 2 1 from top to bottom.

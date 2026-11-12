@@ -1,4 +1,5 @@
 import QtQuick
+import TheLine.Ui
 import qs.services
 
 // The way back from the lock, drawn by the shell's own surface (TheLine) once the lock is let go. It starts from the

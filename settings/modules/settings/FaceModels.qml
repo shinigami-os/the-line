@@ -1,7 +1,7 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
-import qs.modules.common
+import TheLine.Ui
 import qs.services
 
 // Settings > Sign-in > Your face: the faces howdy knows for you (read from /etc/howdy/models/<you>.dat), and

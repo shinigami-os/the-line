@@ -1,6 +1,7 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
+import TheLine.Ui
 import qs.services
 
 // Settings > Bluetooth > Devices: connected first, then paired, then the ones met while looking for devices.

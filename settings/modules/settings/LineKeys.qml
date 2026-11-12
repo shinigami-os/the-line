@@ -1,6 +1,7 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
+import TheLine.Ui
 import qs.services
 
 // Settings > Shortcuts > The Line's keys: every key of the session that can move (the workspace numbers, the mouse

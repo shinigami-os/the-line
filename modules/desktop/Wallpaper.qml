@@ -1,4 +1,5 @@
 import QtQuick
+import TheLine.Ui
 import QtMultimedia
 import Quickshell
 import Quickshell.Wayland

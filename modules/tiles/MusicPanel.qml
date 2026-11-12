@@ -1,6 +1,6 @@
 import QtQuick
+import TheLine.Ui
 import QtQuick.Shapes
-import qs.modules.common
 import qs.services
 
 // The music panel. The track is drawn as a ruler, like the workspace ruler: a tick every 15 s, a longer labelled

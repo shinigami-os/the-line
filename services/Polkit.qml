@@ -2,6 +2,7 @@ pragma Singleton
 pragma ComponentBehavior: Bound
 
 import QtQuick
+import TheLine.Ui
 import Quickshell
 import Quickshell.Hyprland
 import Quickshell.Services.Polkit

@@ -1,4 +1,5 @@
 import QtQuick
+import TheLine.Ui
 import qs.services
 
 // The paragraphs of a beat, centred, rising in one after the other like Kira's voice does (KiraVoice): the first one

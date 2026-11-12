@@ -1,4 +1,5 @@
 import QtQuick
+import TheLine.Ui
 import qs.services
 
 // One half of the notification pulse, a 56px dash drawn for the left half (the right half is the same item mirrored).

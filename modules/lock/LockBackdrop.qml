@@ -1,4 +1,5 @@
 import QtQuick
+import TheLine.Ui
 import QtQuick.Effects
 import qs.services
 

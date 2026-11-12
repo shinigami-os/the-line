@@ -1,5 +1,5 @@
 import QtQuick
-import qs.modules.common
+import TheLine.Ui
 import qs.services
 
 // The polkit agent's dialog: what is asked, the password, and the answer.

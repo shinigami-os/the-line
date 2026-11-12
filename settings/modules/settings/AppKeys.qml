@@ -1,8 +1,8 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
+import TheLine.Ui
 import Quickshell
-import qs.modules.common
 import qs.services
 
 // Settings > Shortcuts > Your app keys: the apps of ~/.config/the-line/hypr/apps.lua and their keys, then

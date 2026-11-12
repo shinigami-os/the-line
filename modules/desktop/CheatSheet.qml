@@ -1,5 +1,5 @@
 import QtQuick
-import qs.modules.common
+import TheLine.Ui
 import qs.services
 
 // Every shortcut, in one sheet (SUPER+F1). Grown from the line like the other dialogs. Tabs (← → or a click):

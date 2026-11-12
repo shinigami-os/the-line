@@ -1,6 +1,7 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
+import TheLine.Ui
 import qs.services
 
 // The story's own layer, on the story screen only (TheLine): the narration under the line, an offer (a setting) when a

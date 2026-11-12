@@ -1,4 +1,5 @@
 import QtQuick
+import TheLine.Ui
 import qs.services
 
 // Flat analog clock: twelve ticks and three hands, no face, no round edges.

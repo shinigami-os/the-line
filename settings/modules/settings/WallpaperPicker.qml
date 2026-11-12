@@ -1,6 +1,6 @@
 import QtQuick
+import TheLine.Ui
 import Quickshell
-import qs.modules.common
 import qs.services
 
 // Settings > Appearance > Wallpaper: thumbnails of The Line's wallpapers (assets/wallpapers), Kira's, and yours

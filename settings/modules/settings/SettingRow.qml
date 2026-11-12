@@ -1,5 +1,5 @@
 import QtQuick
-import qs.modules.common
+import TheLine.Ui
 import qs.services
 
 // One setting: label and what it does on the left, its control on the right, drawn with the line's own parts
