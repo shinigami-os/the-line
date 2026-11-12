@@ -31,16 +31,19 @@ while that page is open.
 
 ## Install
 
-On Kira Linux it is one command, which installs The Line with Hyprland, Quickshell and the programs it relies on:
+On Kira Linux it is one command, which installs The Line with Hyprland, Quickshell, the programs it relies on and
+[The Line UI](https://github.com/shinigami-os/the-line-ui) (its design language, `kira-the-line-ui`):
 
 ```sh
 sudo flux install kira-the-line
 ```
 
 Elsewhere you need [Quickshell](https://quickshell.org) 0.3+ and [Hyprland](https://hypr.land) 0.55+ (the session's configuration is
-Lua), plus a few small programs. The installer tells you exactly what is missing:
+Lua), plus a few small programs. The shell draws with The Line UI, which is a QML module of its own, so clone the two
+side by side. The installer tells you exactly what is missing, and installs The Line UI from the checkout next to it:
 
 ```sh
+git clone git@github.com:shinigami-os/the-line-ui.git
 git clone git@github.com:shinigami-os/the-line.git
 cd the-line
 ./install.sh --check        # what is found, what is missing
@@ -50,12 +53,13 @@ sudo ./install.sh           # installs under /usr; log out and pick "The Line" i
 | | |
 |---|---|
 | `sudo ./install.sh` | install or update (a new tree is swapped in; your settings are never touched) |
-| `sudo ./install.sh --dev` | link `/usr/share/the-line` to this checkout: what you edit is live (the shell reloads by itself) |
+| `sudo ./install.sh --dev` | link `/usr/share/the-line` (and The Line UI, from the checkout next to it) to the checkouts: what you edit is live (the shell reloads by itself) |
+| `sudo ./install.sh --ui=DIR` | install The Line UI from a checkout in another place than `../the-line-ui` (also `THE_LINE_UI=DIR`); run it again to update it |
 | `sudo ./install.sh --greeter` | also put The Line's own login screen first in greetd (Kira's `start-greeter.sh`) |
-| `sudo ./install.sh --uninstall` | remove it; `~/.config/the-line` stays |
-| `DESTDIR=/tmp/pkg ./install.sh` | stage it for packaging (no root, no checks) |
+| `sudo ./install.sh --uninstall` | remove it; `~/.config/the-line` stays, and so does The Line UI (other apps use it too) |
+| `DESTDIR=/tmp/pkg ./install.sh` | stage it for packaging (no root, no checks; The Line UI is its own package) |
 
-**Required:** [The Line UI](https://github.com/shinigami-os/the-line-ui) (the design language, a QML module of its own: `kira-the-line-ui` on Kira), `qs` (Quickshell), `Hyprland` and `start-hyprland`, `dbus-run-session`, PipeWire and WirePlumber (`wpctl`),
+**Required:** [The Line UI](https://github.com/shinigami-os/the-line-ui) (the design language, a QML module of its own: `kira-the-line-ui` on Kira, installed by `install.sh` from a checkout otherwise), `qs` (Quickshell), `Hyprland` and `start-hyprland`, `dbus-run-session`, PipeWire and WirePlumber (`wpctl`),
 `nmcli` (NetworkManager), `loginctl`, `grim`, `wl-copy` (wl-clipboard), `cliphist`, `hypridle`, `foot`, `python3`.
 **Recommended:** `brightnessctl`, `playerctl`, `qalc`, `cava`, `qt6ct`, `jq`, `slurp`, `matugen`, `mpv`.
 **Optional:** `hyprsunset` (night light), `hyprpicker`, `flameshot`, `wf-recorder`, `tesseract`, `yazi`, `howdy`

@@ -4,11 +4,16 @@
 #   sudo ./install.sh               install (or update) system-wide, under /usr
 #   sudo ./install.sh --dev         link /usr/share/the-line to this checkout instead: what you edit here is live
 #   sudo ./install.sh --greeter     also put The Line's login screen first in greetd (Kira's start-greeter.sh)
+#   sudo ./install.sh --ui=DIR      install The Line UI (the design language) from a checkout of github.com/shinigami-os/the-line-ui
 #   ./install.sh --check            only look at what is installed and what is missing
 #   sudo ./install.sh --uninstall   remove it (your ~/.config/the-line stays where it is)
 #   DESTDIR=/tmp/pkg ./install.sh   install into a staging directory (packaging: no root, no checks)
 #
 #   --force                         go on even when a required program is missing
+#
+# The Line UI is a QML module of its own (TheLine.Ui, package kira-the-line-ui on Kira Linux). When it is not installed,
+# a checkout of it next to this one (../the-line-ui, or THE_LINE_UI=DIR) is installed with the shell; --dev links it
+# instead of copying it. It is shared with the other apps that draw with it, so --uninstall leaves it in place.
 #
 # Then log out and pick "The Line" in the login screen's session list.
 set -eu
@@ -22,6 +27,7 @@ tree="$share/the-line"
 mode=install
 greeter=
 force=
+ui=
 for arg in "$@"; do
     case "$arg" in
     --dev) mode=dev ;;
@@ -29,7 +35,8 @@ for arg in "$@"; do
     --uninstall) mode=uninstall ;;
     --greeter) greeter=1 ;;
     --force) force=1 ;;
-    -h | --help) sed -n '2,13p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+    --ui=*) ui="${arg#--ui=}" ;;
+    -h | --help) sed -n '2,17p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
     *) echo "unknown option: $arg (see --help)" >&2; exit 2 ;;
     esac
 done
@@ -121,6 +128,22 @@ EOF
 }"
 }
 
+# Qt's QML import path: where The Line UI (TheLine/Ui) has to be
+qml_dir() {
+    qtpaths6 --query QT_INSTALL_QML 2>/dev/null || echo /usr/lib/qt6/qml
+}
+
+# a checkout of The Line UI to install from: --ui=DIR, THE_LINE_UI, or the one next to this checkout
+ui_source() {
+    for d in "$ui" "${THE_LINE_UI:-}" "$src/../the-line-ui"; do
+        if [ -n "$d" ] && [ -f "$d/TheLine/Ui/qmldir" ]; then
+            (cd "$d" && pwd)
+            return 0
+        fi
+    done
+    return 1
+}
+
 check_deps() {
     step "Checking what The Line needs"
     check_list required "$required"
@@ -128,9 +151,20 @@ check_deps() {
     check_list optional "$optional"
 
     # The Line's design language, a QML module of its own (github.com/shinigami-os/the-line-ui)
-    qml=$(qtpaths6 --query QT_INSTALL_QML 2>/dev/null || echo /usr/lib/qt6/qml)
-    if [ ! -f "$qml/TheLine/Ui/qmldir" ]; then
-        say "  ${red}-${plain} TheLine.Ui$dim  the design language: git clone https://github.com/shinigami-os/the-line-ui, then copy its TheLine/ into $qml$plain"
+    qml=$(qml_dir)
+    if [ -f "$qml/TheLine/Ui/qmldir" ]; then
+        if [ -n "$ui" ] && from=$(ui_source); then
+            say "  ${dim}TheLine.Ui is installed, and gets updated from $from${plain}"
+        fi
+    elif from=$(ui_source); then
+        say "  ${dim}TheLine.Ui (the design language) is not installed yet: it will be from $from${plain}"
+    else
+        if have flux; then
+            hint="sudo flux install kira-the-line-ui"
+        else
+            hint="git clone https://github.com/shinigami-os/the-line-ui next to this checkout (or --ui=DIR)"
+        fi
+        say "  ${red}-${plain} TheLine.Ui$dim  the design language: $hint${plain}"
         missing_required=$((missing_required + 1))
     fi
     if have qs; then
@@ -186,6 +220,28 @@ install_tree() {
     fi
 }
 
+# The Line UI, from a checkout: copied, or with --dev linked so that what is edited there is live too
+install_ui() {
+    qml=$(qml_dir)
+    if [ -f "$qml/TheLine/Ui/qmldir" ] && [ -z "$ui" ]; then
+        return 0
+    fi
+    from=$(ui_source) || return 0
+    step "Installing The Line UI to $qml/TheLine"
+    mkdir -p "$qml"
+    if [ "$mode" = dev ]; then
+        [ -L "$qml/TheLine" ] || [ ! -e "$qml/TheLine" ] || die "$qml/TheLine is a real directory: remove it first (sudo rm -r $qml/TheLine)"
+        ln -sfn "$from/TheLine" "$qml/TheLine"
+        say "  linked to $from/TheLine"
+    else
+        rm -rf "$qml/TheLine.new"
+        cp -a "$from/TheLine" "$qml/TheLine.new"
+        rm -rf "$qml/TheLine"   # (a link to a checkout from --dev: only the link goes)
+        mv "$qml/TheLine.new" "$qml/TheLine"
+        say "  copied from $from"
+    fi
+}
+
 install_files() {
     step "Installing the session, the settings app and the polkit policy"
     if [ "$mode" = dev ]; then
@@ -236,6 +292,7 @@ uninstall() {
     rm -f "$share"/icons/hicolor/*/apps/the-line-settings.png
     rm -rf "$share/icons/TheLine"
     say "  done. Your settings in ~/.config/the-line and the state in ~/.local/state/the-line were left alone."
+    say "  ${dim}The Line UI (TheLine.Ui) stays installed: the other apps that draw with it use it too.${plain}"
 }
 
 # ------------------------------------------------------------------------------------------------ go
@@ -263,6 +320,7 @@ $missing_required required thing(s) missing: install them, then run this again (
     say
 fi
 
+[ -n "$dest" ] || install_ui
 install_tree
 install_files
 install_cursor
