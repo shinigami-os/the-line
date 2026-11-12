@@ -36,6 +36,10 @@ Singleton {
     property bool faceGreetd: false        // ... for the login screen
     property string fingerprint: "—"
 
+    // Closing the lid, the sleep key: "sleep" (lock and sleep), "lock", "nothing" (elogind, through the helper)
+    property string lidAction: "sleep"
+    property string sleepKey: "sleep"
+
     property bool chargeSupported: false
     property int chargeLimit: 100
 
@@ -65,6 +69,10 @@ Singleton {
             run(["face-pam", "greetd", value ? "on" : "off"]);
         else if (key === "chargeLimit")
             run(["charge-limit", String(value)]);
+        else if (key === "lidAction")
+            run(["power-keys", "lid", value]);
+        else if (key === "sleepKey")
+            run(["power-keys", "sleep", value]);
     }
 
     function refresh() {
@@ -107,7 +115,8 @@ Singleton {
             "echo os=$(. /etc/os-release; echo $PRETTY_NAME)",
             "command -v hyprsunset >/dev/null && echo sunset=installed || echo sunset=not installed",
             "echo fingerprint=$(fprintd-list \"$USER\" 2>&1 | head -n1)",
-            "echo faces=$(cat /etc/howdy/models/$USER.dat 2>/dev/null | tr -d '\\n')"
+            "echo faces=$(cat /etc/howdy/models/$USER.dat 2>/dev/null | tr -d '\\n')",
+            "f=/etc/elogind/logind.conf.d/50-the-line.conf; echo lid=$(sed -n 's/^HandleLidSwitch=//p' $f 2>/dev/null); echo sleepkey=$(sed -n 's/^HandleSuspendKey=//p' $f 2>/dev/null)"
         ].join("; ")]
         stdout: StdioCollector {
             onStreamFinished: {
@@ -138,6 +147,9 @@ Singleton {
                 root.faceGreetd = v.facegreetd === "1";
                 root.chargeSupported = v.charge !== undefined;
                 root.chargeLimit = Number(v.charge) || 100;
+                const named = a => a === "lock" ? "lock" : a === "ignore" ? "nothing" : "sleep";
+                root.lidAction = named(v.lid);
+                root.sleepKey = named(v.sleepkey);
                 root.fingerprint = /No devices/i.test(v.fingerprint ?? "") ? "no reader found"
                     : /Fingerprints for user/i.test(v.fingerprint ?? "") ? "ready" : "not available";
                 try {

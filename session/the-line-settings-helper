@@ -9,6 +9,8 @@
 #   charge-limit 50..100          the battery stops charging there; kept across reboots by a udev rule
 #   face add NAME|remove ID|clear the calling user's howdy face models (NAME: 24 characters, no comma)
 #   face-pam hyprlock|greetd on|off   face sign-in for unlocking the screen, or for the login screen
+#   power-keys lid|sleep sleep|lock|nothing   closing the lid, the sleep key: elogind's own handling, in
+#                                 /etc/elogind/logind.conf.d/50-the-line.conf (the lock before any sleep is hypridle's)
 set -u
 
 die() {
@@ -131,7 +133,28 @@ face-pam)
     cat "$f.new" > "$f"
     rm -f "$f.new"
     ;;
+power-keys)
+    case "${3:-}" in
+    sleep) action=suspend ;;
+    lock) action=lock ;;
+    nothing) action=ignore ;;
+    *) die "sleep, lock or nothing" ;;
+    esac
+    f=/etc/elogind/logind.conf.d/50-the-line.conf
+    lid=$(sed -n 's/^HandleLidSwitch=//p' "$f" 2>/dev/null); lid=${lid:-suspend}
+    key=$(sed -n 's/^HandleSuspendKey=//p' "$f" 2>/dev/null); key=${key:-suspend}
+    case "${2:-}" in
+    lid) lid=$action ;;
+    sleep) key=$action ;;
+    *) die "lid or sleep" ;;
+    esac
+    mkdir -p /etc/elogind/logind.conf.d
+    # the power button stays The Line's (acpid asks the shell): elogind leaves it alone
+    printf '# Written by The Line (Settings > Power & idle). The lock before a sleep comes from hypridle.\n[Login]\nHandlePowerKey=ignore\nHandleLidSwitch=%s\nHandleLidSwitchExternalPower=%s\nHandleSuspendKey=%s\n' \
+        "$lid" "$lid" "$key" > "$f"
+    pkill -HUP -x elogind-daemon 2>/dev/null || pkill -HUP -x elogind 2>/dev/null || true
+    ;;
 *)
-    die "usage: the-line-settings-helper hostname|timezone|ntp|time|charge-limit|face|face-pam ..."
+    die "usage: the-line-settings-helper hostname|timezone|ntp|time|charge-limit|face|face-pam|power-keys ..."
     ;;
 esac
