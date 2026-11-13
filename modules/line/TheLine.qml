@@ -216,16 +216,38 @@ Scope {
         WlrLayershell.namespace: "the-line-strut"
     }
 
+    // The surface is only a band at the top (the line, the tiles, a toast) while nothing needs the screen: a whole-screen
+    // surface that redraws once a second (the clock) makes the compositor recomposite it all, on every screen. Anything
+    // that draws below the band (panels, dialogs, the story, the visualiser, a one-off line of Kira, the resize ring, the
+    // lock's curtain) makes it the whole screen first, and it shrinks back once they are gone.
+    readonly property bool needsScreen: panelAnywhere || dialogHere || Welcome.active || UiState.resizing || UiState.unlocking
+        || UiState.frozen || Voice.eventActive || (Visualiser.on && !fullscreen) || Lock.locked
+    property bool wide: needsScreen
+    onNeedsScreenChanged: {
+        if (needsScreen) {
+            shrink.stop();
+            wide = true;
+        } else {
+            shrink.restart();
+        }
+    }
+    Timer {
+        id: shrink
+        interval: 900   // what is closing finishes its animation first
+        onTriggered: root.wide = root.needsScreen
+    }
+
     PanelWindow {
         id: win
 
         screen: root.modelData
         anchors {
             top: true
-            bottom: true
+            bottom: root.wide
             left: true
             right: true
         }
+        implicitHeight: 150
         exclusionMode: ExclusionMode.Ignore
         color: "transparent"
         WlrLayershell.namespace: "the-line"
