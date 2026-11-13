@@ -29,6 +29,9 @@ export DBUS_SYSTEM_BUS_ADDRESS=unix:path=/var/run/dbus/system_bus_socket
 mkdir -p "$XDG_RUNTIME_DIR" && chmod 700 "$XDG_RUNTIME_DIR"
 rm -f "$XDG_RUNTIME_DIR/pipewire-0.lock" "$XDG_RUNTIME_DIR/pipewire-0-manager.lock" "$XDG_RUNTIME_DIR/pulse/native" 2>/dev/null
 
+# The folder the wallpaper picker also reads: yours go here.
+mkdir -p "$HOME/Pictures/Wallpapers"
+
 # First run: your own Hyprland bits live in ~/.config/the-line/hypr/ (monitors, apps, custom).
 # If you come from Sleex, its monitor layout and app keybinds are copied over once.
 hypr="$HOME/.config/the-line/hypr"
