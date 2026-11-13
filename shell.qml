@@ -67,6 +67,33 @@ ShellRoot {
         UiState.toggle(focusedScreen(), panel);
     }
 
+    // A battery about to die: at 15 % a notification, at 10 % and 5 % an urgent one with a coral pulse along the line.
+    // Plugging in starts over.
+    property int batteryWarned: 100
+    function checkBattery() {
+        const d = UPower.displayDevice;
+        if (!(d?.isLaptopBattery ?? false))
+            return;
+        if (!UPower.onBattery) {
+            batteryWarned = 100;
+            return;
+        }
+        const pct = Math.round(d.percentage * 100);
+        const level = pct <= 5 ? 5 : pct <= 10 ? 10 : pct <= 15 ? 15 : 100;
+        if (level >= batteryWarned)
+            return;
+        batteryWarned = level;
+        if (level < 100)
+            Notifs.push("Battery", level <= 5 ? "Battery nearly empty" : "Battery low", pct + " % left. Plug in soon.", level <= 10 ? 2 : 1);
+    }
+    Connections {
+        target: UPower.displayDevice
+
+        function onPercentageChanged() {
+            root.checkBattery();
+        }
+    }
+
     // Easter egg: on a laptop, Kira says something when the charger is plugged in or pulled out.
     readonly property var pluggedLines: ["i've got the power.", "plugged in. unlimited power. almost.", "charging. feel the volts.", "back on the grid at {battery}."]
     readonly property var unpluggedLines: ["on battery. make it count.", "unplugged. every watt counts now.", "cord cut. we ride on {battery}.", "wireless mode. stay close to a socket."]
@@ -77,6 +104,7 @@ ShellRoot {
         function onOnBatteryChanged() {
             if (!(UPower.displayDevice?.isLaptopBattery ?? false))
                 return;
+            root.checkBattery();
             const lines = UPower.onBattery ? root.unpluggedLines : root.pluggedLines;
             Voice.say(lines[Math.floor(Math.random() * lines.length)], root.focusedScreen());
         }

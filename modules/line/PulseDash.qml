@@ -46,7 +46,7 @@ Item {
         y: 9
         width: dash.s - x
         height: 3
-        color: Theme.accent
+        color: LineState.pulseColor
     }
 
     // Phase 2, along the line, going back out.
@@ -56,7 +56,7 @@ Item {
         y: 9
         width: dash.hi(dash.len1) - dash.lo(-dash.dashLen)
         height: 3
-        color: Theme.accent
+        color: LineState.pulseColor
     }
 
     // Down the side.
@@ -66,7 +66,7 @@ Item {
         y: 10.5 + (dash.lo(dash.len1) - dash.len1)
         width: 3
         height: dash.hi(dash.len1 + dash.len2) - dash.lo(dash.len1)
-        color: Theme.accent
+        color: LineState.pulseColor
     }
 
     // Inward along the bottom.
@@ -76,6 +76,6 @@ Item {
         y: dash.bottomY - 1.5
         width: dash.hi(dash.total) - dash.lo(dash.len1 + dash.len2)
         height: 3
-        color: Theme.accent
+        color: LineState.pulseColor
     }
 }

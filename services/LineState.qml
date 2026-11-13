@@ -54,7 +54,11 @@ Singleton {
         hold.restart();
     }
 
-    function pulse(toTile) {
+    // The pulse's colour: the accent, or coral for something urgent (a battery about to die).
+    property color pulseColor: Theme.accent
+
+    function pulse(toTile, color) {
+        pulseColor = color ?? Theme.accent;
         pulseAnim.stop();
         pulseAround = toTile;
         pulseScreen = Hyprland.focusedMonitor?.name ?? "";

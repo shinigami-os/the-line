@@ -43,7 +43,7 @@ Singleton {
         const hushed = quiet && !(n.urgency === 2 && Config.dndUrgent);
         const toastable = n.urgency > 0 && !muted && !hushed && UiState.openPanel !== "tc";
         _pending = toastable ? n : null;
-        LineState.pulse(toastable && toast === null);
+        LineState.pulse(toastable && toast === null, n.urgency === 2 ? Theme.error : Theme.accent);
         if (toastable)
             showDelay.restart();
     }
