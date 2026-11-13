@@ -130,9 +130,9 @@ Singleton {
     }
     Connections {
         target: Time
-        function onNowChanged() {
+        function onTick() {
             root.tick();
-            if (Time.now.getSeconds() % 2 === 0 && !sensors.running)
+            if (Date.now() % 2000 < 1000 && !sensors.running)
                 sensors.running = true;
         }
     }

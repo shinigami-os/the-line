@@ -114,7 +114,7 @@ Tile {
             Row {
                 id: clockRow
 
-                readonly property string full: ClockFace.binary ? String(Math.floor(Time.now.getTime() / 1000)) : Qt.formatTime(Time.now, "HH:mm:ss")
+                readonly property string full: ClockFace.binary ? String(Math.floor(Time.now.getTime() / 1000)) : Qt.formatTime(Time.now, Time.seconds ? "HH:mm:ss" : "HH:mm")
                 readonly property int split: ClockFace.binary ? full.length - 2 : 5
 
                 anchors.verticalCenter: parent.verticalCenter
@@ -131,6 +131,7 @@ Tile {
                 Text {
                     anchors.top: mainTime.top
                     anchors.topMargin: 1
+                    visible: Time.seconds
                     text: clockRow.full.slice(clockRow.split + (ClockFace.binary ? 0 : 1))
                     font.family: Theme.fontMono
                     font.pixelSize: 9

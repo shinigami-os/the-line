@@ -22,6 +22,7 @@ Singleton {
     readonly property string primaryScreen: adapter.primaryScreen !== "" ? adapter.primaryScreen : (Quickshell.screens[0]?.name ?? "")
     readonly property bool workspaceIcons: adapter.workspaceIcons
     readonly property bool kiraVoice: adapter.kiraVoice
+    readonly property bool clockSeconds: adapter.clockSeconds
     readonly property real levelStep: adapter.levelStep
     readonly property int clipboardMax: adapter.clipboardMax
     readonly property bool clipboardImages: adapter.clipboardImages
@@ -186,6 +187,7 @@ Singleton {
             property bool clipboardImages: true            // keep copied images too
             property bool clipboardWipeOnLogin: false      // empty the history at each login
             property real levelStep: 2                     // % per press for volume, brightness, keyboard backlight
+            property bool clockSeconds: true               // seconds on the clock tile (off: the line redraws once a minute)
             property bool kiraVoice: true                  // Kira's quotes on an empty workspace, and her one-off lines
             property bool workspaceScrollInverted: false   // SUPER+scroll: scroll down for the next workspace
             property string wallpaper: root.shellRoot + "/assets/wallpapers/default.png"   // The Line's own; "" = leave it to another tool

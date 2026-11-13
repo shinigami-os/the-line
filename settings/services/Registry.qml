@@ -270,6 +270,8 @@ Singleton {
 
         { section: "line", group: "Levels", key: "levelStep", kind: "slider", min: 1, max: 10, step: 1, unit: "%",
           label: "Volume and brightness step", sub: "How much one key press changes", keywords: "volume brightness keyboard backlight keys" },
+        { section: "line", group: "Clock", key: "clockSeconds", kind: "toggle", label: "Seconds on the clock",
+          sub: "Off: the line and the tiles stay still between two minutes", keywords: "clock seconds time redraw battery performance idle" },
         { section: "line", group: "Kira", key: "kiraVoice", kind: "toggle", label: "Kira's voice",
           sub: "Her quotes on an empty workspace, and her one-off lines", keywords: "quotes voice text desktop" },
         { section: "line", group: "Clipboard", key: "clipboardMax", kind: "choice", label: "History size",

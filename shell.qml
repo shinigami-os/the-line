@@ -19,6 +19,8 @@ ShellRoot {
     Binding { target: Theme; property: "accent"; value: Config.accent }
     Binding { target: Anim; property: "scale"; value: Config.motionScale }
     Binding { target: Anim; property: "reduce"; value: Config.reduceMotion }
+    // (the binary clock face is made of seconds)
+    Binding { target: Time; property: "seconds"; value: Config.clockSeconds || ClockFace.binary }
 
     readonly property var screens: Quickshell.screens.filter(s => Config.screenFilter.length === 0 || Config.screenFilter.includes(s.name))
 

@@ -72,7 +72,7 @@ Singleton {
     Connections {
         target: Time
         enabled: root.playing
-        function onNowChanged() {
+        function onTick() {
             root.player.positionChanged();
         }
     }

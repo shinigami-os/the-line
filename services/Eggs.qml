@@ -34,7 +34,7 @@ Singleton {
     Connections {
         target: Time
 
-        function onNowChanged() {
+        function onTick() {
             const now = Time.now;
             const m = now.getHours() * 60 + now.getMinutes();
             if (m === root.lastMinute)

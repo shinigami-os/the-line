@@ -90,6 +90,7 @@ Item {
         color: Theme.text
     }
     Hand {
+        visible: Time.seconds
         width: 1
         length: clock.c * 0.86
         angle: clock.sec * 6
