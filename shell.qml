@@ -33,35 +33,6 @@ ShellRoot {
         return names.includes(focused) ? focused : names[0];
     }
 
-    // Something of the shell holds the keyboard (a panel, a dialog, a picker).
-    readonly property bool holdsKeys: UiState.openPanel !== "" || UiState.clipScreen !== "" || UiState.emojiScreen !== ""
-        || UiState.wallScreen !== "" || UiState.powerScreen !== "" || UiState.sheetScreen !== "" || Polkit.active
-    onHoldsKeysChanged: if (!holdsKeys) giveBackKeys.restart()
-
-    // When it lets go, Hyprland still counts the window under it as focused and does not send it the keyboard back
-    // (focusing that same window again is a no-op): the focus hops to another window and back, where nothing moves:
-    // a window on the same workspace, else another screen, else the last window.
-    Timer {
-        id: giveBackKeys
-        interval: 120
-        onTriggered: {
-            const win = Hyprland.activeToplevel;
-            if (!win || root.holdsKeys)
-                return;
-            const here = "address:0x" + win.address;
-            const ws = win.workspace;
-            const other = Hyprland.toplevels.values.find(t => t !== win && t.workspace === ws);
-            const screen = Hyprland.monitors.values.find(m => m !== Hyprland.focusedMonitor);
-            if (other)
-                Hyprland.dispatch(`hl.dsp.focus({ window = "address:0x${other.address}" })`);
-            else if (screen)
-                Hyprland.dispatch(`hl.dsp.focus({ monitor = "${screen.name}" })`);
-            else
-                Hyprland.dispatch("hl.dsp.focus({ last = true })");
-            Hyprland.dispatch(`hl.dsp.focus({ window = "${here}" })`);
-        }
-    }
-
     // Panels opened from the keyboard go to the focused screen.
     function toggleFocused(panel) {
         UiState.toggle(focusedScreen(), panel);

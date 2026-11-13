@@ -28,27 +28,8 @@ Scope {
     // itself is told (Welcome).
     readonly property bool storyHere: Welcome.active && (Welcome.scope === "all" || Welcome.screen === screenName)
     readonly property bool storyScreen: Welcome.active && Welcome.screen === screenName
-    // This screen's surface wants the keyboard (a panel or a dialog open here); keysTaken follows it a moment later.
+    // This screen's surface wants the keyboard (a panel or a dialog open here, or the story).
     readonly property bool keysHere: panelHere || dialogHere || storyScreen
-    property bool keysTaken: false
-
-    onKeysHereChanged: updateKeys()
-
-    // (also at creation: the first-login story is already running when the screens' surfaces appear)
-    Component.onCompleted: updateKeys()
-
-    function updateKeys() {
-        // one screen: no other surface to wait for
-        keysTaken = keysHere && Quickshell.screens.length === 1;
-        if (keysHere && !keysTaken)
-            takeKeys.restart();
-    }
-
-    Timer {
-        id: takeKeys
-        interval: 60
-        onTriggered: root.keysTaken = true
-    }
 
     // A fullscreen window on this screen's workspace. Going fullscreen runs in stages, one after the other:
     //   1. the music part leaves the workspace tile,  2. the three tiles fold up into the line,
@@ -223,12 +204,30 @@ Scope {
     readonly property bool needsScreen: panelAnywhere || dialogHere || Welcome.active || UiState.resizing || UiState.unlocking
         || UiState.frozen || Voice.eventActive || (Visualiser.on && !fullscreen) || Lock.locked
     property bool wide: needsScreen
-    onNeedsScreenChanged: {
+    onNeedsScreenChanged: updateWide()
+
+    // Giving the screen back resizes the surface, and for a few frames (about 65 ms) the compositor shows nothing of it:
+    // a blink of the line and the tiles. It must not happen under the eyes of someone who just closed a panel, so the
+    // surface stays whole until nobody has touched the keyboard or the pointer for a while.
+    IdleMonitor {
+        id: away
+        timeout: 20
+        respectInhibitors: false
+    }
+    Connections {
+        target: away
+        function onIsIdleChanged() {
+            root.updateWide();
+        }
+    }
+    function updateWide() {
         if (needsScreen) {
             shrink.stop();
             wide = true;
-        } else {
+        } else if (wide && away.isIdle) {
             shrink.restart();
+        } else {
+            shrink.stop();
         }
     }
     Timer {
@@ -253,12 +252,20 @@ Scope {
         WlrLayershell.namespace: "the-line"
         // Hyprland draws fullscreen windows over the top layer, so the line moves to the overlay layer meanwhile.
         WlrLayershell.layer: root.fullscreen || root.stage > 0 || UiState.unlocking || root.storyHere ? WlrLayer.Overlay : WlrLayer.Top
-        // While a surface holds the keyboard (exclusive), Hyprland sends clicks to such surfaces only: with a panel open,
-        // every screen's surface takes the keyboard, so a click on another screen still reaches its close area. The
-        // panel's own screen takes it a moment later (keysTaken), as Hyprland gives the keys to the last one.
-        // (during the welcome story every story screen takes the keyboard: Hyprland sends the keys to the pointer's screen)
-        WlrLayershell.keyboardFocus: (root.keysHere && root.keysTaken) || root.storyHere || (root.panelAnywhere && !root.keysHere && !Welcome.active)
-            ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
+        // The keyboard of a panel or a dialog comes from the focus grab below, not from an exclusive layer: Hyprland
+        // hands the window that had it back by itself when the grab ends, without moving the pointer or picking
+        // another window. Only the welcome story takes the keyboard for good (Hyprland sends the keys to the
+        // pointer's screen: every story screen takes it).
+        WlrLayershell.keyboardFocus: root.storyHere ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
+
+        // Same as the launcher and the overview of Sleex: while a panel or a dialog is open here, the surface holds the
+        // keyboard and the clicks; a click anywhere else (another screen) ends it, and closes the panel.
+        HyprlandFocusGrab {
+            windows: [win]
+            active: root.keysHere && !root.storyHere
+            onCleared: if (root.panelHere)
+                UiState.close()
+        }
 
         IdleInhibitor {
             window: win
