@@ -197,56 +197,16 @@ Scope {
         WlrLayershell.namespace: "the-line-strut"
     }
 
-    // The surface is only a band at the top (the line, the tiles, a toast) while nothing needs the screen: a whole-screen
-    // surface that redraws once a second (the clock) makes the compositor recomposite it all, on every screen. Anything
-    // that draws below the band (panels, dialogs, the story, the visualiser, a one-off line of Kira, the resize ring, the
-    // lock's curtain) makes it the whole screen first, and it shrinks back once they are gone.
-    readonly property bool needsScreen: panelAnywhere || dialogHere || Welcome.active || UiState.resizing || UiState.unlocking
-        || UiState.frozen || Voice.eventActive || (Visualiser.on && !fullscreen) || Lock.locked
-    property bool wide: needsScreen
-    onNeedsScreenChanged: updateWide()
-
-    // Giving the screen back resizes the surface, and for a few frames (about 65 ms) the compositor shows nothing of it:
-    // a blink of the line and the tiles. It must not happen under the eyes of someone who just closed a panel, so the
-    // surface stays whole until nobody has touched the keyboard or the pointer for a while.
-    IdleMonitor {
-        id: away
-        timeout: 20
-        respectInhibitors: false
-    }
-    Connections {
-        target: away
-        function onIsIdleChanged() {
-            root.updateWide();
-        }
-    }
-    function updateWide() {
-        if (needsScreen) {
-            shrink.stop();
-            wide = true;
-        } else if (wide && away.isIdle) {
-            shrink.restart();
-        } else {
-            shrink.stop();
-        }
-    }
-    Timer {
-        id: shrink
-        interval: 900   // what is closing finishes its animation first
-        onTriggered: root.wide = root.needsScreen
-    }
-
     PanelWindow {
         id: win
 
         screen: root.modelData
         anchors {
             top: true
-            bottom: root.wide
+            bottom: true
             left: true
             right: true
         }
-        implicitHeight: 150
         exclusionMode: ExclusionMode.Ignore
         color: "transparent"
         WlrLayershell.namespace: "the-line"

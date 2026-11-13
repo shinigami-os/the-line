@@ -11,12 +11,15 @@ import Quickshell.Io
 //   Floating one: it shrinks to 75% of its tiled size, centred where it was tiled, instead of filling the screen;
 //   or, for an app floated before, it goes back to that app's last size and place.
 //   The apps you float are remembered with their size and position (on their screen) as Hyprland window rules in
-//   ~/.config/the-line/hypr/floating.lua: their next window opens floating, in place. Tiling one again forgets it.
+//   ~/.config/the-line/hypr/floating.lua: their next window opens floating, in place. Tiling one again stops that
+//   (it opens tiled), but its last floating size and place are kept (sizes): floating it again brings them back.
 Singleton {
     id: root
 
     property var memory: ({})   // class -> { w, h, x, y } (x, y on the window's screen)
+    property var sizes: ({})    // class -> { w, h, x, y }: the last floating geometry of every app floated, tiled again or not
     property bool dirty: false
+    property string lastRules: ""
     // The Line's own windows with a fixed floating rule (session/hyprland.lua): never remembered over it.
     readonly property var fixed: ["the-line-settings"]
     readonly property string rulesPath: Quickshell.env("HOME") + "/.config/the-line/hypr/floating.lua"
@@ -37,11 +40,19 @@ Singleton {
                 mem = {};
             }
         }
-        if (mem[cls] === undefined)
+        let known = sizes;
+        try {
+            known = JSON.parse(sizeFile.text() || "{}");
+        } catch (e) {}
+        if (mem[cls] === undefined && known[cls] === undefined)
             return;
+        sizes = known;
         const m = Object.assign({}, mem);
         delete m[cls];
         memory = m;
+        const z = Object.assign({}, sizes);
+        delete z[cls];
+        sizes = z;
         save(true);
         maybeReload(cls);
     }
@@ -54,6 +65,14 @@ Singleton {
         const cls = win.class ?? "";
         const target = "window = \"address:" + win.address + "\"";
         if (win.floating) {
+            // its geometry now, for the next time it floats
+            if (cls !== "" && fixed.indexOf(cls) < 0) {
+                const fmon = monitorOf(win.monitor);
+                const z = Object.assign({}, sizes);
+                z[cls] = { w: win.size[0], h: win.size[1], x: win.at[0] - (fmon?.x ?? 0), y: win.at[1] - (fmon?.y ?? 0) };
+                sizes = z;
+                save(false);
+            }
             Hyprland.dispatch("hl.dsp.window.float({ action = \"disable\", " + target + " })");
             if (memory[cls] !== undefined) {
                 const m = Object.assign({}, memory);
@@ -65,7 +84,7 @@ Singleton {
         }
         const mon = monitorOf(win.monitor);
         const mx = mon?.x ?? 0, my = mon?.y ?? 0;
-        const known = memory[cls];
+        const known = memory[cls] ?? sizes[cls];
         const w = known ? known.w : Math.round(win.size[0] * 0.75);
         const h = known ? known.h : Math.round(win.size[1] * 0.75);
         const x = known ? mx + known.x : Math.round(win.at[0] + (win.size[0] - w) / 2);
@@ -77,6 +96,9 @@ Singleton {
             const m = Object.assign({}, memory);
             m[cls] = { w: w, h: h, x: x - mx, y: y - my };
             memory = m;
+            const z = Object.assign({}, sizes);
+            z[cls] = m[cls];
+            sizes = z;
             save(true);
         }
     }
@@ -95,9 +117,14 @@ Singleton {
             lines.push("hl.window_rule({ match = { class = \"" + pattern(cls) + "\" }, float = true, size = \""
                 + g.w + " " + g.h + "\", move = \"" + g.x + " " + g.y + "\" })");
         }
-        rules.setText(lines.join("\n") + "\n");
+        const text = lines.join("\n") + "\n";
+        if (text !== lastRules) {
+            lastRules = text;
+            rules.setText(text);
+            dirty = true;
+        }
         state.setText(JSON.stringify(memory));
-        dirty = true;
+        sizeFile.setText(JSON.stringify(sizes));
     }
 
     // Hyprland reads the rules when it loads its config: reload it when an app it should now remember closes.
@@ -146,6 +173,7 @@ Singleton {
                 } catch (e) {}
                 if (changed) {
                     root.memory = m;
+                    root.sizes = Object.assign({}, root.sizes, m);
                     root.save(false);
                 }
             }
@@ -177,6 +205,19 @@ Singleton {
                 root.memory = JSON.parse(text());
             } catch (e) {
                 root.memory = {};
+            }
+        }
+    }
+    FileView {
+        id: sizeFile
+        path: Quickshell.env("HOME") + "/.local/state/the-line/floating-sizes.json"
+        blockLoading: true
+        printErrors: false
+        onLoaded: {
+            try {
+                root.sizes = JSON.parse(text());
+            } catch (e) {
+                root.sizes = {};
             }
         }
     }
