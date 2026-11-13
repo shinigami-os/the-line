@@ -1,7 +1,7 @@
 <h1 align="center">The Line</h1>
 
 <p align="center">
-  <a href="docs/the-line-demo.mp4"><img src="docs/screenshots/hero.jpg" alt="The Line: a desktop shell built on one line. Click to watch the demo." width="900"></a>
+  <a href="https://kira-linux.com/watch"><img src="docs/screenshots/hero.jpg" alt="The Line: a desktop shell built on one line. Click to watch the demo." width="900"></a>
 </p>
 
 <p align="center">
@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="docs/the-line-demo.mp4"><b>▶ Watch the demo</b></a> (under 2 minutes, no sound needed)
+  <a href="https://kira-linux.com/watch"><b>▶ Watch the demo</b></a> (under 2 minutes, full screen, with its music)
   &nbsp;·&nbsp; <a href="#install">Install</a>
   &nbsp;·&nbsp; <a href="#a-tour">A tour</a>
   &nbsp;·&nbsp; <a href="#keys">Keys</a>
