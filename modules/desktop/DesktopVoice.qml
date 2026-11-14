@@ -18,15 +18,34 @@ PanelWindow {
         left: true
         bottom: true
     }
-    implicitWidth: Math.max(1, voice.width + 32)
-    implicitHeight: voice.height + 22 + 8
+    // A fixed size: a surface that resized with each quote made the compositor reconfigure it just as the workspace
+    // slid in (a visible hitch when going to an empty workspace).
+    implicitWidth: Math.max(1, (screen?.width ?? 1280) - 32)
+    implicitHeight: 100
     exclusionMode: ExclusionMode.Ignore
     color: "transparent"
     mask: Region {}
     WlrLayershell.layer: WlrLayer.Bottom
     WlrLayershell.namespace: "the-line-voice"
 
-    onActiveChanged: if (active) Voice.next()
+    // The new quote waits for the workspace to finish sliding in: laying it out during the slide made it hitch.
+    onActiveChanged: {
+        if (active) {
+            resting = true;
+            first.restart();
+        } else {
+            first.stop();
+        }
+    }
+
+    Timer {
+        id: first
+        interval: 400
+        onTriggered: {
+            Voice.next();
+            win.resting = false;
+        }
+    }
 
     Timer {
         running: win.active
