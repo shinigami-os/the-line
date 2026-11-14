@@ -30,7 +30,7 @@ Singleton {
         chargeLimit: "ChargeLimit.qml", appKeys: "AppKeys.qml", lineKeys: "LineKeys.qml", displayMap: "DisplayMap.qml",
         displayModes: "DisplayModes.qml", kbLayout: "LayoutPicker.qml", aboutCard: "AboutCard.qml",
         disks: "DiskList.qml", homeUsage: "HomeUsage.qml", defaultApp: "DefaultApp.qml", mutedApps: "MutedApps.qml",
-        iconTheme: "IconThemePicker.qml"
+        iconTheme: "IconThemePicker.qml", audioTest: "AudioTest.qml"
     })
 
     function isCustom(setting) {
@@ -214,12 +214,16 @@ Singleton {
           label: "Volume", sub: "The output's own volume", keywords: "loud sound level" },
         { section: "sound", group: "Output", source: "sound", key: "outputMuted", kind: "toggle", label: "Mute",
           sub: "Silences the output", keywords: "silence quiet" },
+        { section: "sound", group: "Output", key: "speakerTest", kind: "audioTest", label: "Test the speakers",
+          sub: "A tone on the left, then on the right, on the output in use", keywords: "speakers headphones test sound left right stereo check" },
         { section: "sound", group: "Input", source: "sound", key: "inputs", kind: "audioDevices", label: "Listens on",
           sub: "Enter picks the microphone", keywords: "microphone mic input device record" },
         { section: "sound", group: "Input", source: "sound", key: "inputVolume", kind: "slider", min: 0, max: 100, step: 2, unit: "%",
           label: "Input level", sub: "How loud the microphone is", keywords: "microphone gain level" },
         { section: "sound", group: "Input", source: "sound", key: "inputMuted", kind: "toggle", label: "Mute the microphone",
           sub: "Nothing is recorded", keywords: "microphone silence privacy" },
+        { section: "sound", group: "Input", key: "micTest", kind: "audioTest", label: "Test the microphone",
+          sub: "Records 5 seconds from the input in use and plays them back", keywords: "microphone mic test record check hear" },
         { section: "sound", group: "Apps", source: "sound", key: "streams", kind: "audioStreams", label: "Apps playing",
           sub: "Each app's own volume · ← → changes it", keywords: "app application volume mixer per-app" },
 
