@@ -223,7 +223,7 @@ Singleton {
         { section: "sound", group: "Input", source: "sound", key: "inputMuted", kind: "toggle", label: "Mute the microphone",
           sub: "Nothing is recorded", keywords: "microphone silence privacy" },
         { section: "sound", group: "Input", key: "micTest", kind: "audioTest", label: "Test the microphone",
-          sub: "Records 5 seconds from the input in use and plays them back", keywords: "microphone mic test record check hear" },
+          sub: "A live level bar of the input in use", keywords: "microphone mic test level meter check hear bar" },
         { section: "sound", group: "Apps", source: "sound", key: "streams", kind: "audioStreams", label: "Apps playing",
           sub: "Each app's own volume · ← → changes it", keywords: "app application volume mixer per-app" },
 

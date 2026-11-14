@@ -7,7 +7,7 @@ import Quickshell.Io
 import qs.services
 
 // Settings > Sound > Test the speakers / Test the microphone. Speakers: a tone on the left, then on the right, on
-// the output in use. Microphone: five seconds recorded from the input in use, then played back on the output in use.
+// the output in use. Microphone: a live level bar of the input in use (as in chat apps).
 // Enter (or a click) starts it, and stops it again.
 Item {
     id: test
@@ -18,10 +18,11 @@ Item {
     signal picked
 
     readonly property bool speakers: setting?.key === "speakerTest"
-    // "" idle, then "left" / "right" (speakers), "record" / "play" (microphone)
+    // "" idle, then "left" / "right" (speakers) or "listen" (microphone)
     property string step: ""
-    readonly property string recording: Quickshell.env("XDG_RUNTIME_DIR") + "/the-line-mic-test.wav"
-    property int remaining: 0
+    // the microphone's level, 0..1, as it is heard now, and the loudest of the last moments
+    property real level: 0
+    property real peak: 0
 
     implicitHeight: 34
 
@@ -30,13 +31,11 @@ Item {
             return "Playing on the left…";
         if (step === "right")
             return "Playing on the right…";
-        if (step === "record")
-            return "Recording, say something… " + remaining + " s";
-        if (step === "play")
-            return "Playing back what was recorded…";
+        if (step === "listen")
+            return "Say something…";
         if (!speakers && Sound.inputMuted)
             return "The microphone is muted: unmute it first";
-        return speakers ? "Play a sound on each side" : "Record 5 seconds and play them back";
+        return speakers ? "Play a sound on each side" : "Show what the microphone hears";
     }
 
     function tone(side) {
@@ -51,20 +50,18 @@ Item {
             step = "left";
             left.running = true;
         } else if (!Sound.inputMuted) {
-            step = "record";
-            remaining = 5;
-            record.running = true;
-            tick.restart();
+            step = "listen";
+            meter.running = true;
         }
     }
 
     function stop() {
         step = "";
-        tick.stop();
+        level = 0;
+        peak = 0;
         left.running = false;
         right.running = false;
-        record.running = false;
-        playback.running = false;
+        meter.running = false;
     }
 
     function key(event) {
@@ -91,32 +88,34 @@ Item {
         onExited: if (test.step === "right")
             test.step = ""
     }
-    // parecord writes a proper file when it is interrupted (SIGINT)
+
+    // The input in use, 8 kHz mono, in blocks of 40 ms; one line per block: its level, 0 to 100, above the room's own
+    // noise (the quietest of the last moments, which rises slowly), up to -8 dB.
     Process {
-        id: record
-        command: ["timeout", "-s", "INT", "5", "parecord", "--channels=1", "--file-format=wav", test.recording]
-        onExited: {
-            tick.stop();
-            if (test.step === "record") {
-                test.step = "play";
-                playback.running = true;
+        id: meter
+        command: ["sh", "-c", "parec --raw --format=s16le --rate=8000 --channels=1 --latency-msec=40 | python3 -u -c '"
+            + "import sys,array,math\n"
+            + "f=None\n"
+            + "while True:\n"
+            + " b=sys.stdin.buffer.read(640)\n"
+            + " if len(b)<640: break\n"
+            + " a=array.array(\"h\",b)\n"
+            + " m=sum(a)/len(a)\n"
+            + " r=math.sqrt(sum((x-m)**2 for x in a)/len(a))/32768\n"
+            + " d=20*math.log10(r) if r>0 else -90\n"
+            + " f=d if f is None else min(f+0.02,d)\n"
+            + " print(int(max(0,min(100,(d-f)/max(10,-8-f)*100))))\n"
+            + "'"]
+        stdout: SplitParser {
+            onRead: line => {
+                const v = parseInt(line) / 100;
+                // quick to rise, slow to fall
+                test.level = v > test.level ? v : test.level * 0.7 + v * 0.3;
+                test.peak = Math.max(v, test.peak - 0.01);
             }
         }
-    }
-    Process {
-        id: playback
-        command: ["paplay", test.recording]
-        onExited: {
-            if (test.step === "play")
-                test.step = "";
-            Quickshell.execDetached(["rm", "-f", test.recording]);
-        }
-    }
-    Timer {
-        id: tick
-        interval: 1000
-        repeat: true
-        onTriggered: test.remaining = Math.max(0, test.remaining - 1)
+        onExited: if (test.step === "listen")
+            test.stop()
     }
 
     ListLine {
@@ -129,6 +128,35 @@ Item {
         onClicked: {
             test.picked();
             test.start();
+        }
+
+        // the level bar: the sound as it is now, a tick on the loudest of the last moments
+        Item {
+            visible: test.step === "listen"
+            width: 260
+            height: 10
+
+            Rectangle {
+                anchors.fill: parent
+                color: Theme.surface
+                border.width: 1
+                border.color: Theme.border
+            }
+            Rectangle {
+                x: 1
+                y: 1
+                width: Math.max(0, (parent.width - 2) * test.level)
+                height: parent.height - 2
+                color: test.level > 0.92 ? Theme.error : Theme.accent
+            }
+            Rectangle {
+                x: 1 + (parent.width - 3) * test.peak
+                y: 1
+                width: 2
+                height: parent.height - 2
+                color: Theme.text
+                visible: test.peak > 0.02
+            }
         }
     }
 }
