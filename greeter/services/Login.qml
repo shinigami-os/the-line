@@ -190,7 +190,7 @@ Singleton {
         running: true
         command: ["sh", "-c", "cat /etc/passwd; echo '#last'; cat \"$1/last-user\" 2>/dev/null; echo; echo '#lastsession'; "
             + "cat \"$1/last-session\" 2>/dev/null; echo; for f in /usr/share/wayland-sessions/*.desktop; do [ -f \"$f\" ] || continue; "
-            + "echo '#session'; sed -n -e 's/^Name=/name=/p' -e 's/^Exec=/exec=/p' -e 's/^DesktopNames=/desktop=/p' \"$f\" | head -n 3; done",
+            + "echo '#session'; { cat \"$f\"; echo; } | sed -n -e 's/^Name=/name=/p' -e 's/^Exec=/exec=/p' -e 's/^DesktopNames=/desktop=/p' | head -n 3; done",
             "sh", root.stateDir]
         stdout: StdioCollector {
             onStreamFinished: {
