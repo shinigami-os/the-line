@@ -11,15 +11,29 @@ Singleton {
     id: root
 
     property var all: []      // { char, group, name }
+    property var byChar: ({})
     property var recent: []   // chars, most recent first
+
+    // Recent ones first (those that still exist), then everything else.
+    readonly property var defaultList: {
+        if (all.length === 0)
+            return [];
+        const seen = {};
+        const rec = [];
+        for (const c of recent) {
+            if (byChar[c]) {
+                rec.push(byChar[c]);
+                seen[c] = true;
+            }
+        }
+        return rec.concat(all.filter(e => !seen[e.char]));
+    }
 
     // Every word of the query in the name; nothing typed: the recent ones, then everything.
     function search(query) {
         const words = query.trim().toLowerCase().split(/\s+/).filter(w => w !== "");
-        if (words.length === 0) {
-            const rec = recent.map(c => all.find(e => e.char === c)).filter(e => e);
-            return rec.concat(all.filter(e => !recent.includes(e.char)));
-        }
+        if (words.length === 0)
+            return defaultList;
         return all.filter(e => words.every(w => e.name.includes(w) || e.group.startsWith(w)));
     }
 
@@ -30,12 +44,17 @@ Singleton {
     }
 
     FileView {
-        path: Qt.resolvedUrl("../assets/emoji.txt").toString().replace("file://", "")
+        // read the first time the picker opens, not at login
+        path: UiState.emojiScreen !== "" || root.all.length > 0 ? Qt.resolvedUrl("../assets/emoji.txt").toString().replace("file://", "") : ""
         onLoaded: {
+            const map = {};
             root.all = text().split("\n").filter(l => l !== "" && !l.startsWith("#")).map(l => {
                 const f = l.split("\t");
-                return { char: f[0], group: f[1], name: f[2] ?? "" };
+                const item = { char: f[0], group: f[1], name: f[2] ?? "" };
+                map[item.char] = item;
+                return item;
             });
+            root.byChar = map;
         }
     }
 

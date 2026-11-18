@@ -78,10 +78,9 @@ Singleton {
         return out;
     }
 
-    readonly property var lines: paragraphs(current.id)
 
     FileView {
-        path: Qt.resolvedUrl("../assets/story.txt").toString().replace("file://", "")
+        path: root.active ? Qt.resolvedUrl("../assets/story.txt").toString().replace("file://", "") : ""
         watchChanges: true
         printErrors: false
         onFileChanged: reload()

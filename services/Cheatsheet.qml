@@ -624,6 +624,4 @@ Singleton {
             }
         }
     }
-
-    Component.onCompleted: refresh()
 }

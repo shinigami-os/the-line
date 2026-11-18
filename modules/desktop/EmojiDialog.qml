@@ -12,7 +12,7 @@ CenterDialog {
     readonly property int columns: 12
     readonly property real cell: 44
     property int selected: 0
-    readonly property var shown: Emoji.search(search.text)
+    readonly property var shown: visible ? Emoji.search(search.text) : []
 
     open: UiState.emojiScreen === screenName
     boxWidth: 40 + columns * cell

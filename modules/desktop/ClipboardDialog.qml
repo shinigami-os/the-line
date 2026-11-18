@@ -11,6 +11,8 @@ CenterDialog {
 
     property int selected: 0
     readonly property var shown: {
+        if (!visible)
+            return [];
         const q = search.text.trim().toLowerCase();
         return q === "" ? Clipboard.entries : Clipboard.entries.filter(e => e.text.toLowerCase().includes(q) || (e.image && e.image.format.includes(q)));
     }
@@ -199,6 +201,7 @@ CenterDialog {
                                 asynchronous: true
                                 cache: false
                                 sourceSize.width: 192
+                                sourceSize.height: 112
                             }
                         }
                         Text {

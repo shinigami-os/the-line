@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Shapes
 import TheLine.Ui
 import qs.services
 
@@ -11,7 +12,7 @@ CenterDialog {
 
     property int tab: 0
     readonly property var tabs: Cheatsheet.tabs
-    readonly property var groups: tabs[Math.min(tab, tabs.length - 1)]?.groups ?? []
+    readonly property var groups: visible ? (tabs[Math.min(tab, tabs.length - 1)]?.groups ?? []) : []
 
     // Groups shared out over three columns, each going to the shortest one.
     readonly property var columns: {
@@ -259,19 +260,23 @@ CenterDialog {
                                                 color: Theme.text
                                             }
 
-                                            Row {
+                                            // the dotted leader: one dashed line, not a rectangle per dot
+                                            Shape {
                                                 x: row.descEnd + 6
                                                 y: 10
-                                                spacing: 3
+                                                width: Math.max(0, row.width - keyCol.implicitWidth - row.descEnd - 14)
+                                                height: 1
 
-                                                Repeater {
-                                                    model: Math.max(0, Math.floor((row.width - keyCol.implicitWidth - row.descEnd - 14) / 4))
+                                                ShapePath {
+                                                    strokeWidth: 1
+                                                    strokeColor: Theme.borderStrong
+                                                    fillColor: "transparent"
+                                                    strokeStyle: ShapePath.DashLine
+                                                    dashPattern: [1, 3]
 
-                                                    Rectangle {
-                                                        width: 1
-                                                        height: 1
-                                                        color: Theme.borderStrong
-                                                    }
+                                                    startX: 0
+                                                    startY: 0.5
+                                                    PathLine { x: Math.max(0, row.width - keyCol.implicitWidth - row.descEnd - 14); y: 0.5 }
                                                 }
                                             }
                                         }
