@@ -7,7 +7,7 @@ import qs.services
 
 // Settings > Shortcuts > Your app keys: the apps of ~/.config/the-line/hypr/apps.lua and their keys, then
 // "+ add an app key": type an app's name, Enter, then press its keys.
-// Keyboard: ↑↓ lines · Enter gives new keys · Delete removes the key (the app stays installed).
+// Keyboard: ↑↓ lines · Enter gives new keys · Delete or Backspace removes the key (the app stays installed).
 Item {
     id: apps
 
@@ -101,7 +101,7 @@ Item {
                 listen(cursor);
             return true;
         }
-        if (k === Qt.Key_Delete && cursor < list.length) {
+        if ((k === Qt.Key_Delete || k === Qt.Key_Backspace) && cursor < list.length) {
             Binds.removeApp(list[cursor]);
             return true;
         }
@@ -158,14 +158,23 @@ Item {
                         visible: line.listeningHere
                     }
                     Text {
+                        id: removeText
+
                         visible: line.under && !line.listeningHere
                         anchors.verticalCenter: parent.verticalCenter
                         text: "Del remove"
                         font.family: Theme.fontMono
                         font.pixelSize: 10
-                        color: Theme.muted
+                        color: removeHover.hovered ? Theme.error : Theme.muted
 
+                        HoverHandler {
+                            id: removeHover
+                            cursorShape: Qt.PointingHandCursor
+                        }
+                        // a hit area wider than the words, so it is easy to click (the line itself gives new keys)
                         TapHandler {
+                            margin: 8
+                            gesturePolicy: TapHandler.ReleaseWithinBounds
                             onTapped: Binds.removeApp(line.modelData)
                         }
                     }
