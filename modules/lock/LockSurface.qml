@@ -98,7 +98,7 @@ Item {
             y: -surface.lineY
             width: surface.width
             height: surface.height
-            source: Lock.captureOf(surface.screenName)
+            source: parent.visible ? Lock.captureOf(surface.screenName) : ""
             asynchronous: false
             cache: false
         }

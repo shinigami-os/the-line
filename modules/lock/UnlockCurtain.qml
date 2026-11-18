@@ -48,10 +48,14 @@ Item {
         height: curtain.lineY
         clip: true
 
-        LockBackdrop {
+        // Only while there is something to hand over: the blurred wallpaper costs a decode and its buffers.
+        Loader {
+            active: Lock.locked || UiState.unlocking || curtain.rise < 1
             width: curtain.width
             height: curtain.height
-            screenName: curtain.screenName
+            sourceComponent: LockBackdrop {
+                screenName: curtain.screenName
+            }
         }
     }
 

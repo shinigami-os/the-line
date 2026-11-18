@@ -69,7 +69,7 @@ Tile {
     // The shell's own tools: a few under the apps, all of them with ":".
     readonly property var tools: kind !== "tl" ? [] : prefix === ":" ? Tools.search(rest, maxRows)
         : prefix === "" ? Tools.search(query, query.trim() === "" ? 4 : 2) : []
-    readonly property var apps: prefix !== "" || egg ? [] : Apps.search(query, Math.max(2, maxRows - (showCalc ? 1 : 0) - sections.length - tools.length))
+    readonly property var apps: kind !== "tl" || prefix !== "" || egg ? [] : Apps.search(query, Math.max(2, maxRows - (showCalc ? 1 : 0) - sections.length - tools.length))
     readonly property bool showRun: !egg && ((prefix === ">" && rest !== "")
         || (prefix === "" && query.trim() !== "" && apps.length === 0 && sections.length === 0 && tools.length === 0 && !showCalc))
     readonly property var results: {
@@ -213,7 +213,8 @@ Tile {
                     required property int index
                     readonly property int n: index + 1
                     readonly property bool active: n === tile.workspace
-                    readonly property bool busy: tile.occupied(n)
+                    readonly property var ws: Hyprland.workspaces.values.find(w => w.id === n)
+                    readonly property bool busy: !!ws && ws.toplevels.values.length > 0
 
                     width: Geometry.wsCell
                     height: 20
@@ -229,8 +230,7 @@ Tile {
                     readonly property string iconName: {
                         if (!Config.workspaceIcons || !cell.busy)
                             return "";
-                        const ws = Hyprland.workspaces.values.find(w => w.id === cell.n);
-                        const cls = ws?.toplevels?.values?.[0]?.lastIpcObject?.class ?? "";
+                        const cls = cell.ws?.toplevels?.values?.[0]?.lastIpcObject?.class ?? "";
                         const name = cls === "" ? "" : (DesktopEntries.heuristicLookup(cls)?.icon ?? "");
                         // An icon the theme doesn't have: keep the numeral.
                         return name !== "" ? Quickshell.iconPath(name, true) : "";
@@ -466,7 +466,7 @@ Tile {
             Connections {
                 target: tile
                 function onKindChanged() {
-                    if (tile.kind !== "tw")
+                    if (tile.kind !== "tw" && overviewPanel.active)
                         overviewLinger.restart();
                 }
             }

@@ -44,7 +44,9 @@ Item {
         readonly property int gap: 6
         readonly property int half: Math.floor(line.lineWidth / 2 / gap)
 
-        anchors.fill: parent
+        // only the strip the bars are drawn in, not a backing store the size of the screen
+        width: parent.width
+        height: 12 + Theme.tileHeight
         visible: opacity > 0
         opacity: line.spectrumShown && Visualiser.on ? 1 : 0
 
