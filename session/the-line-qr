@@ -1,13 +1,13 @@
 #!/bin/sh
-# QR code scanner, SHIFT+Print: pick an area of the screen with a QR code (or any bar code) in it; what it says is copied
-# to the clipboard and shown in a notification. A link is only copied, never opened for you.
+# QR code scanner, SHIFT+Print: pick an area of the screen with a QR code in it; what it says is copied to the clipboard
+# and shown in a notification. A link is only copied, never opened for you. Decoded with OpenCV (py3-opencv).
 
 notify() {
     notify-send -a "QR code" -i camera-photo "$1" "$2" 2>/dev/null
 }
 
-if ! command -v zbarimg >/dev/null 2>&1; then
-    notify "Can't scan" "zbar isn't installed."
+if ! python3 -c "import cv2" 2>/dev/null; then
+    notify "Can't scan" "py3-opencv isn't installed."
     exit 1
 fi
 
@@ -20,7 +20,26 @@ shot="$dir/qr-$$.png"
 trap 'rm -f "$shot"' EXIT
 
 grim -g "$area" "$shot" || exit 1
-result=$(zbarimg --raw -q "$shot" 2>/dev/null)
+result=$(python3 - "$shot" <<'PY'
+import sys
+import cv2
+
+img = cv2.imread(sys.argv[1])
+if img is None:
+    sys.exit(0)
+detector = cv2.QRCodeDetector()
+found = []
+# as it is, then grown (a small code on a big screen) and in grey with a border (a code cut close to its edge)
+grey = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+for candidate in (img, cv2.resize(img, None, fx=2, fy=2, interpolation=cv2.INTER_CUBIC),
+                  cv2.copyMakeBorder(grey, 40, 40, 40, 40, cv2.BORDER_CONSTANT, value=255)):
+    ok, texts, _, _ = detector.detectAndDecodeMulti(candidate)
+    found = [t for t in (texts if ok else []) if t]
+    if found:
+        break
+print("\n".join(dict.fromkeys(found)))
+PY
+)
 
 if [ -z "$result" ]; then
     notify "No QR code found" "Select the code with some room around it."
