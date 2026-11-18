@@ -297,6 +297,7 @@ bind("XF86AudioPrev", hl.dsp.exec_cmd("playerctl previous"), { locked = true, de
 bind("Print", hl.dsp.exec_cmd("grim - | wl-copy"), { locked = true, desc = "Screenshots and tools: Screenshot to the clipboard" })
 bind("SUPER+SHIFT+S", hl.dsp.exec_cmd(SHELL .. "/session/the-line-shot"), { desc = "Screenshots and tools: Screenshot (Flameshot, on this screen)" })
 bind("CTRL+Print", hl.dsp.exec_cmd("grim -g \"$(slurp)\" - | tesseract - - | wl-copy"), { desc = "Screenshots and tools: Text from an area (OCR) to the clipboard" })
+bind("SHIFT+Print", hl.dsp.exec_cmd(SHELL .. "/session/the-line-qr"), { desc = "Screenshots and tools: Scan a QR code on the screen (copied)" })
 bind("ALT+Print", hl.dsp.exec_cmd("hyprpicker -a"), { desc = "Screenshots and tools: Colour picker to the clipboard" })
 bind("SUPER+ALT+R", hl.dsp.exec_cmd(SHELL .. "/session/the-line-record"), { desc = "Screenshots and tools: Record an area (again to stop)" })
 
@@ -382,6 +383,10 @@ load_user("input")      -- written by The Line from config.json (Settings > Inpu
 load_user("apps")
 -- The settings app floats at the size it is drawn for, centred.
 hl.window_rule({ match = { class = "^(the-line-settings)$" }, float = true, size = "1120 740" })
+-- howdy's "Identifying you... Scanned 15 frames" window (howdy-gtk, opened by the face scan on the lock screen): never
+-- seen, never focused. Its title is translated by howdy, so the class howdy gives it is matched too.
+hl.window_rule({ match = { title = "^Howdy Authentication" }, float = true, opacity = "0 override 0 override", no_anim = true, no_focus = true, no_shadow = true, no_blur = true, border_size = 0, move = "-4000 -4000" })
+hl.window_rule({ match = { class = "^(howdy-gtk|init\\.py)$" }, float = true, opacity = "0 override 0 override", no_anim = true, no_focus = true, no_shadow = true, no_blur = true, border_size = 0, move = "-4000 -4000" })
 load_user("floating")   -- written by The Line: the apps you float, where you left them
 load_user("workspaces") -- written by The Line from config.json: apps that open on their workspace
 load_user("custom")

@@ -1,0 +1,31 @@
+#!/bin/sh
+# QR code scanner, SHIFT+Print: pick an area of the screen with a QR code (or any bar code) in it; what it says is copied
+# to the clipboard and shown in a notification. A link is only copied, never opened for you.
+
+notify() {
+    notify-send -a "QR code" -i camera-photo "$1" "$2" 2>/dev/null
+}
+
+if ! command -v zbarimg >/dev/null 2>&1; then
+    notify "Can't scan" "zbar isn't installed."
+    exit 1
+fi
+
+area=$(slurp) || exit 0
+[ -n "$area" ] || exit 0
+
+dir="${XDG_RUNTIME_DIR:-/tmp}/the-line"
+mkdir -p "$dir"
+shot="$dir/qr-$$.png"
+trap 'rm -f "$shot"' EXIT
+
+grim -g "$area" "$shot" || exit 1
+result=$(zbarimg --raw -q "$shot" 2>/dev/null)
+
+if [ -z "$result" ]; then
+    notify "No QR code found" "Select the code with some room around it."
+    exit 0
+fi
+
+printf '%s' "$result" | wl-copy
+notify "Copied" "$result"

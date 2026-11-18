@@ -85,6 +85,7 @@ hyprpicker    the colour picker
 flameshot     screenshots with annotations
 wf-recorder   screen recording
 tesseract     text from a screenshot (OCR)
+zbarimg       the QR code scanner (package zbar)
 yazi          the file manager in the terminal
 voxel         the graphical file manager (package kira-voxel on Kira, github.com/AxOS-project/Voxel elsewhere)
 howdy         face sign-in
