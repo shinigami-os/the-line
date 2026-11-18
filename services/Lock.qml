@@ -10,7 +10,8 @@ import Quickshell.Services.Pam
 // can start from what was on it, then the session lock is taken. PAM runs as soon as it is up: with face sign-in on, howdy tries
 // first and says so; then it asks for the password, typed on the line.
 //   phase  ""  →  "locking" (the line glides down)  →  "locked"  →  "unlocking" (accent fills the line)  →  ""
-// A face or a fingerprint first (Config.unlockBiometrics, a button on the lock screen): the lock then asks PAM with the
+// A face or a fingerprint first, only when asked for in this lock (a button on the lock screen, Tab: every lock starts
+// with it off, so the camera isn't lit the moment the screen locks): the lock then asks PAM with the
 // stack "the-line" (session/the-line-pam), three runs at most per lock, after that "the-line-password": the password only.
 // While locked, $XDG_RUNTIME_DIR/the-line/locked exists: a shell that starts again after a crash locks again at once
 // (Hyprland keeps the session locked meanwhile: misc:allow_session_lock_restore).
@@ -38,7 +39,8 @@ Singleton {
     property bool restarting: false
     property bool bioRun: false      // the run going now tries it
     readonly property bool bioAvailable: bioKinds.length > 0
-    readonly property bool bioOn: Config.unlockBiometrics && bioAvailable
+    property bool bioArmed: false    // asked for in this lock; off again at every lock
+    readonly property bool bioOn: bioArmed && bioAvailable
     // the three tries are used up (the third one, while it runs, still counts as a try)
     readonly property bool bioSpent: bioOn && bioTries >= bioMax && !bioRun
     readonly property string bioName: bioKinds.join(" or ")
@@ -79,6 +81,7 @@ Singleton {
         messageIsError = false;
         failures = 0;
         bioTries = 0;
+        bioArmed = false;
         waiting = false;
         phase = "locking";
         locked = true;
@@ -154,12 +157,12 @@ Singleton {
         }
     }
 
-    // The button on the lock screen (and Tab): face / fingerprint on or off, from now on. The run that is going is ended
+    // The button on the lock screen (and Tab): face / fingerprint on or off, for this lock. The run that is going is ended
     // and a new one started with the other stack. Turning it on gives the three tries back.
     function toggleBiometrics() {
         if (!bioAvailable || waiting || phase === "unlocking")
             return;
-        Config.set("unlockBiometrics", !Config.unlockBiometrics);
+        bioArmed = !bioArmed;
         bioTries = 0;
         message = "";
         messageIsError = false;

@@ -181,8 +181,6 @@ Singleton {
 
         { section: "signin", group: "Your face", source: "sys", key: "faces", kind: "faces", label: "Faces",
           sub: "Recorded with howdy · Delete removes one", keywords: "howdy face camera record ir" },
-        { section: "signin", group: "Your face", key: "unlockBiometrics", kind: "toggle", label: "Unlock the screen with your face or fingerprint",
-          sub: "Three tries, then only the password · also a button on the lock screen", keywords: "howdy lock unlock face fingerprint biometrics tries" },
         { section: "signin", group: "Your face", source: "sys", key: "faceGreetd", kind: "toggle", label: "Log in with your face",
           sub: "On the login screen, before the password", keywords: "howdy login greeter face" },
         { section: "signin", group: "Fingerprint", source: "sys", key: "fingerprint", kind: "info", label: "Fingerprint reader",

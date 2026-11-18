@@ -162,7 +162,7 @@ optional:
 { "accent": "#9A5CFF", "accentFromWallpaper": false, "reduceMotion": false, "motionScale": 1.0,
   "terminal": "foot", "primaryScreen": "", "wallpaper": "…/default.png", "wallpapers": { "DP-2": "/path/to/own.mp4" },
   "wallpaperStillOnBattery": true, "workspaceIcons": false, "kiraVoice": true, "levelStep": 2,
-  "clipboardMax": 200, "clipboardImages": true, "clipboardWipeOnLogin": false, "unlockBiometrics": false }
+  "clipboardMax": 200, "clipboardImages": true, "clipboardWipeOnLogin": false }
 ```
 
 ## Under the hood

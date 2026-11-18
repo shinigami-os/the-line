@@ -300,7 +300,7 @@ Item {
         Item {
             id: bio
 
-            readonly property string state: !Config.unlockBiometrics ? "off" : Lock.bioSpent ? "password only" : "on"
+            readonly property string state: !Lock.bioOn ? "off" : Lock.bioSpent ? "password only" : "on"
 
             visible: Lock.bioAvailable
             anchors.horizontalCenter: parent.horizontalCenter

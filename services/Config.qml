@@ -58,7 +58,6 @@ Singleton {
     readonly property string nightTo: adapter.nightTo
     readonly property string iconTheme: adapter.iconTheme
     readonly property bool pulseFocusedOnly: adapter.pulseFocusedOnly
-    readonly property bool unlockBiometrics: adapter.unlockBiometrics
 
     // "22:00" to "08:00" holds `now` (a Date), across midnight too.
     function within(from, to, now) {
@@ -234,7 +233,6 @@ Singleton {
             property bool dndScheduled: false               // do not disturb from dndFrom to dndTo, every day
             property string dndFrom: "22:00"
             property string dndTo: "08:00"
-            property bool unlockBiometrics: false           // the lock screen tries a face / fingerprint first (three tries a lock)
             property bool pulseFocusedOnly: false           // the notification pulse and toast on the focused screen only
             property bool dndUrgent: true                   // urgent notifications still show during do not disturb
             property int nightTemp: 4000                    // night light warmth, in kelvin (lower is warmer)
