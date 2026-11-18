@@ -23,7 +23,7 @@ Scope {
     // A dialog from the line (polkit) is open on this screen: it takes the keyboard and every click.
     readonly property bool dialogHere: (Polkit.active && Polkit.screen === screenName) || UiState.sheetScreen === screenName
         || UiState.powerScreen === screenName || UiState.clipScreen === screenName || UiState.emojiScreen === screenName
-        || UiState.wallScreen === screenName
+        || UiState.appsScreen === screenName || UiState.wallScreen === screenName
     // The welcome story: on every screen it runs on (all of them on a first login), and on its own screen the story
     // itself is told (Welcome).
     readonly property bool storyHere: Welcome.active && (Welcome.scope === "all" || Welcome.screen === screenName)
@@ -421,6 +421,11 @@ Scope {
             }
 
             EmojiDialog {
+                anchors.fill: parent
+                screenName: root.screenName
+            }
+
+            AppsDialog {
                 anchors.fill: parent
                 screenName: root.screenName
             }

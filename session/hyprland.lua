@@ -267,6 +267,7 @@ bind("SUPER+F1", hl.dsp.global("the-line:cheatsheet"), { desc = "The Line: every
 bind("SUPER+V", hl.dsp.global("the-line:clipboard"), { desc = "The Line: clipboard history" })
 bind("SUPER+T", hl.dsp.global("the-line:wallpapers"), { desc = "The Line: wallpaper picker" })
 bind("SUPER+M", hl.dsp.global("the-line:visualiser"), { desc = "The Line: music visualiser on the line (again to stop)" })
+bind("SUPER+SHIFT+A", hl.dsp.global("the-line:apps"), { desc = "The Line: every installed app" })
 bind("SUPER+semicolon", hl.dsp.global("the-line:emoji"), { desc = "The Line: emoji picker" })
 bind("SUPER+I", hl.dsp.exec_cmd(SHELL .. "/session/the-line-settings"), { desc = "The Line: settings" })
 bind("CTRL+ALT+Delete", hl.dsp.global("the-line:power"), { desc = "The Line: power menu" })

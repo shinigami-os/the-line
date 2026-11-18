@@ -223,6 +223,11 @@ ShellRoot {
         onPressed: Visualiser.toggle()
     }
     Shortcut {
+        name: "apps"
+        description: "Every installed app"
+        onPressed: root.toggleDialog("appsScreen")
+    }
+    Shortcut {
         name: "emoji"
         description: "Emoji picker"
         onPressed: root.toggleDialog("emojiScreen")
@@ -349,6 +354,10 @@ ShellRoot {
 
         function clipboard(): void {
             root.toggleDialog("clipScreen");
+        }
+
+        function apps(): void {
+            root.toggleDialog("appsScreen");
         }
 
         function emoji(): void {

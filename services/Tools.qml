@@ -26,6 +26,8 @@ Singleton {
           keywords: "background picture image", run: s => root.dialog("wallScreen", s) },
         { id: "clipboard", name: "Clipboard history", about: "what you copied", bind: "The Line: clipboard history",
           keywords: "copy paste", run: s => root.dialog("clipScreen", s) },
+        { id: "apps", name: "Every app", about: "all that is installed, to launch", bind: "The Line: every installed app",
+          keywords: "applications installed list grid launcher", run: s => root.dialog("appsScreen", s) },
         { id: "emoji", name: "Emoji", about: "pick one, it is copied", bind: "The Line: emoji picker",
           keywords: "smiley symbol", run: s => root.dialog("emojiScreen", s) },
         { id: "visualiser", name: "Music visualiser", about: "the frequencies on the line", bind: "The Line: music visualiser on the line (again to stop)",

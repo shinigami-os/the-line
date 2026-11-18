@@ -43,10 +43,14 @@ Singleton {
         return s > 0 ? s + Math.min(15, Math.log2(1 + (counts[e.app.id] ?? 0)) * 3) : 0;
     }
 
-    function search(query, limit) {
+    // A to Z, for the viewer of every app.
+    readonly property var byName: all.slice().sort((a, b) => a.name.localeCompare(b.name))
+
+    // `alphabetical`: an empty search gives every app A to Z (the viewer) and not the most used first (the launcher).
+    function search(query, limit, alphabetical) {
         const q = query.trim().toLowerCase();
         if (q === "")
-            return byUse.slice(0, limit);
+            return (alphabetical ? byName : byUse).slice(0, limit);
         return index.map(e => ({ app: e.app, s: score(e, q) })).filter(x => x.s > 0).sort((a, b) => b.s - a.s || a.app.name.localeCompare(b.app.name)).slice(0, limit).map(x => x.app);
     }
 
