@@ -93,6 +93,15 @@ Singleton {
         UiState.close();
     }
 
+    // Swiped away in the list: gone without its action, and the panel stays open.
+    function dismiss(id) {
+        const n = list.find(x => x.id === id);
+        if (!n)
+            return;
+        n.ref?.dismiss();
+        list = list.filter(x => x.id !== id);
+    }
+
     function forget(ref) {
         list = list.filter(x => x.ref !== ref);
     }

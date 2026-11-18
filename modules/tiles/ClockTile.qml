@@ -430,6 +430,34 @@ Tile {
                             onTapped: Notifs.activate(card.modelData.id)
                         }
 
+                        // Swipe it sideways to dismiss it (no action taken): past a third of its width it leaves, else it
+                        // slides back. Only here, in the list: the toast on the line has no swipe.
+                        DragHandler {
+                            id: swipe
+                            target: card
+                            xAxis.enabled: true
+                            yAxis.enabled: false
+                            onActiveChanged: {
+                                if (active)
+                                    return;
+                                if (Math.abs(card.x) > card.width / 3) {
+                                    card.leaving = true;
+                                    card.x = card.x < 0 ? -card.width * 1.1 : card.width * 1.1;
+                                } else {
+                                    card.x = 0;
+                                }
+                            }
+                        }
+                        property bool leaving: false
+                        Behavior on x {
+                            enabled: !swipe.active
+                            NumberAnimation {
+                                duration: Anim.base
+                                easing.type: Anim.easing
+                                onRunningChanged: if (!running && card.leaving) Notifs.dismiss(card.modelData.id)
+                            }
+                        }
+
                         Column {
                             id: cardCol
                             x: 10
