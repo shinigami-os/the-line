@@ -388,8 +388,11 @@ Singleton {
                     // while a change waits, or is only drawn, the plan stays what was asked
                     if (!root.pending) {
                         const keepPlan = root.dirty && !root.resync;
-                        root.live = list;
-                        if (!keepPlan)
+                        // the same list again would rebuild every screen's delegates (and cancel a drag in progress)
+                        const same = JSON.stringify(list) === JSON.stringify(root.live);
+                        if (!same)
+                            root.live = list;
+                        if (!keepPlan && (!same || root.resync))
                             root.screens = list;
                         root.resync = false;
                     }

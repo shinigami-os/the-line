@@ -129,8 +129,10 @@ Singleton {
                     if (!prev || n.active || (!prev.active && n.signal > prev.signal))
                         best[n.ssid] = n;
                 }
-                root.networks = Object.values(best).map(n => Object.assign(n, { known: root.known.indexOf(n.ssid) >= 0 }))
+                const next = Object.values(best).map(n => Object.assign(n, { known: root.known.indexOf(n.ssid) >= 0 }))
                     .sort((a, b) => (b.active - a.active) || (b.known - a.known) || (b.signal - a.signal));
+                if (JSON.stringify(next) !== JSON.stringify(root.networks))
+                    root.networks = next;
             }
         }
     }

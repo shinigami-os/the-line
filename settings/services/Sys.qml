@@ -154,7 +154,9 @@ Singleton {
                     : /Fingerprints for user/i.test(v.fingerprint ?? "") ? "ready" : "not available";
                 try {
                     const models = JSON.parse(v.faces || "[]");
-                    root.faces = models.map(m => ({ id: m.id, label: m.label, time: m.time }));
+                    const next = models.map(m => ({ id: m.id, label: m.label, time: m.time }));
+                    if (JSON.stringify(next) !== JSON.stringify(root.faces))
+                        root.faces = next;
                 } catch (e) {
                     root.faces = [];
                 }

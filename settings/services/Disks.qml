@@ -58,11 +58,13 @@ Singleton {
                         const mount = (p.mountpoints ?? []).filter(x => x).sort((a, b) => a.length - b.length)[0] ?? "";
                         return { name: p.name, label: p.label ?? "", fstype: p.fstype ?? "", size: p.size, mount: mount, used: mount !== "" ? used[mount] ?? -1 : -1 };
                     };
-                    root.disks = devs.filter(d => d.type === "disk" && !/^(zram|loop)/.test(d.name)).map(d => ({
+                    const next = devs.filter(d => d.type === "disk" && !/^(zram|loop)/.test(d.name)).map(d => ({
                         name: d.name, model: (d.model ?? "").trim(), size: d.size, removable: d.rm === true || d.rm === "1",
                         parts: (d.children ?? []).filter(c => c.type === "part" || c.type === "crypt" || c.type === "lvm").map(part)
                             .concat((d.children ?? []).length === 0 && (d.mountpoints ?? []).some(x => x) ? [part(d)] : [])
                     }));
+                    if (JSON.stringify(next) !== JSON.stringify(root.disks))
+                        root.disks = next;
                 } catch (e) {
                     console.warn("storage:", e);
                 }
