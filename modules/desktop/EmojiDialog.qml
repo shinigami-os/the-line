@@ -75,6 +75,7 @@ CenterDialog {
                 id: search
                 width: parent.width
                 placeholder: "Find an emoji by name"
+                sideArrowsMove: true
                 onTextChanged: dialog.selected = 0
                 onMoved: (dx, dy) => dialog.selected = Math.max(0, Math.min(dialog.shown.length - 1, dialog.selected + dx + dy * dialog.columns))
                 onAccepted: dialog.choose()
