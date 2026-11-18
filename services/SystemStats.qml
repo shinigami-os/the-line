@@ -31,8 +31,8 @@ Singleton {
     property real gpuTemp: NaN
     property var temps: []     // [{ group: "CPU", label: "Core 0", c: 41, crit: 100 }], grouped, CPU first
 
-    // The dashboard sets this while it is open.
-    property bool watching: false
+    // The dashboard is open (on whichever screen): the per-core loads and the sensor list are only kept while it is.
+    readonly property bool watching: UiState.openPanel === "tp"
 
     property var _prev: ({})
 
@@ -52,6 +52,9 @@ Singleton {
         for (const line of procStat.text().split("\n")) {
             if (!line.startsWith("cpu"))
                 continue;
+            const isTotal = line.startsWith("cpu ");
+            if (!isTotal && !watching && cores.length > 0)
+                continue;
             const f = line.trim().split(/\s+/);
             const v = f.slice(1).map(Number);
             const idle = v[3] + v[4];
@@ -59,12 +62,13 @@ Singleton {
             const prev = _prev[f[0]];
             const load = prev && total > prev.total ? 1 - (idle - prev.idle) / (total - prev.total) : 0;
             _prev[f[0]] = { idle: idle, total: total };
-            if (f[0] === "cpu")
+            if (isTotal)
                 cpu = load;
             else
                 loads.push(load);
         }
-        cores = loads;
+        if (watching || cores.length === 0)
+            cores = loads;
         cpuHistory = cpuHistory.slice(1).concat(cpu);
 
         const mem = {};
@@ -81,7 +85,8 @@ Singleton {
         swap = swapTotalKiB > 0 ? swapUsedKiB / swapTotalKiB : 0;
 
         load = procLoad.text().trim().split(" ").slice(0, 3).join(" ");
-        uptime = Number(procUptime.text().trim().split(" ")[0]) || 0;
+        // whole minutes: nothing shows the seconds, and a new value every second rebuilt the labels
+        uptime = Math.floor((Number(procUptime.text().trim().split(" ")[0]) || 0) / 60) * 60;
     }
 
     // RES column of top: KiB, or with an m / g suffix.
@@ -168,6 +173,9 @@ Singleton {
         radeon: "GPU", nouveau: "GPU", nvme: "Disk", drivetemp: "Disk", acpitz: "Board", pch_cometlake: "Board" })
     readonly property var groupOrder: ["CPU", "GPU", "Disk", "Board", "Wi-Fi"]
 
+    onWatchingChanged: if (watching && !sensors.running)
+        sensors.running = true
+
     Process {
         id: sensors
         command: ["sh", "-c", "for h in /sys/class/hwmon/hwmon*; do n=$(cat \"$h/name\" 2>/dev/null); for t in \"$h\"/temp*_input; do [ -r \"$t\" ] || continue; b=${t%_input}; echo \"$n|$(cat \"${b}_label\" 2>/dev/null)|$(cat \"$t\" 2>/dev/null)|$(cat \"${b}_crit\" 2>/dev/null)\"; done; done"]
@@ -184,24 +192,29 @@ Singleton {
                     // a sensor with no label of its own is named after what it measures, not its driver
                     const name = label.replace(/^Package id \d+$/, "Package") || ({ acpitz: "ACPI", nvme: "Drive" })[chip]
                         || (chip.startsWith("iwlwifi") ? "Card" : chip);
-                    out.push({ group: group, label: name, c: Math.round(c), crit: crit ? Number(crit) / 1000 : NaN });
+                    if (root.watching)
+                        out.push({ group: group, label: name, c: Math.round(c), crit: crit ? Number(crit) / 1000 : NaN });
                     // the CPU's one figure: the package (Intel), Tctl / Tdie (AMD), else the first CPU sensor, else the board
                     const rank = /^Package/.test(label) || /^T(ctl|die)$/.test(label) ? 0 : group === "CPU" ? 1 : chip === "acpitz" ? 2 : 9;
                     if (rank < cpuRank) {
                         cpuRank = rank;
-                        cpu = c;
+                        cpu = Math.round(c);
                     }
                     if (group === "GPU" && (isNaN(gpu) || /edge|junction/.test(label)))
-                        gpu = Math.max(isNaN(gpu) ? 0 : gpu, c);
+                        gpu = Math.max(isNaN(gpu) ? 0 : gpu, Math.round(c));
                 }
-                const order = g => { const i = root.groupOrder.indexOf(g); return i < 0 ? 99 : i; };
-                // cores in their own order (Core 2 before Core 10)
-                const num = l => Number((l.match(/\d+/) ?? ["0"])[0]);
-                out.sort((a, b) => order(a.group) - order(b.group) || a.group.localeCompare(b.group)
-                    || (/^Package/.test(b.label) - /^Package/.test(a.label)) || num(a.label) - num(b.label));
-                root.temps = out;
-                root.cpuTemp = cpu;
-                root.gpuTemp = gpu;
+                if (root.watching) {
+                    const order = g => { const i = root.groupOrder.indexOf(g); return i < 0 ? 99 : i; };
+                    // cores in their own order (Core 2 before Core 10)
+                    const num = l => Number((l.match(/\d+/) ?? ["0"])[0]);
+                    out.sort((a, b) => order(a.group) - order(b.group) || a.group.localeCompare(b.group)
+                        || (/^Package/.test(b.label) - /^Package/.test(a.label)) || num(a.label) - num(b.label));
+                    root.temps = out;
+                }
+                if (!(isNaN(cpu) && isNaN(root.cpuTemp)))
+                    root.cpuTemp = cpu;
+                if (!(isNaN(gpu) && isNaN(root.gpuTemp)))
+                    root.gpuTemp = gpu;
             }
         }
     }

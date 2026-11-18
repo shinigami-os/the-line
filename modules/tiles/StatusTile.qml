@@ -41,12 +41,6 @@ Tile {
     openH: Theme.tileHeight + (kind === "tp" ? 12 + performance.implicitHeight + 12 : 348)
     mode: kind !== "" ? "open" : "rest"
 
-    Binding {
-        target: SystemStats
-        property: "watching"
-        value: tile.kind === "tp"
-    }
-
     // Top row: two groups of readings. The summary opens the performance dashboard, the status group opens
     // quick settings. While a panel is open, its group writes its readings out in full.
     Item {

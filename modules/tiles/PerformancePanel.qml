@@ -97,10 +97,13 @@ Column {
             spacing: 3
 
             Repeater {
-                model: SystemStats.cores
+                model: SystemStats.cores.length
 
                 Item {
-                    required property real modelData
+                    id: core
+
+                    required property int index
+                    readonly property real load: SystemStats.cores[index] ?? 0
 
                     width: (panel.width - (SystemStats.cores.length - 1) * 3) / Math.max(1, SystemStats.cores.length)
                     height: 24
@@ -113,9 +116,9 @@ Column {
                     }
                     Rectangle {
                         width: parent.width
-                        height: Math.max(1, parent.modelData * 23)
+                        height: Math.max(1, core.load * 23)
                         y: 24 - height
-                        color: parent.modelData > 0.8 ? Theme.accent : Theme.muted
+                        color: core.load > 0.8 ? Theme.accent : Theme.muted
                     }
                 }
             }
@@ -124,16 +127,16 @@ Column {
 
     // Memory: RAM and swap, each a line gauge like the one on the screen's line.
     Repeater {
-        model: [
-            { label: "RAM", used: SystemStats.ramUsedKiB, total: SystemStats.ramTotalKiB },
-            { label: "Swap", used: SystemStats.swapUsedKiB, total: SystemStats.swapTotalKiB }
-        ]
+        model: ["RAM", "Swap"]
 
         PanelItem {
             id: mem
 
-            required property var modelData
+            required property string modelData
             required property int index
+
+            readonly property real used: index === 0 ? SystemStats.ramUsedKiB : SystemStats.swapUsedKiB
+            readonly property real total: index === 0 ? SystemStats.ramTotalKiB : SystemStats.swapTotalKiB
 
             order: 2 + index
             shown: panel.shown
@@ -143,7 +146,7 @@ Column {
             Text {
                 x: 4
                 anchors.verticalCenter: parent.verticalCenter
-                text: mem.modelData.label
+                text: mem.modelData
                 font.family: Theme.fontUi
                 font.pixelSize: 12
                 font.weight: Font.Medium
@@ -158,7 +161,7 @@ Column {
 
                 Rectangle {
                     y: -1
-                    width: mem.modelData.total > 0 ? parent.width * mem.modelData.used / mem.modelData.total : 0
+                    width: mem.total > 0 ? parent.width * mem.used / mem.total : 0
                     height: 3
                     color: Theme.accent
                 }
@@ -167,7 +170,7 @@ Column {
                 anchors.right: parent.right
                 anchors.rightMargin: 4
                 anchors.verticalCenter: parent.verticalCenter
-                text: mem.modelData.total > 0 ? SystemStats.formatKiB(mem.modelData.used) + " / " + SystemStats.formatKiB(mem.modelData.total) : "none"
+                text: mem.total > 0 ? SystemStats.formatKiB(mem.used) + " / " + SystemStats.formatKiB(mem.total) : "none"
                 font.family: Theme.fontMono
                 font.pixelSize: 11
                 color: Theme.muted
