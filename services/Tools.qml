@@ -106,7 +106,9 @@ Singleton {
                         if (d !== "" && map[d] === undefined)
                             map[d] = Cheatsheet.capsOf(b).join("+");
                     }
-                    root.keyOf = map;
+                    // the same keys again would re-evaluate every launcher row
+                    if (JSON.stringify(map) !== JSON.stringify(root.keyOf))
+                        root.keyOf = map;
                 } catch (e) {}
             }
         }

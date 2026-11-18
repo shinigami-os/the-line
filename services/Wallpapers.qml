@@ -28,7 +28,9 @@ Singleton {
             "sh", Config.shellRoot]
         stdout: StdioCollector {
             onStreamFinished: {
-                root.files = text.split("\n").filter(f => f !== "");
+                const list = text.split("\n").filter(f => f !== "");
+                if (JSON.stringify(list) !== JSON.stringify(root.files))
+                    root.files = list;
                 root.loaded = true;
                 Frames.make(root.files.filter(f => Config.wallpaperKind(f) === "video"));
             }

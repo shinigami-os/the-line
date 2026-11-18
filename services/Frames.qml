@@ -28,7 +28,7 @@ Singleton {
             }
             waiting = waiting.concat([{ path: list[0], then: then }]);
         }
-        queue = queue.concat(list.filter(p => queue.indexOf(p) < 0));
+        queue = queue.concat(list.filter(p => !have[p] && queue.indexOf(p) < 0));
         next();
     }
 

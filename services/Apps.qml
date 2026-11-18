@@ -19,27 +19,35 @@ Singleton {
         return (words.length > 1 ? words[0][0] + words[1][0] : name.slice(0, 2)).toLowerCase();
     }
 
-    function score(app, q) {
-        const name = app.name.toLowerCase();
+    // The apps with their searchable text lowercased and split once, not on every keystroke.
+    readonly property var index: all.map(a => {
+        const name = a.name.toLowerCase();
+        return { app: a, name: name, words: name.split(/[\s\-_.]+/), generic: (a.genericName ?? "").toLowerCase(),
+            keywords: (a.keywords ?? []).map(k => k.toLowerCase()), comment: (a.comment ?? "").toLowerCase() };
+    })
+    // Most launched first, then by name: what an empty search shows.
+    readonly property var byUse: all.slice().sort((a, b) => (counts[b.id] ?? 0) - (counts[a.id] ?? 0) || a.name.localeCompare(b.name))
+
+    function score(e, q) {
         let s = 0;
-        if (name.startsWith(q))
+        if (e.name.startsWith(q))
             s = 100;
-        else if (name.split(/[\s\-_.]+/).some(w => w.startsWith(q)))
+        else if (e.words.some(w => w.startsWith(q)))
             s = 80;
-        else if (name.includes(q))
+        else if (e.name.includes(q))
             s = 60;
-        else if ((app.genericName ?? "").toLowerCase().includes(q) || (app.keywords ?? []).some(k => k.toLowerCase().includes(q)))
+        else if (e.generic.includes(q) || e.keywords.some(k => k.includes(q)))
             s = 40;
-        else if ((app.comment ?? "").toLowerCase().includes(q))
+        else if (e.comment.includes(q))
             s = 20;
-        return s > 0 ? s + Math.min(15, Math.log2(1 + (counts[app.id] ?? 0)) * 3) : 0;
+        return s > 0 ? s + Math.min(15, Math.log2(1 + (counts[e.app.id] ?? 0)) * 3) : 0;
     }
 
     function search(query, limit) {
         const q = query.trim().toLowerCase();
         if (q === "")
-            return all.slice().sort((a, b) => (counts[b.id] ?? 0) - (counts[a.id] ?? 0) || a.name.localeCompare(b.name)).slice(0, limit);
-        return all.map(a => ({ app: a, s: score(a, q) })).filter(x => x.s > 0).sort((a, b) => b.s - a.s || a.app.name.localeCompare(b.app.name)).slice(0, limit).map(x => x.app);
+            return byUse.slice(0, limit);
+        return index.map(e => ({ app: e.app, s: score(e, q) })).filter(x => x.s > 0).sort((a, b) => b.s - a.s || a.app.name.localeCompare(b.app.name)).slice(0, limit).map(x => x.app);
     }
 
     function launch(app) {

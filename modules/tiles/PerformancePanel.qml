@@ -44,6 +44,8 @@ Column {
 
     // CPU: graph over the last minute, then one bar per core.
     PanelItem {
+        id: cpuItem
+
         order: 1
         shown: panel.shown
         width: panel.width
@@ -73,7 +75,8 @@ Column {
             Shape {
                 id: graph
 
-                readonly property var points: SystemStats.cpuHistory.map((v, i) =>
+                // not recomputed every second while the panel is closed (and kept through its fade-out)
+                readonly property var points: cpuItem.opacity === 0 ? [] : SystemStats.cpuHistory.map((v, i) =>
                     Qt.point(1 + i * (width - 2) / (SystemStats.historyLength - 1), height - 2 - v * (height - 4)))
 
                 anchors.fill: parent
