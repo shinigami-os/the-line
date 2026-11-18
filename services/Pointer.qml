@@ -13,7 +13,11 @@ Singleton {
 
     property real x: -1
     property real y: -1
-    readonly property bool watching: Hyprland.workspaces.values.some(w => w.hasFullscreen)
+    // Only a workspace on show with a real fullscreen window (mode 2: a maximized one, mode 1, counts as "fullscreen" too).
+    readonly property bool watching: Hyprland.monitors.values.some(m => {
+        const ws = m.activeWorkspace;
+        return (ws?.hasFullscreen ?? false) && ws.toplevels.values.some(t => (t.lastIpcObject?.fullscreen ?? 2) === 2);
+    })
 
     property string reply: ""
 

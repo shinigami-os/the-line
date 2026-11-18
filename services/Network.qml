@@ -38,7 +38,7 @@ Singleton {
 
     Process {
         id: active
-        command: ["nmcli", "-t", "-f", "ACTIVE,SIGNAL,SSID", "dev", "wifi"]
+        command: ["nmcli", "-t", "-f", "ACTIVE,SIGNAL,SSID", "dev", "wifi", "list", "--rescan", "no"]
         stdout: StdioCollector {
             onStreamFinished: {
                 // yes:72:MATRIXBOX (colons inside the SSID are escaped as \:)

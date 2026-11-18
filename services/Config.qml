@@ -83,8 +83,13 @@ Singleton {
     }
 
     // The clipboard recorders read their settings when they start: restart them when those change.
-    onClipboardMaxChanged: if (loadedOnce && inShell) Quickshell.execDetached([session("the-line-clipboard")])
-    onClipboardImagesChanged: if (loadedOnce && inShell) Quickshell.execDetached([session("the-line-clipboard")])
+    Timer {
+        id: applyClipboard
+        interval: 600
+        onTriggered: Quickshell.execDetached([root.session("the-line-clipboard")])
+    }
+    onClipboardMaxChanged: if (loadedOnce && inShell) applyClipboard.restart()
+    onClipboardImagesChanged: if (loadedOnce && inShell) applyClipboard.restart()
     // hypridle and Hyprland's workspace rules are generated from this file (session/the-line-apply), by whoever
     // changes those settings, right after writing it (see set()).
     Timer {
@@ -147,10 +152,19 @@ Singleton {
         set("reduceMotion", value);
     }
 
+    // A dragged slider sets a key on every pixel: the file is written once the drag pauses (well before the apply timers).
+    Timer {
+        id: writeTimer
+        interval: 60
+        onTriggered: file.writeAdapter()
+    }
+
     // Any key of the file (the settings app writes through this).
     function set(key, value) {
+        if (adapter[key] === value)
+            return;
         adapter[key] = value;
-        file.writeAdapter();
+        writeTimer.restart();
         if (key === "idleDim" || key === "idleLock" || key === "idleSuspend")
             applyIdle.restart();
         else if (key === "workspaceApps")
