@@ -118,11 +118,13 @@ Item {
 
     // The bottom of the screen darkens under the strip, so it reads on any wallpaper.
     Rectangle {
-        anchors.fill: parent
+        // only the band that darkens (the rest of it was transparent)
+        y: Math.max(0, strip.lineY - 90)
+        width: parent.width
+        height: parent.height - y
         opacity: strip.open ? 1 : 0
         gradient: Gradient {
             GradientStop { position: 0; color: "transparent" }
-            GradientStop { position: Math.max(0, (strip.lineY - 90) / strip.height); color: "transparent" }
             GradientStop { position: 1; color: Qt.rgba(0, 0, 0, 0.82) }
         }
 
@@ -252,7 +254,7 @@ Item {
 
         // One line per kind: the active one bright with the marker, the other dimmed, each where it was left.
         Repeater {
-            model: strip.lanes
+            model: strip.visible ? strip.lanes : []
 
             Item {
                 id: laneItem

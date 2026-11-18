@@ -24,6 +24,15 @@ Item {
         return "file://" + p;
     }
 
+    // faded out: let go of the two screen-sized textures
+    onVisibleChanged: {
+        if (!visible) {
+            settle.stop();
+            a.source = "";
+            b.source = "";
+        }
+    }
+
     onPathChanged: settle.restart()
     onOpenChanged: {
         if (open) {
@@ -60,6 +69,8 @@ Item {
         sourceSize.width: preview.width
         sourceSize.height: preview.height
         z: preview.frontA ? 1 : 0
+        // hidden once the picture over it is fully in: no second full-screen layer drawn under it
+        visible: opacity > 0 && (preview.frontA || b.opacity < 1)
         opacity: preview.open && status === Image.Ready ? 1 : 0
 
         Behavior on opacity {
@@ -75,6 +86,7 @@ Item {
         sourceSize.width: preview.width
         sourceSize.height: preview.height
         z: preview.frontA ? 0 : 1
+        visible: opacity > 0 && (!preview.frontA || a.opacity < 1)
         opacity: preview.open && status === Image.Ready ? 1 : 0
 
         Behavior on opacity {

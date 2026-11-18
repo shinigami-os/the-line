@@ -168,7 +168,7 @@ Scope {
         active: Config.wallpaperFor(root.screenName) !== "" && !Welcome.holdWallpaper
         sourceComponent: Wallpaper {
             screen: root.modelData
-            paused: root.fullscreen || (Config.wallpaperStillOnBattery && UPower.onBattery)
+            paused: root.fullscreen || Lock.locked || (Config.wallpaperStillOnBattery && UPower.onBattery)
         }
     }
 

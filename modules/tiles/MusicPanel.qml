@@ -111,7 +111,9 @@ Column {
             Image {
                 anchors.fill: parent
                 anchors.margins: 1
-                source: Media.art
+                // not decoded while the panel is closed, and at the size it is drawn
+                source: panel.shown || cover.parent.opacity > 0 ? Media.art : ""
+                sourceSize: Qt.size(172, 172)
                 fillMode: Image.PreserveAspectCrop
                 asynchronous: true
                 visible: status === Image.Ready
@@ -210,7 +212,7 @@ Column {
         }
 
         Repeater {
-            model: Math.floor(rulerItem.secs / 15) + 1
+            model: panel.shown || rulerItem.opacity > 0 ? Math.floor(rulerItem.secs / 15) + 1 : 0
 
             Item {
                 id: tick
