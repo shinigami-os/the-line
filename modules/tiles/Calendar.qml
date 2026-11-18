@@ -209,15 +209,16 @@ Column {
             }
 
             Repeater {
-                model: cal.days
+                // 42 cells that stay: a month change rewrites them, it does not rebuild them
+                model: 42
 
                 Rectangle {
                     id: day
 
-                    required property var modelData
                     required property int index
-                    readonly property bool inMonth: modelData.getMonth() === cal.first.getMonth()
-                    readonly property bool isToday: cal.sameDay(modelData, cal.today)
+                    readonly property date date: cal.days[index] ?? cal.first
+                    readonly property bool inMonth: date.getMonth() === cal.first.getMonth()
+                    readonly property bool isToday: cal.sameDay(date, cal.today)
                     readonly property bool weekend: index % 7 >= 5
 
                     x: cal.cellW * (1 + index % 7)
@@ -232,7 +233,7 @@ Column {
 
                     Text {
                         anchors.centerIn: parent
-                        text: day.modelData.getDate()
+                        text: day.date.getDate()
                         font.family: Theme.fontUi
                         font.pixelSize: 12
                         font.weight: day.isToday ? Font.Bold : Font.Medium

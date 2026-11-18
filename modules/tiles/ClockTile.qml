@@ -154,7 +154,7 @@ Tile {
 
                 Text {
                     id: shortDate
-                    text: Qt.formatDate(Time.now, "ddd d MMM")
+                    text: { Time.today; return Qt.formatDate(new Date(), "ddd d MMM"); }
                     font.family: Theme.fontUi
                     font.pixelSize: 11
                     font.weight: Font.Medium
@@ -167,7 +167,7 @@ Tile {
                 }
                 Text {
                     id: longDate
-                    text: Qt.formatDate(Time.now, "dddd d MMMM yyyy")
+                    text: { Time.today; return Qt.formatDate(new Date(), "dddd d MMMM yyyy"); }
                     font.family: Theme.fontUi
                     font.pixelSize: 11
                     font.weight: Font.Medium

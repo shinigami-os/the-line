@@ -80,7 +80,7 @@ Item {
     Hand {
         width: 3
         length: clock.c * 0.5
-        angle: (clock.h * 3600 + clock.m * 60 + clock.sec) / 120
+        angle: (clock.h * 60 + clock.m) / 2   // a step a minute: a second moves it 0.005°
         color: Theme.text
     }
     Hand {

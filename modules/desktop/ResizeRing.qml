@@ -12,8 +12,8 @@ Item {
 
     required property var screen   // this surface's ShellScreen
 
-    readonly property var focused: Hyprland.activeToplevel ?? Hyprland.toplevels.values.find(t => t.activated) ?? null
-    readonly property var ipc: UiState.resizing ? (focused?.lastIpcObject ?? null) : null
+    readonly property var focused: !UiState.resizing ? null : Hyprland.activeToplevel ?? Hyprland.toplevels.values.find(t => t.activated) ?? null
+    readonly property var ipc: focused?.lastIpcObject ?? null
     readonly property bool here: ipc !== null && ipc.at !== undefined
         && ipc.at[0] >= screen.x && ipc.at[0] < screen.x + screen.width
         && ipc.at[1] >= screen.y && ipc.at[1] < screen.y + screen.height
@@ -95,9 +95,10 @@ Item {
         }
     }
 
-    // Window classes and sizes come from Hyprland's IPC: read them often while resizing.
+    // Window classes and sizes come from Hyprland's IPC: read them often while resizing (by the one screen the ring
+    // is on, not once per screen).
     Timer {
-        running: UiState.resizing
+        running: ring.here
         repeat: true
         interval: 50
         onTriggered: Hyprland.refreshToplevels()

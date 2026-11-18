@@ -79,7 +79,7 @@ Singleton {
             q = quotes[Math.floor(Math.random() * quotes.length)];
         currentDecode = Math.random() < 1 / 25;
         current = q;
-        if (!counter.running)
+        if (q.includes("{packages}") && !counter.running)
             counter.running = true;
     }
 

@@ -31,12 +31,15 @@ Item {
     function startDecode() {
         typed = 0;
         resolved = 0;
+        decodeStart.stop();
+        decodeStep.stop();
         if (decode && shown)
             decodeStart.restart();
     }
 
+    // A quote's live figures ({cpu}, {load}) change under the reader: that must not restart the decoding, which
+    // would then never finish. A new quote arrives while the voice is hidden, and showing it starts the decoding.
     onShownChanged: startDecode()
-    onTextChanged: startDecode()
     onDecodeChanged: startDecode()
 
     Timer {
@@ -66,7 +69,7 @@ Item {
     Text {
         id: lineMeasure
         visible: false
-        text: voice.text
+        text: voice.decode ? voice.text : ""
         font: quote.font
     }
 

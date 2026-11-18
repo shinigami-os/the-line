@@ -68,6 +68,8 @@ Singleton {
     }
 
     function markAllRead() {
+        if (unread === 0)
+            return;
         list = list.map(n => Object.assign({}, n, { read: true }));
     }
 
