@@ -3,8 +3,11 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import TheLine.Core
 
-// Backlight level through brightnessctl. Polled, so changes made elsewhere (media keys) also show on the line.
+// Backlight level. Read from sysfs by TheLine.Core's BacklightReader (a thread of its own, no process per second, and
+// not at all while the screen is locked), so changes made elsewhere (media keys) also show on the line. Setting goes
+// through brightnessctl.
 Singleton {
     id: root
 
@@ -14,6 +17,7 @@ Singleton {
     function set(level) {
         const v = Math.max(0.01, Math.min(1, level));
         value = v;
+        reader.expect(v);
         setter.command = ["brightnessctl", "-q", "set", Math.round(v * 100) + "%"];
         setter.running = true;
     }
@@ -25,32 +29,15 @@ Singleton {
         LineState.showGauge("bri", value);
     }
 
-    Process {
-        id: getter
-        command: ["brightnessctl", "-m"]
-        stdout: StdioCollector {
-            onStreamFinished: {
-                // device,class,current,percent,max
-                const f = text.trim().split(",");
-                if (f.length >= 5 && Number(f[4]) > 0) {
-                    const v = Number(f[2]) / Number(f[4]);
-                    if (Math.abs(v - root.value) > 0.004)
-                        root.value = v;
-                }
-            }
-        }
+    BacklightReader {
+        id: reader
+        active: !Lock.locked
+        // what the hardware says while a set is still on its way is the old level
+        onValueChanged: if (!setter.running) root.value = reader.value
     }
 
     Process {
         id: setter
-    }
-
-    Timer {
-        running: true
-        repeat: true
-        triggeredOnStart: true
-        interval: 1000
-        onTriggered: if (!getter.running) getter.running = true
     }
 
     // Ignore the first reading.

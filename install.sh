@@ -167,6 +167,16 @@ check_deps() {
         say "  ${red}-${plain} TheLine.Ui$dim  the design language: $hint${plain}"
         missing_required=$((missing_required + 1))
     fi
+    # The native half (github.com/shinigami-os/the-line-core): the sampler of /proc and the sensors, the backlight and cava readers
+    if [ ! -f "$qml/TheLine/Core/qmldir" ]; then
+        if have flux; then
+            hint="sudo flux install kira-the-line-core"
+        else
+            hint="build github.com/shinigami-os/the-line-core (cmake, see its README); with --dev, link its build/TheLine/Core into the-line-ui/TheLine/"
+        fi
+        say "  ${red}-${plain} TheLine.Core$dim  the native readers: $hint${plain}"
+        missing_required=$((missing_required + 1))
+    fi
     if have qs; then
         v=$(version_of qs --version)
         if [ -n "$v" ] && ! version_ge "$v" 0.3; then
@@ -236,6 +246,10 @@ install_ui() {
     else
         rm -rf "$qml/TheLine.new"
         cp -a "$from/TheLine" "$qml/TheLine.new"
+        # TheLine.Core lives in the same directory: it stays
+        if [ -d "$qml/TheLine/Core" ] && [ ! -L "$qml/TheLine" ]; then
+            cp -a "$qml/TheLine/Core" "$qml/TheLine.new/Core"
+        fi
         rm -rf "$qml/TheLine"   # (a link to a checkout from --dev: only the link goes)
         mv "$qml/TheLine.new" "$qml/TheLine"
         say "  copied from $from"
