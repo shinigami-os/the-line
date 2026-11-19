@@ -19,6 +19,10 @@ export MOZ_ENABLE_WAYLAND=1
 export SDL_VIDEODRIVER=wayland
 export _JAVA_AWT_WM_NONREPARENTING=1
 
+# A UTF-8 locale when the system sets none (Kira has no /etc/locale.conf): in the plain C locale an app, a Flatpak one above
+# all, cannot take a file named with é or â (Discord crashed on such a drop). The user's own LANG stays.
+export LANG="${LANG:-C.UTF-8}"
+
 # Flatpak apps in the launcher and on the PATH.
 export XDG_DATA_DIRS="$HOME/.local/share/flatpak/exports/share:/var/lib/flatpak/exports/share:${XDG_DATA_DIRS:-/usr/local/share:/usr/share}"
 export PATH="$HOME/.local/share/flatpak/exports/bin:/var/lib/flatpak/exports/bin:$PATH"
