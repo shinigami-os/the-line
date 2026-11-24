@@ -30,15 +30,20 @@ Tile {
         return (h > 0 ? h + " h " : "") + m + " min";
     }
 
+    // The view quick settings is showing: "" the toggles, "wifi" or "bt" the connections (right-click on the toggle).
+    property string sub: ""
+
     // Which panel is open on this screen: "tr" quick settings, "tp" performance.
     readonly property string kind: UiState.isOpen(screenName, "tr") ? "tr" : (UiState.isOpen(screenName, "tp") ? "tp" : "")
+
+    onKindChanged: if (kind !== "tr") sub = ""
 
     anchorSide: "right"
     // Rest width from the compact readings, so it doesn't follow the expansion while closing.
     restW: 12 + 36 + 10 + cpuR.compactWidth + 10 + swapR.compactWidth + 10 + ramR.compactWidth + (tempR.available ? 10 + tempR.compactWidth : 0)
         + 12 + 1 + 12 + netR.compactWidth + 10 + volR.compactWidth + 10 + batR.compactWidth + 12
     openW: kind === "tp" ? 460 : 400
-    openH: Theme.tileHeight + (kind === "tp" ? 12 + performance.implicitHeight + 12 : 348)
+    openH: Theme.tileHeight + (kind === "tp" ? 12 + performance.implicitHeight + 12 : 370)
     mode: kind !== "" ? "open" : "rest"
 
     // Top row: two groups of readings. The summary opens the performance dashboard, the status group opens
@@ -246,12 +251,12 @@ Tile {
             x: 13
             y: 12
             width: 374
-            enabled: tile.kind === "tr"
+            enabled: tile.kind === "tr" && tile.sub === ""
             spacing: 8
 
             PanelItem {
                 order: 0
-                shown: tile.open && tile.kind === "tr"
+                shown: tile.open && tile.kind === "tr" && tile.sub === ""
                 width: panel.width
                 height: 104
 
@@ -265,6 +270,11 @@ Tile {
                         sub: Network.label
                         on: Network.wifiEnabled
                         onClicked: Network.setWifi(!Network.wifiEnabled)
+
+                        TapHandler {
+                            acceptedButtons: Qt.RightButton
+                            onTapped: tile.sub = "wifi"
+                        }
                     }
                     Toggle {
                         width: (panel.width - 8) / 2
@@ -272,6 +282,11 @@ Tile {
                         sub: !tile.btAdapter ? "no adapter" : (tile.btAdapter.enabled ? (tile.btConnected > 0 ? "on · " + tile.btConnected + (tile.btConnected === 1 ? " device" : " devices") : "on · no device") : "off")
                         on: tile.btAdapter?.enabled ?? false
                         onClicked: if (tile.btAdapter) tile.btAdapter.enabled = !tile.btAdapter.enabled
+
+                        TapHandler {
+                            acceptedButtons: Qt.RightButton
+                            onTapped: tile.sub = "bt"
+                        }
                     }
                     Toggle {
                         width: (panel.width - 8) / 2
@@ -291,8 +306,23 @@ Tile {
             }
 
             PanelItem {
+                order: 1
+                shown: tile.open && tile.kind === "tr" && tile.sub === ""
+                width: panel.width
+                height: 14
+
+                Text {
+                    x: 4
+                    text: "right-click Wi-Fi or Bluetooth to manage connections"
+                    font.family: Theme.fontMono
+                    font.pixelSize: 10
+                    color: Theme.muted
+                }
+            }
+
+            PanelItem {
                 order: 2
-                shown: tile.open && tile.kind === "tr"
+                shown: tile.open && tile.kind === "tr" && tile.sub === ""
                 width: panel.width
                 height: 36
 
@@ -325,7 +355,7 @@ Tile {
 
             PanelItem {
                 order: 3
-                shown: tile.open && tile.kind === "tr"
+                shown: tile.open && tile.kind === "tr" && tile.sub === ""
                 width: panel.width
                 height: 36
 
@@ -358,7 +388,7 @@ Tile {
 
             PanelItem {
                 order: 4
-                shown: tile.open && tile.kind === "tr"
+                shown: tile.open && tile.kind === "tr" && tile.sub === ""
                 width: panel.width
                 height: 44
 
@@ -375,7 +405,7 @@ Tile {
             // Power lives here and nowhere else.
             PanelItem {
                 order: 5
-                shown: tile.open && tile.kind === "tr"
+                shown: tile.open && tile.kind === "tr" && tile.sub === ""
                 width: panel.width
                 height: 40
 
@@ -438,7 +468,7 @@ Tile {
 
             PanelItem {
                 order: 6
-                shown: tile.open && tile.kind === "tr"
+                shown: tile.open && tile.kind === "tr" && tile.sub === ""
                 width: panel.width
                 height: 20
 
@@ -457,6 +487,38 @@ Tile {
                     font.pixelSize: 11
                     color: Theme.muted
                 }
+            }
+        },
+
+        PanelItem {
+            order: 0
+            shown: tile.open && tile.kind === "tr" && tile.sub === "wifi"
+            x: 13
+            y: 12
+            width: 374
+            height: 346
+            enabled: shown
+
+            WifiPanel {
+                anchors.fill: parent
+                shown: parent.shown
+                onBack: tile.sub = ""
+            }
+        },
+
+        PanelItem {
+            order: 0
+            shown: tile.open && tile.kind === "tr" && tile.sub === "bt"
+            x: 13
+            y: 12
+            width: 374
+            height: 346
+            enabled: shown
+
+            BluetoothPanel {
+                anchors.fill: parent
+                shown: parent.shown
+                onBack: tile.sub = ""
             }
         }
     ]
