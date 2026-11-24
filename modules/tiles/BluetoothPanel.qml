@@ -23,7 +23,7 @@ Item {
 
     signal back
 
-    height: 346
+    height: 330
 
     onShownChanged: {
         if (adapter && (!shown || enabled))
@@ -123,7 +123,7 @@ Item {
         y: parent.height - height
         width: parent.width - 8
         elide: Text.ElideRight
-        text: "click a device to connect · ‹ goes back"
+        text: "click to connect · ‹ or right-click goes back"
         font.family: Theme.fontMono
         font.pixelSize: 11
         color: Theme.muted

@@ -15,7 +15,7 @@ Item {
 
     signal back
 
-    height: 346
+    height: 330
 
     onShownChanged: {
         Network.watching = shown;
@@ -137,7 +137,7 @@ Item {
             anchors.bottom: parent.bottom
             width: parent.width - 8
             elide: Text.ElideRight
-            text: Network.error !== "" ? Network.error : "click a network to connect · ‹ goes back"
+            text: Network.error !== "" ? Network.error : "click to connect · ‹ or right-click goes back"
             font.family: Theme.fontMono
             font.pixelSize: 11
             color: Network.error !== "" ? Theme.error : Theme.muted

@@ -256,7 +256,7 @@ Tile {
 
             PanelItem {
                 order: 0
-                shown: tile.open && tile.kind === "tr" && tile.sub === ""
+                shown: tile.open && tile.kind === "tr"
                 width: panel.width
                 height: 104
 
@@ -307,7 +307,7 @@ Tile {
 
             PanelItem {
                 order: 1
-                shown: tile.open && tile.kind === "tr" && tile.sub === ""
+                shown: tile.open && tile.kind === "tr"
                 width: panel.width
                 height: 14
 
@@ -322,7 +322,7 @@ Tile {
 
             PanelItem {
                 order: 2
-                shown: tile.open && tile.kind === "tr" && tile.sub === ""
+                shown: tile.open && tile.kind === "tr"
                 width: panel.width
                 height: 36
 
@@ -355,7 +355,7 @@ Tile {
 
             PanelItem {
                 order: 3
-                shown: tile.open && tile.kind === "tr" && tile.sub === ""
+                shown: tile.open && tile.kind === "tr"
                 width: panel.width
                 height: 36
 
@@ -388,7 +388,7 @@ Tile {
 
             PanelItem {
                 order: 4
-                shown: tile.open && tile.kind === "tr" && tile.sub === ""
+                shown: tile.open && tile.kind === "tr"
                 width: panel.width
                 height: 44
 
@@ -405,7 +405,7 @@ Tile {
             // Power lives here and nowhere else.
             PanelItem {
                 order: 5
-                shown: tile.open && tile.kind === "tr" && tile.sub === ""
+                shown: tile.open && tile.kind === "tr"
                 width: panel.width
                 height: 40
 
@@ -468,7 +468,7 @@ Tile {
 
             PanelItem {
                 order: 6
-                shown: tile.open && tile.kind === "tr" && tile.sub === ""
+                shown: tile.open && tile.kind === "tr"
                 width: panel.width
                 height: 20
 
@@ -490,35 +490,85 @@ Tile {
             }
         },
 
-        PanelItem {
-            order: 0
-            shown: tile.open && tile.kind === "tr" && tile.sub === "wifi"
-            x: 13
-            y: 12
-            width: 374
-            height: 346
-            enabled: shown
+        // Right-click on Wi-Fi or Bluetooth: that toggle grows over the whole panel and holds its connections.
+        Rectangle {
+            id: grow
 
-            WifiPanel {
-                anchors.fill: parent
-                shown: parent.shown
-                onBack: tile.sub = ""
+            readonly property bool expanded: tile.sub !== ""
+            property string view: "wifi"   // the last one opened, kept while it shrinks back
+            readonly property bool wifiView: view === "wifi"
+            readonly property bool viewOn: wifiView ? Network.wifiEnabled : (tile.btAdapter?.enabled ?? false)
+            readonly property real restX: wifiView ? 13 : 204
+
+            x: expanded ? 13 : restX
+            y: 12
+            width: expanded ? 374 : 183
+            height: expanded ? 346 : 48
+            visible: expanded || width > 183.5 || height > 48.5
+            color: Theme.surface
+            clip: true
+
+            Behavior on x {
+                NumberAnimation { duration: Anim.panel; easing.type: Anim.easing }
             }
-        },
+            Behavior on width {
+                NumberAnimation { duration: Anim.panel; easing.type: Anim.easing }
+            }
+            Behavior on height {
+                NumberAnimation { duration: Anim.panel; easing.type: Anim.easing }
+            }
 
-        PanelItem {
-            order: 0
-            shown: tile.open && tile.kind === "tr" && tile.sub === "bt"
-            x: 13
-            y: 12
-            width: 374
-            height: 346
-            enabled: shown
+            Connections {
+                target: tile
 
-            BluetoothPanel {
+                function onSubChanged() {
+                    if (tile.sub !== "")
+                        grow.view = tile.sub;
+                }
+            }
+
+            Rectangle {
                 anchors.fill: parent
-                shown: parent.shown
-                onBack: tile.sub = ""
+                color: "transparent"
+                border.width: 1
+                border.color: grow.viewOn ? Theme.accent : Theme.borderStrong
+            }
+
+            TapHandler {
+                acceptedButtons: Qt.RightButton
+                onTapped: tile.sub = ""
+            }
+
+            PanelItem {
+                order: 1
+                shown: tile.open && tile.kind === "tr" && tile.sub === "wifi"
+                x: 12
+                y: 8
+                width: 350
+                height: 330
+                enabled: shown
+
+                WifiPanel {
+                    anchors.fill: parent
+                    shown: parent.shown
+                    onBack: tile.sub = ""
+                }
+            }
+
+            PanelItem {
+                order: 1
+                shown: tile.open && tile.kind === "tr" && tile.sub === "bt"
+                x: 12
+                y: 8
+                width: 350
+                height: 330
+                enabled: shown
+
+                BluetoothPanel {
+                    anchors.fill: parent
+                    shown: parent.shown
+                    onBack: tile.sub = ""
+                }
             }
         }
     ]
