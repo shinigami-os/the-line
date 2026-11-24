@@ -500,21 +500,19 @@ Tile {
             readonly property bool viewOn: wifiView ? Network.wifiEnabled : (tile.btAdapter?.enabled ?? false)
             readonly property real restX: wifiView ? 13 : 204
 
-            x: expanded ? 13 : restX
+            // 0 at rest (the toggle's own rectangle), 1 over the whole panel: position and size follow it, so the
+            // start is always the toggle that was clicked.
+            property real grown: expanded ? 1 : 0
+
+            x: restX + (13 - restX) * grown
             y: 12
-            width: expanded ? 374 : 183
-            height: expanded ? 346 : 48
-            visible: expanded || width > 183.5 || height > 48.5
+            width: 183 + 191 * grown
+            height: 48 + 298 * grown
+            visible: grown > 0
             color: Theme.surface
             clip: true
 
-            Behavior on x {
-                NumberAnimation { duration: Anim.panel; easing.type: Anim.easing }
-            }
-            Behavior on width {
-                NumberAnimation { duration: Anim.panel; easing.type: Anim.easing }
-            }
-            Behavior on height {
+            Behavior on grown {
                 NumberAnimation { duration: Anim.panel; easing.type: Anim.easing }
             }
 
