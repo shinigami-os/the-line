@@ -205,7 +205,7 @@ check_deps() {
 # ------------------------------------------------------------------------------------------------ what it puts where
 
 # the runtime tree: what the shell, the session and the settings app read
-runtime="shell.qml VERSION services modules settings greeter session assets"
+runtime="shell.qml VERSION services modules settings greeter session assets cursor"
 
 put() { # put <mode> <from> <to>
     install -Dm"$1" "$2" "$3"
