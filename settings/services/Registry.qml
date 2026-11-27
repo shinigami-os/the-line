@@ -39,7 +39,8 @@ Singleton {
 
     function backend(setting) {
         return setting.source === "net" ? Net : setting.source === "bt" ? Bt : setting.source === "sound" ? Sound
-            : setting.source === "sys" ? Sys : setting.source === "displays" ? Displays : null;
+            : setting.source === "sys" ? Sys : setting.source === "displays" ? Displays
+            : setting.source === "kage" ? Kage : null;
     }
 
     // Times of day every half hour, for the schedules: { value: "21:30", label: "21:30" }.
@@ -115,6 +116,10 @@ Singleton {
           sub: "Gets workspace 1, and gives the accent its wallpaper", keywords: "primary main first default" },
         { section: "displays", group: "The picked screen", source: "displays", key: "enabled", kind: "toggle", label: "Use this screen",
           sub: "Off: nothing is shown on it", keywords: "disable turn off enable" },
+
+        { section: "displays", group: "Decoy screen", source: "kage", key: "size", kind: "choice", label: "Bigger than the real screen",
+          sub: "Apps see this size, the screen shows it scaled down (kagemusha)", keywords: "kagemusha decoy fake virtual resolution 2k 4k 5k evdi mirror",
+          choices: [{ value: "off", label: "off" }, { value: "2560x1440@60", label: "2560 × 1440" }, { value: "3840x2160@60", label: "3840 × 2160" }, { value: "5120x2880@60", label: "5120 × 2880" }] },
 
         { section: "input", group: "Keyboard", key: "kbLayout", kind: "kbLayout", label: "Layout",
           sub: "Enter, then type a language", keywords: "keyboard layout azerty qwerty language bepo dvorak xkb" },
