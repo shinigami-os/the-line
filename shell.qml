@@ -38,19 +38,24 @@ ShellRoot {
         UiState.toggle(focusedScreen(), panel);
     }
 
-    // A battery about to die: at 15 % a notification, at 10 % and 5 % an urgent one with a coral pulse along the line.
-    // Plugging in starts over.
+    // A battery about to die: a notification at 20 % and 15 %, an urgent one at 10 % and 5 %, and under 20 % a coral
+    // pulse along the line for every percent lost. Plugging in starts over.
     property int batteryWarned: 100
+    property int batteryPct: 100
     function checkBattery() {
         const d = UPower.displayDevice;
         if (!(d?.isLaptopBattery ?? false))
             return;
         if (!UPower.onBattery) {
             batteryWarned = 100;
+            batteryPct = 100;
             return;
         }
         const pct = Math.round(d.percentage * 100);
-        const level = pct <= 5 ? 5 : pct <= 10 ? 10 : pct <= 15 ? 15 : 100;
+        if (pct < 20 && pct < batteryPct)
+            LineState.pulse(false, Theme.error);
+        batteryPct = pct;
+        const level = pct <= 5 ? 5 : pct <= 10 ? 10 : pct <= 15 ? 15 : pct <= 20 ? 20 : 100;
         if (level >= batteryWarned)
             return;
         batteryWarned = level;
