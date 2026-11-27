@@ -379,8 +379,10 @@ hl.gesture({ fingers = 4, direction = "vertical", action = "fullscreen" })
 
 ------------- Yours -------------
 
+-- Every screen starts at 125%; monitors.lua (Settings > Displays) overrides it per screen.
+hl.monitor({ output = "", mode = "preferred", position = "auto", scale = 1.25 })
 load_user("monitors")
-load_user("input")      -- written by The Line from config.json (Settings > Input)
+load_user("input")     -- written by The Line from config.json (Settings > Input)
 load_user("apps")
 -- The settings app floats at the size it is drawn for, centred.
 hl.window_rule({ match = { class = "^(the-line-settings)$" }, float = true, size = "1120 740" })
