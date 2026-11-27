@@ -252,11 +252,71 @@ def set_keys(path, section, values, sep="="):
     os.replace(path + ".new", path)
 
 
-def icons(name):
+# Papirus' folder colours and their hue in degrees; a grey accent gets the grey folders.
+FOLDER_HUES = {"red": 4, "deeporange": 14, "orange": 32, "yellow": 50, "green": 125, "teal": 172, "cyan": 190,
+               "blue": 215, "indigo": 238, "violet": 268, "magenta": 300, "pink": 332}
+
+
+def folder_colour(accent):
+    h, s, _ = colorsys.rgb_to_hsv(*rgb(accent))
+    if s < 0.15:
+        return "grey"
+    hue = h * 360
+    return min(FOLDER_HUES, key=lambda c: min(abs(hue - FOLDER_HUES[c]), 360 - abs(hue - FOLDER_HUES[c])))
+
+
+def tinted_icons(base, accent):
+    """~/.local/share/icons/TheLine-<base>: the base theme with its folders in the accent's colour. Papirus draws a
+    coloured folder as folder-<colour>[-name].svg and points folder[-name].svg at the blue ones: here they point at
+    the accent's.
+    Returns the name to use; the base itself when it has no coloured folders."""
+    root = next((os.path.join(d, base) for d in icon_dirs() if os.path.exists(os.path.join(d, base, "index.theme"))), "")
+    if not root or not base.lower().endswith("papirus") and "papirus" not in base.lower():
+        return base
+    colour = folder_colour(accent)
+    name = "TheLine-" + base
+    out = os.path.join(HOME, ".local", "share", "icons", name)
+    places = []
+    for dirpath, _, files in os.walk(root, followlinks=True):
+        if os.path.basename(dirpath) != "places":
+            continue
+        rel = os.path.relpath(dirpath, root)
+        have = set(files)
+        links = []
+        for f in files:
+            if f == "folder.svg":
+                new = "folder-%s.svg" % colour
+            elif f.startswith("folder-") and ("folder-blue-" + f[7:]) in have:
+                new = "folder-%s-%s" % (colour, f[7:])
+            else:
+                continue
+            if new in have:
+                links.append((f, os.path.join(dirpath, new)))
+        if links:
+            places.append((rel, links))
+    if not places:
+        return base
+    shutil.rmtree(out, ignore_errors=True)
+    sections = []
+    for rel, links in sorted(places):
+        os.makedirs(os.path.join(out, rel))
+        for f, target in links:
+            os.symlink(target, os.path.join(out, rel, f))
+        size = re.match(r"(\d+)x\d+(@(\d+))?", rel)
+        sections.append("[%s]\nContext=Places\nSize=%s\n%sType=Fixed\n" % (
+            rel, size.group(1) if size else "48", "Scale=%s\n" % size.group(3) if size and size.group(3) else ""))
+    with open(os.path.join(out, "index.theme"), "w") as f:
+        f.write("[Icon Theme]\nName=%s\nComment=%s with the accent's folders (%s). %s\nInherits=%s\nHidden=true\nDirectories=%s\n\n%s" % (
+            name, base, colour, MARK, base, ",".join(r for r, _ in sorted(places)), "\n".join(sections)))
+    return name
+
+
+def icons(name, accent):
     if not name or not installed(name):
         name = next((t for t in ICON_THEMES if installed(t)), "")
     if not name:
         return
+    name = tinted_icons(name, accent)
     gtk3 = {"gtk-icon-theme-name": name, "gtk-application-prefer-dark-theme": "1"}
     # GTK 3 apps read the colours of gtk.css only through adw-gtk3
     if any(os.path.exists(os.path.join(d, "adw-gtk3-dark")) for d in ("/usr/share/themes", os.path.join(HOME, ".themes"),
@@ -281,7 +341,7 @@ def main():
     gtk(accent)
     kvantum(accent)
     material(accent)
-    icons(sys.argv[2] if len(sys.argv) > 2 else "")
+    icons(sys.argv[2] if len(sys.argv) > 2 else "", accent)
 
 
 if __name__ == "__main__":
