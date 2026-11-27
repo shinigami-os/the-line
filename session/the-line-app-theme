@@ -7,6 +7,8 @@
         apps with the adw-gtk3 theme). Prefers dark.
   Qt    ~/.config/Kvantum/TheLine: Kvantum's KvGnomeDark recoloured (greys onto The Line's greys by lightness, its
         blue onto the accent), and made the Kvantum theme in use.
+  Material ~/.local/state/sleex/user/generated/colors.json: the Material palette Voxel (and any app built on the Sleex
+        UI kit) reads, made from The Line's greys and the accent.
   Icons the icon theme (no name: the first installed of ICON_THEMES) for GTK (settings.ini, gsettings) and Qt
         (qt6ct.conf / qt5ct.conf, read once the session sets QT_QPA_PLATFORMTHEME=qt6ct, which it does when qt6ct
         is installed). Only their icon_theme, style and custom_palette keys are written; the rest stays yours.
@@ -14,6 +16,7 @@ A file that was there before The Line wrote it is kept once as <file>.before-the
 (theme), at each accent change. Shapes stay the base themes' own: only colours change.
 """
 import colorsys
+import json
 import os
 import re
 import shutil
@@ -172,6 +175,34 @@ def kvantum(accent):
           "# %s: The Line's colours for Qt apps (session/the-line-app-theme).\n[General]\ntheme=TheLine\n" % MARK)
 
 
+def material(accent):
+    """The Sleex UI kit's palette file (Material You role names), from The Line's tokens."""
+    light = mix(accent, TEXT, 0.6)
+    dim = mix(MUTED, SURFACE, 0.3)
+    roles = {
+        "background": SURFACE, "on_background": TEXT,
+        "surface": SURFACE, "surface_dim": BG, "surface_bright": BORDER, "surface_tint": accent,
+        "surface_container_lowest": BG, "surface_container_low": SURFACE, "surface_container": SURFACE2,
+        "surface_container_high": mix(SURFACE2, BORDER, 0.5), "surface_container_highest": BORDER,
+        "surface_variant": BORDER, "on_surface": TEXT, "on_surface_variant": MUTED,
+        "inverse_surface": TEXT, "inverse_on_surface": SURFACE, "inverse_primary": mix(accent, BG, 0.4),
+        "outline": BORDER_STRONG, "outline_variant": BORDER, "scrim": "#000000", "shadow": "#000000",
+        "primary": accent, "on_primary": ACCENT_TEXT, "primary_container": mix(SURFACE, accent, 0.3),
+        "on_primary_container": light, "primary_fixed": light, "primary_fixed_dim": accent,
+        "on_primary_fixed": ACCENT_TEXT, "on_primary_fixed_variant": mix(SURFACE, accent, 0.3),
+        "secondary": MUTED, "on_secondary": ACCENT_TEXT, "secondary_container": BORDER,
+        "on_secondary_container": TEXT, "secondary_fixed": TEXT, "secondary_fixed_dim": MUTED,
+        "on_secondary_fixed": ACCENT_TEXT, "on_secondary_fixed_variant": BORDER,
+        "tertiary": dim, "on_tertiary": ACCENT_TEXT, "tertiary_container": SURFACE2,
+        "on_tertiary_container": TEXT, "tertiary_fixed": TEXT, "tertiary_fixed_dim": dim,
+        "on_tertiary_fixed": ACCENT_TEXT, "on_tertiary_fixed_variant": SURFACE2,
+        "error": ERROR, "on_error": ACCENT_TEXT, "error_container": mix(SURFACE, ERROR, 0.3),
+        "on_error_container": mix(ERROR, TEXT, 0.6),
+    }
+    state = os.environ.get("XDG_STATE_HOME", os.path.join(HOME, ".local", "state"))
+    write(os.path.join(state, "sleex", "user", "generated", "colors.json"), json.dumps(roles, indent=2) + "\n")
+
+
 def icon_dirs():
     data = os.environ.get("XDG_DATA_DIRS", "/usr/local/share:/usr/share").split(":")
     return [os.path.join(HOME, ".icons"), os.path.join(HOME, ".local/share/icons")] + [os.path.join(d, "icons") for d in data]
@@ -249,6 +280,7 @@ def main():
     accent = "#" + accent.lstrip("#").lower()
     gtk(accent)
     kvantum(accent)
+    material(accent)
     icons(sys.argv[2] if len(sys.argv) > 2 else "")
 
 
