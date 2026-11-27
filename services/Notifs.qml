@@ -44,6 +44,8 @@ Singleton {
         const toastable = n.urgency > 0 && !muted && !hushed && UiState.openPanel !== "tc";
         _pending = toastable ? n : null;
         LineState.pulse(toastable && toast === null, n.urgency === 2 ? Theme.error : Theme.accent);
+        if (n.urgency === 2 && toastable)
+            LineState.flash(Theme.error, 2);
         if (toastable)
             showDelay.restart();
     }

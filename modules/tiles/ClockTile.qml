@@ -24,9 +24,11 @@ Tile {
     anchorSide: "center"
     // While the line shows a level (volume, brightness, keyboard backlight), the clock gives way to its name and
     // exact value, so you know which one the line is showing.
-    readonly property bool levelShown: LineState.gaugeKind !== "" && mode === "rest"
-    readonly property string levelName: ({ "vol": "Volume", "bri": "Brightness", "kbd": "Keyboard backlight" })[LineState.gaugeKind] ?? ""
-    readonly property string levelValue: LineState.gaugeKind === "vol" && Audio.muted ? "muted" : Math.round(LineState.gaugeValue * 100) + "%"
+    // An alert (LineState.alert) takes the same place: what is wrong, and its value, in the alert's colour.
+    readonly property bool alertShown: LineState.alertOn(screenName) && mode === "rest"
+    readonly property bool levelShown: (LineState.gaugeKind !== "" || alertShown) && mode === "rest"
+    readonly property string levelName: alertShown ? LineState.alertName : ({ "vol": "Volume", "bri": "Brightness", "kbd": "Keyboard backlight" })[LineState.gaugeKind] ?? ""
+    readonly property string levelValue: alertShown ? LineState.alertDetail : LineState.gaugeKind === "vol" && Audio.muted ? "muted" : Math.round(LineState.gaugeValue * 100) + "%"
 
     restW: levelShown ? Math.max(152, levelRow.implicitWidth + 40) : (ClockFace.binary ? 176 : 152)
     toastW: LineState.toastW
@@ -93,9 +95,10 @@ Tile {
             Text {
                 anchors.verticalCenter: parent.verticalCenter
                 text: tile.levelValue
+                visible: text !== ""
                 font.family: Theme.fontMono
                 font.pixelSize: 15
-                color: Theme.accent
+                color: tile.alertShown ? LineState.alertColor : Theme.accent
             }
         }
 

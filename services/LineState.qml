@@ -71,6 +71,32 @@ Singleton {
 
     property string flashScreen: ""
 
+    // An alert: the flash, and the middle tile says why for a few seconds, like it does for the brightness
+    // ("Disk nearly full  96 %"). No notification: it is the line that talks.
+    property string alertName: ""
+    property string alertDetail: ""
+    property color alertColor: Theme.error
+    property string alertScreen: ""
+
+    function alert(name, detail, color, times) {
+        alertName = name;
+        alertDetail = detail ?? "";
+        alertColor = color ?? Theme.error;
+        alertScreen = Hyprland.focusedMonitor?.name ?? "";
+        alertHold.restart();
+        flash(alertColor, times);
+    }
+
+    function alertOn(screen) {
+        return alertName !== "" && (!Config.pulseFocusedOnly || alertScreen === "" || alertScreen === screen);
+    }
+
+    Timer {
+        id: alertHold
+        interval: Anim.d(4500)
+        onTriggered: root.alertName = ""
+    }
+
     Timer {
         id: flashTimer
         onTriggered: {

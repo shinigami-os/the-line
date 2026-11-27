@@ -1,0 +1,7 @@
+#!/bin/sh
+# The whole line flashes and the middle tile says why, for scripts: the-line-alert [error|ok|accent] "Title" ["detail"] [times]
+#   make && the-line-alert ok "Build finished" || the-line-alert error "Build failed"
+kind=error
+case "$1" in error|ok|accent) kind=$1; shift ;; esac
+[ -n "$1" ] || { echo "usage: the-line-alert [error|ok|accent] title [detail] [times]" >&2; exit 2; }
+exec qs -p "${THE_LINE_DIR:-/usr/share/the-line}" ipc call line alert "$kind" "$1" "${2:-}" "${3:-2}"

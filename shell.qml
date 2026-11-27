@@ -38,6 +38,8 @@ ShellRoot {
         UiState.toggle(focusedScreen(), panel);
     }
 
+    Alerts {}
+
     // A battery about to die: a notification at 20 % and 15 %, an urgent one at 10 % and 5 %, and under 20 % the whole line
     // flashes coral (twice, three times from 10 %) for every percent lost. Plugging in starts over.
     property int batteryWarned: 100
@@ -53,7 +55,7 @@ ShellRoot {
         }
         const pct = Math.round(d.percentage * 100);
         if (pct < 20 && pct < batteryPct)
-            LineState.flash(Theme.error, pct <= 10 ? 3 : 2);
+            LineState.alert("Battery low", pct + " %", Theme.error, pct <= 10 ? 3 : 2);
         batteryPct = pct;
         const level = pct <= 5 ? 5 : pct <= 10 ? 10 : pct <= 15 ? 15 : pct <= 20 ? 20 : 100;
         if (level >= batteryWarned)
@@ -81,6 +83,9 @@ ShellRoot {
             if (!(UPower.displayDevice?.isLaptopBattery ?? false))
                 return;
             root.checkBattery();
+            const left = Math.round((UPower.displayDevice?.percentage ?? 1) * 100);
+            if (UPower.onBattery && left < 30)
+                LineState.alert("On battery", left + " %", Theme.error, 2);
             const lines = UPower.onBattery ? root.unpluggedLines : root.pluggedLines;
             Voice.say(lines[Math.floor(Math.random() * lines.length)], root.focusedScreen());
         }
@@ -276,6 +281,12 @@ ShellRoot {
 
         function keycast(on: bool): void {
             Demo.keycast = on;
+        }
+
+        // A flash with its reason on the middle tile. kind: "error" (coral), "ok" (green) or "accent".
+        // `the-line-alert` calls this for scripts.
+        function alert(kind: string, name: string, detail: string, times: int): void {
+            LineState.alert(name, detail, kind === "ok" ? Theme.ok : kind === "accent" ? Theme.accent : Theme.error, times);
         }
 
         // The whole line lit for a moment: kind is "error", "ok" or "accent", times how often it blinks.
