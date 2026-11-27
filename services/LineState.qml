@@ -54,6 +54,40 @@ Singleton {
         hold.restart();
     }
 
+    // The flash: the whole line lit in one colour, a few times (a battery about to die, a script that wants attention).
+    // Cut on and off, not faded: a fade is an animation and any animation redraws every window.
+    property bool flashOn: false
+    property color flashColor: Theme.error
+    property int flashLeft: 0
+
+    function flash(color, times) {
+        flashColor = color ?? Theme.error;
+        flashLeft = Math.max(1, times ?? 2);
+        flashScreen = Hyprland.focusedMonitor?.name ?? "";
+        flashOn = true;
+        flashTimer.interval = Anim.d(200);
+        flashTimer.restart();
+    }
+
+    property string flashScreen: ""
+
+    Timer {
+        id: flashTimer
+        onTriggered: {
+            if (root.flashOn) {
+                root.flashOn = false;
+                root.flashLeft--;
+                if (root.flashLeft <= 0)
+                    return;
+                interval = Anim.d(150);
+            } else {
+                root.flashOn = true;
+                interval = Anim.d(200);
+            }
+            restart();
+        }
+    }
+
     // The pulse's colour: the accent, or coral for something urgent (a battery about to die).
     property color pulseColor: Theme.accent
 

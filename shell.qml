@@ -38,8 +38,8 @@ ShellRoot {
         UiState.toggle(focusedScreen(), panel);
     }
 
-    // A battery about to die: a notification at 20 % and 15 %, an urgent one at 10 % and 5 %, and under 20 % a coral
-    // pulse along the line for every percent lost. Plugging in starts over.
+    // A battery about to die: a notification at 20 % and 15 %, an urgent one at 10 % and 5 %, and under 20 % the whole line
+    // flashes coral (twice, three times from 10 %) for every percent lost. Plugging in starts over.
     property int batteryWarned: 100
     property int batteryPct: 100
     function checkBattery() {
@@ -53,7 +53,7 @@ ShellRoot {
         }
         const pct = Math.round(d.percentage * 100);
         if (pct < 20 && pct < batteryPct)
-            LineState.pulse(false, Theme.error);
+            LineState.flash(Theme.error, pct <= 10 ? 3 : 2);
         batteryPct = pct;
         const level = pct <= 5 ? 5 : pct <= 10 ? 10 : pct <= 15 ? 15 : pct <= 20 ? 20 : 100;
         if (level >= batteryWarned)
@@ -276,6 +276,11 @@ ShellRoot {
 
         function keycast(on: bool): void {
             Demo.keycast = on;
+        }
+
+        // The whole line lit for a moment: kind is "error", "ok" or "accent", times how often it blinks.
+        function flash(kind: string, times: int): void {
+            LineState.flash(kind === "ok" ? Theme.ok : kind === "accent" ? Theme.accent : Theme.error, times);
         }
 
         function gauge(kind: string, value: real): void {

@@ -34,6 +34,25 @@ Item {
         color: Theme.borderStrong
     }
 
+    // Flash: the whole line lit (LineState.flash), with a faint glow under it.
+    Rectangle {
+        visible: LineState.flashOn && (!Config.pulseFocusedOnly || LineState.flashScreen === "" || LineState.flashScreen === line.screenName)
+        x: 0
+        y: 7
+        width: line.lineWidth
+        height: 7
+        color: LineState.flashColor
+        opacity: 0.22
+    }
+    Rectangle {
+        visible: LineState.flashOn && (!Config.pulseFocusedOnly || LineState.flashScreen === "" || LineState.flashScreen === line.screenName)
+        x: 0
+        y: 9
+        width: line.lineWidth
+        height: 3
+        color: LineState.flashColor
+    }
+
     // Music visualiser: the frequencies as ticks hanging from the line, like a ruler that plays. One tick every 6 px
     // whatever the screen's width (a wide screen gets more of them, not wider gaps), each one reading cava's bands
     // in between. Mirrored from the middle: the lowest ones there, the highest at both edges. Louder is longer and
