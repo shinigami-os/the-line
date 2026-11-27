@@ -88,7 +88,14 @@ PanelWindow {
                 source: "file://" + win.path
                 loops: MediaPlayer.Infinite
                 videoOutput: out
-                onMediaStatusChanged: if (mediaStatus === MediaPlayer.LoadedMedia && !win.paused) play()
+                onMediaStatusChanged: {
+                    if (mediaStatus !== MediaPlayer.LoadedMedia)
+                        return;
+                    if (win.paused)
+                        pause();    // a paused player still shows its first frame; a stopped one shows nothing
+                    else
+                        play();
+                }
                 onErrorOccurred: (error, message) => console.warn("wallpaper:", message)
             }
 
